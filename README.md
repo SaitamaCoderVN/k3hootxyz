@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# K3HOOT - Nền tảng Quiz Web3 trên Solana
 
-## Getting Started
+K3HOOT là nền tảng quiz Web3 đầu tiên được xây dựng trên blockchain Solana, cho phép người dùng tạo và tham gia các quiz với phần thưởng token.
 
-First, run the development server:
+## Tính năng
 
+- 🎮 Tạo và tham gia quiz realtime
+- 🏆 Nhận token khi chiến thắng
+- 👥 Chế độ multiplayer với bảng xếp hạng
+- 🎨 Giao diện đẹp mắt với hiệu ứng
+- 🔒 Tích hợp với ví Solana
+- ⚡ Realtime updates với Supabase
+
+## Công nghệ sử dụng
+
+- Next.js 14 (App Router)
+- TypeScript
+- TailwindCSS
+- Framer Motion
+- Supabase
+- Solana Web3.js
+
+## Cài đặt
+
+1. Clone repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/k3hoot.git
+cd k3hoot
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Cài đặt dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Tạo file môi trường:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Cập nhật các biến môi trường trong `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-## Learn More
+5. Khởi tạo database schema:
+```bash
+npx supabase init
+npx supabase migration up
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. Chạy development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Mở [http://localhost:3000](http://localhost:3000) để xem kết quả.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Cấu trúc thư mục
 
-## Deploy on Vercel
+```
+k3hoot/
+├── src/
+│   ├── app/              # Next.js app router
+│   │   ├── components/       # React components
+│   │   │   ├── animations/   # Animation components
+│   │   │   ├── audio/       # Audio components
+│   │   │   ├── interactive/ # Interactive components
+│   │   │   ├── layout/      # Layout components
+│   │   │   ├── quiz/        # Quiz components
+│   │   │   └── ui/          # UI components
+│   │   ├── contexts/        # React contexts
+│   │   ├── lib/            # Utility functions
+│   │   └── types/          # TypeScript types
+│   ├── public/             # Static files
+│   └── supabase/          # Supabase configurations
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API Routes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `POST /api/quiz` - Tạo quiz mới
+- `GET /api/quiz` - Lấy danh sách quiz
+- `GET /api/quiz?id={id}` - Lấy thông tin quiz
+- `POST /api/game` - Tạo phòng chơi mới
+- `PUT /api/game` - Cập nhật trạng thái phòng
+- `GET /api/game?session_id={id}` - Lấy thông tin phòng
+- `POST /api/answer` - Gửi câu trả lời
+
+## Contributing
+
+1. Fork repository
+2. Tạo branch mới (`git checkout -b feature/amazing-feature`)
+3. Commit thay đổi (`git commit -m 'Add some amazing feature'`)
+4. Push lên branch (`git push origin feature/amazing-feature`)
+5. Tạo Pull Request
+
+## License
+
+MIT License - xem [LICENSE](LICENSE) để biết thêm chi tiết.

@@ -1,26 +1,127 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #e879f9;
+  --primary-dark: #d946ef;
+  --pixel-border: 4px;
+  --pixel-shadow: 0 6px 0 #4c1d95;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Base text colors */
+@layer base {
+  html {
+    @apply text-white;
+  }
+  
+  body {
+    @apply bg-black text-white;
+    font-family: var(--font-pixelify);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white;
+  }
+
+  p {
+    @apply text-gray-100;
+  }
+
+  a {
+    @apply text-purple-300 hover:text-purple-200;
+  }
+
+  button {
+    @apply text-white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.pixel-corners {
+  clip-path: polygon(
+    0 var(--pixel-border),
+    var(--pixel-border) 0,
+    calc(100% - var(--pixel-border)) 0,
+    100% var(--pixel-border),
+    100% calc(100% - var(--pixel-border)),
+    calc(100% - var(--pixel-border)) 100%,
+    var(--pixel-border) 100%,
+    0 calc(100% - var(--pixel-border))
+  );
+}
+
+.pixel-button {
+  @apply relative px-6 py-3 font-medium transition-all duration-200 text-white;
+  font-family: var(--font-press-start);
+  text-shadow: 2px 2px #000;
+  box-shadow: var(--pixel-shadow);
+  transform: translateY(0);
+}
+
+.pixel-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #4c1d95;
+}
+
+.pixel-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #4c1d95;
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text;
+    font-family: var(--font-press-start);
+  }
+}
+
+.pixel-border {
+  border: 4px solid var(--primary);
+  image-rendering: pixelated;
+}
+
+/* Optimize performance for large number of animations */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  
+  .transform-gpu {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Custom text colors */
+.text-white {
+  color: #fff !important;
+}
+
+.text-gray-100 {
+  color: #f3f4f6 !important;
+}
+
+.text-purple-300 {
+  color: #d8b4fe !important;
+}
+
+.text-purple-400 {
+  color: #c084fc !important;
+}
+
+/* Form elements */
+input, textarea, select {
+  @apply text-white bg-purple-900/30 border border-purple-500/20;
+}
+
+input::placeholder, textarea::placeholder {
+  @apply text-purple-300/50;
+}
+
+/* Dark mode overrides */
+.dark {
+  @apply text-white;
 }
