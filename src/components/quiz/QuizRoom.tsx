@@ -40,7 +40,7 @@ export default function QuizRoom() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <h2 className="text-3xl font-bold mb-4">Đang kết nối...</h2>
+          <h2 className="text-3xl font-bold mb-4">Connecting...</h2>
           <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" />
         </motion.div>
       </div>
@@ -57,7 +57,7 @@ export default function QuizRoom() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h2 className="text-3xl font-bold mb-8">
-              Phòng chờ
+              Waiting Room
             </h2>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
@@ -84,14 +84,14 @@ export default function QuizRoom() {
                 }}
                 disabled={players.length < 2}
               >
-                Bắt đầu trò chơi
+                Start Game
               </GlowingButton>
             )}
 
             <p className="mt-4 text-purple-300">
               {isHost
-                ? 'Đợi thêm người chơi tham gia...'
-                : 'Đợi host bắt đầu trò chơi...'}
+                ? 'Waiting for more players to join...'
+                : 'Waiting for the host to start the game...'}
             </p>
           </motion.div>
         </div>
@@ -112,7 +112,7 @@ export default function QuizRoom() {
             animate={{ opacity: 1, scale: 1 }}
           >
             <h2 className="text-3xl font-bold text-center mb-12">
-              Kết quả trò chơi
+              Game Results
             </h2>
 
             <div className="relative mb-16">
@@ -143,13 +143,13 @@ export default function QuizRoom() {
                         <div>
                           <p className="font-medium">{player.player_id}</p>
                           <p className="text-sm text-purple-300">
-                            {player.correct_answers} câu đúng
+                            {player.correct_answers} correct answers
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold">{player.score}</p>
-                        <p className="text-sm text-purple-300">điểm</p>
+                        <p className="text-sm text-purple-300">points</p>
                       </div>
                     </div>
                   </motion.div>
@@ -162,7 +162,7 @@ export default function QuizRoom() {
                 variant="primary"
                 onClick={() => window.location.href = '/'}
               >
-                Trở về trang chủ
+                Return to Home
               </GlowingButton>
             </div>
           </motion.div>
@@ -180,7 +180,7 @@ export default function QuizRoom() {
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <h3 className="text-lg font-semibold mb-4">Người chơi</h3>
+          <h3 className="text-lg font-semibold mb-4">Players</h3>
           <div className="space-y-2">
             {players.map((player) => (
               <motion.div
@@ -222,14 +222,14 @@ export default function QuizRoom() {
               exit={{ opacity: 0 }}
             >
               <h2 className="text-2xl font-bold mb-4">
-                Đang chuẩn bị câu hỏi tiếp theo...
+                Preparing the next question...
               </h2>
               {isHost && (
                 <GlowingButton 
                   variant="primary"
                   onClick={handleNextQuestion}
                 >
-                  Câu hỏi tiếp theo
+                  Next Question
                 </GlowingButton>
               )}
             </motion.div>

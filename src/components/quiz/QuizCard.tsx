@@ -72,7 +72,7 @@ export default function QuizCard({
         <div className="flex justify-between items-center mb-2">
           <span className="text-2xl font-bold">{timeLeft}s</span>
           <span className="text-purple-300">
-            {answeredCount}/{totalPlayers} đã trả lời
+            {answeredCount}/{totalPlayers} answered
           </span>
         </div>
         <motion.div
@@ -152,12 +152,12 @@ export default function QuizCard({
             exit={{ opacity: 0, y: -20 }}
           >
             <h4 className="text-xl font-bold mb-2">
-              {selectedAnswer === correctAnswer ? '🎉 Chính xác!' : '❌ Rất tiếc!'}
+              {selectedAnswer === correctAnswer ? '🎉 Correct!' : '❌ Sorry!'}
             </h4>
             <p className="text-purple-300">
               {selectedAnswer === correctAnswer
-                ? 'Bạn đã trả lời đúng câu hỏi này.'
-                : `Đáp án đúng là ${String.fromCharCode(65 + correctAnswer)}`}
+                ? 'You answered this question correctly.'
+                : `The correct answer is ${String.fromCharCode(65 + correctAnswer)}`}
             </p>
           </motion.div>
         )}
