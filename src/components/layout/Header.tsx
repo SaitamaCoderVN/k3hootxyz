@@ -63,12 +63,6 @@ export default function Header() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
             {menuItems.map((item, index) => (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
                 <Link
                   href={item.href}
                   className="relative group px-4 py-2 rounded-lg transition-all"
@@ -82,7 +76,6 @@ export default function Header() {
                     whileHover={{ scale: 1.05 }}
                   />
                 </Link>
-              </motion.div>
             ))}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}

@@ -42,11 +42,17 @@ export default function JoinPage() {
     setIsValidating(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // TODO: Add actual API validation
-      if (pinCode === '123456') {
+      const response = await fetch('/api/game/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pin: pinCode }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.valid) {
         showToast({
           type: 'success',
           title: 'Joining game!',
@@ -55,11 +61,11 @@ export default function JoinPage() {
         
         router.push(`/game/${pinCode}`);
       } else {
-        setPinError('Invalid game PIN. Please check and try again.');
+        setPinError(data.message || 'Invalid game PIN. Please check and try again.');
         showToast({
           type: 'error',
           title: 'Invalid PIN',
-          message: 'This game room doesn\'t exist.'
+          message: data.message || 'This game room doesn\'t exist.'
         });
       }
     } catch (error) {

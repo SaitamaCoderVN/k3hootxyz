@@ -13,19 +13,19 @@ const socialLinks = [
   },
   {
     icon: <FaDiscord className="w-6 h-6" />,
-    href: 'https://discord.gg/k3hoot',
+    href: 'https://discord.gg/k3hootxyz',
     label: 'Discord',
     color: 'hover:text-indigo-400'
   },
   {
     icon: <FaTelegram className="w-6 h-6" />,
-    href: 'https://t.me/k3hoot',
+    href: 'https://t.me/k3hootxyz',
     label: 'Telegram',
     color: 'hover:text-sky-400'
   },
   {
     icon: <FaGithub className="w-6 h-6" />,
-    href: 'https://github.com/k3hoot',
+    href: 'https://github.com/k3hootxyz',
     label: 'GitHub',
     color: 'hover:text-gray-400'
   }
@@ -44,7 +44,7 @@ const footerLinks = [
   {
     title: 'Community',
     links: [
-      { label: 'Discord', href: 'https://discord.gg/k3hoot' },
+      { label: 'Discord', href: 'https://discord.gg/k3hootxyz' },
       { label: 'Twitter', href: 'https://twitter.com/k3hootxyz' },
       { label: 'Blog', href: '/blog' },
       { label: 'Forum', href: '/forum' }

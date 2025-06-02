@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import QuizCard from './QuizCard';
 import { useGame } from '@/contexts/GameContext';
@@ -21,15 +21,20 @@ export default function QuizRoom() {
     endGame,
   } = useGame();
   const { playClickSound } = useGameSounds();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAnswer = (answer: number) => {
+  const handleAnswer = async (answer: number) => {
     playClickSound();
-    submitAnswer(answer);
+    setIsLoading(true);
+    await submitAnswer(answer);
+    setIsLoading(false);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     playClickSound();
-    nextQuestion();
+    setIsLoading(true);
+    await nextQuestion();
+    setIsLoading(false);
   };
 
   if (!session) {
@@ -201,7 +206,17 @@ export default function QuizRoom() {
 
         {/* Quiz Content */}
         <AnimatePresence mode="wait">
-          {currentQuestion ? (
+          {isLoading ? (
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-purple-300">Loading...</p>
+            </motion.div>
+          ) : currentQuestion ? (
             <QuizCard
               key={currentQuestion.id}
               question={currentQuestion.content}
