@@ -62,16 +62,16 @@ export default function QuizCard({
 
   return (
     <motion.div
-      className="w-full max-w-4xl mx-auto"
+      className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
       {/* Timer and Progress */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-2xl font-bold">{timeLeft}s</span>
-          <span className="text-purple-300">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-2 space-y-2 sm:space-y-0">
+          <span className="text-xl sm:text-2xl font-bold">{timeLeft}s</span>
+          <span className="text-purple-300 text-sm sm:text-base">
             {answeredCount}/{totalPlayers} answered
           </span>
         </div>
@@ -87,21 +87,21 @@ export default function QuizCard({
 
       {/* Question */}
       <motion.div
-        className="bg-purple-900/20 backdrop-blur-lg rounded-xl p-8 mb-8"
+        className="bg-purple-900/20 backdrop-blur-lg rounded-xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8"
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <h3 className="text-2xl font-bold text-center mb-2">{question}</h3>
+        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-center mb-2 leading-tight">{question}</h3>
       </motion.div>
 
       {/* Answers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4">
         <AnimatePresence mode="wait">
           {answers.map((answer, index) => (
             <motion.button
               key={index}
-              className={`p-6 text-left rounded-xl border-2 border-purple-500/20 
+              className={`p-4 sm:p-6 text-left rounded-xl border-2 border-purple-500/20 
                 hover:border-purple-400 transition-all duration-300 
                 ${getAnswerStyle(index)}
                 ${isAnswered ? 'cursor-default' : 'cursor-pointer'}
@@ -115,7 +115,7 @@ export default function QuizCard({
                 }
               }}
               onMouseEnter={playHoverSound}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 + index * 0.1 }}
               whileHover={!isAnswered ? {
@@ -123,11 +123,11 @@ export default function QuizCard({
                 boxShadow: "0 0 20px rgba(147, 51, 234, 0.3)"
               } : {}}
             >
-              <div className="flex items-center space-x-4">
-                <span className="w-10 h-10 flex items-center justify-center rounded-full bg-purple-500/20 text-lg font-bold">
+              <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
+                <span className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-purple-500/20 text-base sm:text-lg font-bold flex-shrink-0">
                   {String.fromCharCode(65 + index)}
                 </span>
-                <span className="text-lg">{answer}</span>
+                <span className="text-base sm:text-lg leading-relaxed">{answer}</span>
               </div>
 
               {/* Hover Effect */}
@@ -146,15 +146,15 @@ export default function QuizCard({
       <AnimatePresence>
         {showAnswer && (
           <motion.div
-            className="mt-8 p-6 rounded-xl bg-purple-500/10 text-center"
+            className="mt-6 sm:mt-8 p-4 sm:p-6 rounded-xl bg-purple-500/10 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <h4 className="text-xl font-bold mb-2">
+            <h4 className="text-lg sm:text-xl font-bold mb-2">
               {selectedAnswer === correctAnswer ? '🎉 Correct!' : '❌ Sorry!'}
             </h4>
-            <p className="text-purple-300">
+            <p className="text-purple-300 text-sm sm:text-base">
               {selectedAnswer === correctAnswer
                 ? 'You answered this question correctly.'
                 : `The correct answer is ${String.fromCharCode(65 + correctAnswer)}`}

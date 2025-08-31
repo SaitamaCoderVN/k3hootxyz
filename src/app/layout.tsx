@@ -2,31 +2,25 @@ import './globals.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import { WalletContextProvider } from '@/contexts/WalletContextProvider';
 import { GameProvider } from '@/contexts/GameContext';
-import { Press_Start_2P, Pixelify_Sans } from 'next/font/google';
+import { VT323, Orbitron } from 'next/font/google';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { PageLoader } from '@/components/ui/LoadingStates';
 
-const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
-  ssr: false,
-});
-
-const pixelifySans = Pixelify_Sans({
+const vt323 = VT323({
   subsets: ['latin'],
   weight: '400',
   display: 'swap',
-  variable: '--font-pixelify',
-  adjustFontFallback: false,
+  variable: '--font-pixel',
 });
 
-const pressStart2P = Press_Start_2P({
+const orbitron = Orbitron({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
-  variable: '--font-press-start',
+  variable: '--font-heading',
 });
 
 export const metadata: Metadata = {
@@ -53,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${pixelifySans.variable} ${pressStart2P.variable}`}>
+    <html lang="en" className={`${vt323.variable} ${orbitron.variable}`}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -67,7 +61,6 @@ export default function RootLayout({
             <WalletContextProvider>
               <GameProvider>
                 <Suspense fallback={<PageLoader message="Loading K3HOOT..." />}>
-                  <PixelEffect />
                   {children}
                 </Suspense>
               </GameProvider>

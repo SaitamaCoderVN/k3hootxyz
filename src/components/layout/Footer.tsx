@@ -6,25 +6,25 @@ import { FaTwitter, FaDiscord, FaGithub, FaTelegram } from 'react-icons/fa';
 
 const socialLinks = [
   {
-    icon: <FaTwitter className="w-6 h-6" />,
+    icon: <FaTwitter className="w-5 h-5 sm:w-6 sm:h-6" />,
     href: 'https://twitter.com/k3hootxyz',
     label: 'Twitter',
     color: 'hover:text-blue-400'
   },
   {
-    icon: <FaDiscord className="w-6 h-6" />,
+    icon: <FaDiscord className="w-5 h-5 sm:w-6 sm:h-6" />,
     href: 'https://discord.gg/k3hootxyz',
     label: 'Discord',
     color: 'hover:text-indigo-400'
   },
   {
-    icon: <FaTelegram className="w-6 h-6" />,
+    icon: <FaTelegram className="w-5 h-5 sm:w-6 sm:h-6" />,
     href: 'https://t.me/k3hootxyz',
     label: 'Telegram',
     color: 'hover:text-sky-400'
   },
   {
-    icon: <FaGithub className="w-6 h-6" />,
+    icon: <FaGithub className="w-5 h-5 sm:w-6 sm:h-6" />,
     href: 'https://github.com/k3hootxyz',
     label: 'GitHub',
     color: 'hover:text-gray-400'
@@ -73,20 +73,20 @@ const footerLinks = [
 export default function Footer() {
   return (
     <footer className="relative z-10 border-t border-purple-500/20 bg-black/50 backdrop-blur-lg">
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12">
           {/* Brand */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
             >
-              <h3 className="text-3xl font-bold gradient-text">K3HOOT.XYZ</h3>
-              <p className="text-purple-300 leading-relaxed">
+              <h3 className="text-2xl sm:text-3xl font-bold gradient-text">K3HOOT.XYZ</h3>
+              <p className="text-purple-300 leading-relaxed text-sm sm:text-base">
                 The ultimate Web3 quiz platform on Solana. Play, Learn, and Earn in the most exciting way possible.
               </p>
-              <div className="flex space-x-4">
+              <div className="flex space-x-3 sm:space-x-4">
                 {socialLinks.map((link) => (
                   <motion.a
                     key={link.label}
@@ -113,13 +113,13 @@ export default function Footer() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <h3 className="font-semibold text-white mb-6 text-lg">{section.title}</h3>
-              <ul className="space-y-3">
+              <h3 className="font-semibold text-white mb-4 sm:mb-6 text-base sm:text-lg">{section.title}</h3>
+              <ul className="space-y-2 sm:space-y-3">
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-purple-300 hover:text-white transition-colors inline-flex items-center gap-2 group"
+                      className="text-purple-300 hover:text-white transition-colors inline-flex items-center gap-2 group text-sm sm:text-base"
                     >
                       <span className="w-1 h-1 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                       {link.label}
@@ -133,33 +133,33 @@ export default function Footer() {
 
         {/* Bottom */}
         <motion.div 
-          className="mt-16 pt-8 border-t border-purple-500/20"
+          className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-purple-500/20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-purple-300 text-sm text-center md:text-left">
+            <p className="text-purple-300 text-xs sm:text-sm text-center md:text-left">
               © 2024 K3HOOT.XYZ. All rights reserved. Built with ❤️ on Solana.
             </p>
-            <div className="flex items-center space-x-6">
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <Link
                 href="/privacy"
-                className="text-purple-300 hover:text-white text-sm transition-colors"
+                className="text-purple-300 hover:text-white text-xs sm:text-sm transition-colors"
               >
                 Privacy Policy
               </Link>
-              <span className="text-purple-500">•</span>
+              <span className="hidden sm:inline text-purple-500">•</span>
               <Link
                 href="/terms"
-                className="text-purple-300 hover:text-white text-sm transition-colors"
+                className="text-purple-300 hover:text-white text-xs sm:text-sm transition-colors"
               >
                 Terms of Service
               </Link>
-              <span className="text-purple-500">•</span>
+              <span className="hidden sm:inline text-purple-500">•</span>
               <Link
                 href="/sitemap"
-                className="text-purple-300 hover:text-white text-sm transition-colors"
+                className="text-purple-300 hover:text-white text-xs sm:text-sm transition-colors"
               >
                 Sitemap
               </Link>
@@ -170,8 +170,8 @@ export default function Footer() {
 
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-pink-500/10 rounded-full blur-3xl" />
       </div>
     </footer>
   );

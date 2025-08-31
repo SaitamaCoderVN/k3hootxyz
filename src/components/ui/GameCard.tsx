@@ -54,7 +54,7 @@ export default function GameCard({ icon, title, description, onClick }: GameCard
 
   return (
     <motion.div
-      className="relative perspective-1000"
+      className="relative perspective-1000 w-full max-w-sm mx-auto"
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -67,7 +67,7 @@ export default function GameCard({ icon, title, description, onClick }: GameCard
       transition={{ duration: 0.2 }}
     >
       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-50 group-hover:opacity-100 transition duration-300" />
-      <div className="relative flex flex-col items-center p-6 bg-black rounded-lg cursor-pointer">
+      <div className="relative flex flex-col items-center p-4 sm:p-6 bg-black rounded-lg cursor-pointer h-full">
         {/* Glowing effect */}
         <div className={`absolute inset-0 rounded-lg transition-opacity duration-300 ${
           isHovered ? 'opacity-100' : 'opacity-0'
@@ -76,12 +76,16 @@ export default function GameCard({ icon, title, description, onClick }: GameCard
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="mb-4 rounded-full bg-purple-500/10 p-3 ring-1 ring-purple-500/20">
-            {icon}
+        <div className="relative z-10 flex flex-col items-center text-center h-full justify-between">
+          <div className="mb-3 sm:mb-4 rounded-full bg-purple-500/10 p-2 sm:p-3 ring-1 ring-purple-500/20">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+              {icon}
+            </div>
           </div>
-          <h3 className="text-lg font-semibold mb-2 text-center">{title}</h3>
-          <p className="text-sm text-purple-300 text-center">{description}</p>
+          <div className="flex-1 flex flex-col justify-center">
+            <h3 className="text-base sm:text-lg font-semibold mb-2 text-center text-white leading-tight">{title}</h3>
+            <p className="text-xs sm:text-sm text-purple-300 text-center leading-relaxed">{description}</p>
+          </div>
         </div>
       </div>
     </motion.div>

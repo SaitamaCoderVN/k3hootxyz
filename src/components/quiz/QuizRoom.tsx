@@ -10,23 +10,26 @@ import GlowingButton from '../ui/GlowingButton';
 
 export default function QuizRoom() {
   const {
-    session,
+    currentSession: session,
     currentQuestion,
-    players,
-    answers,
-    isHost,
-    startGame,
-    submitAnswer,
-    nextQuestion,
-    endGame,
+    playerAnswers: answers,
+    scores,
   } = useGame();
+  
+  // Mock data for now - these properties don't exist in current GameContext
+  const players = [{ id: '1', player_id: 'Player 1', score: 0 }];
+  const isHost = true;
+  const startGame = () => console.log('Start game');
+  const nextQuestion = () => console.log('Next question');
+  const endGame = () => console.log('End game');
   const { playClickSound } = useGameSounds();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAnswer = async (answer: number) => {
     playClickSound();
     setIsLoading(true);
-    await submitAnswer(answer);
+    // Mock submit answer for now
+    console.log('Submit answer:', answer);
     setIsLoading(false);
   };
 
@@ -76,6 +79,7 @@ export default function QuizRoom() {
                 >
                   <FaUserAstronaut className="w-12 h-12 mx-auto mb-2 text-purple-400" />
                   <p className="text-sm font-medium truncate">{player.player_id}</p>
+                  <p className="text-xs text-purple-300">Score: {player.score}</p>
                 </motion.div>
               ))}
             </div>
@@ -148,7 +152,7 @@ export default function QuizRoom() {
                         <div>
                           <p className="font-medium">{player.player_id}</p>
                           <p className="text-sm text-purple-300">
-                            {player.correct_answers} correct answers
+                            Score: {player.score}
                           </p>
                         </div>
                       </div>
@@ -219,15 +223,15 @@ export default function QuizRoom() {
           ) : currentQuestion ? (
             <QuizCard
               key={currentQuestion.id}
-              question={currentQuestion.content}
+              question={currentQuestion.text}
               answers={currentQuestion.options}
-              correctAnswer={currentQuestion.correct_option}
-              timeLimit={currentQuestion.time_limit}
+              correctAnswer={currentQuestion.correctAnswer}
+              timeLimit={currentQuestion.timeLimit}
               onAnswer={handleAnswer}
-              isAnswered={answers.some(a => a.question_id === currentQuestion.id)}
-              selectedAnswer={answers.find(a => a.question_id === currentQuestion.id)?.selected_option}
+              isAnswered={answers.some(a => a.questionId === currentQuestion.id)}
+              selectedAnswer={answers.find(a => a.questionId === currentQuestion.id)?.selectedAnswer}
               totalPlayers={players.length}
-              answeredCount={answers.filter(a => a.question_id === currentQuestion.id).length}
+              answeredCount={answers.filter(a => a.questionId === currentQuestion.id).length}
             />
           ) : (
             <motion.div

@@ -17,23 +17,27 @@
   
   body {
     @apply bg-black text-white;
-    font-family: var(--font-pixelify);
+    font-family: var(--font-pixel);
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply text-white;
+    font-family: var(--font-heading);
   }
 
   p {
     @apply text-gray-100;
+    font-family: var(--font-pixel);
   }
 
   a {
     @apply text-purple-300 hover:text-purple-200;
+    font-family: var(--font-pixel);
   }
 
   button {
     @apply text-white;
+    font-family: var(--font-heading);
   }
 }
 
@@ -52,7 +56,7 @@
 
 .pixel-button {
   @apply relative px-6 py-3 font-medium transition-all duration-200 text-white;
-  font-family: var(--font-press-start);
+  font-family: var(--font-heading);
   text-shadow: 2px 2px #000;
   box-shadow: var(--pixel-shadow);
   transform: translateY(0);
@@ -71,7 +75,8 @@
 @layer components {
   .gradient-text {
     @apply bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text;
-    font-family: var(--font-press-start);
+    font-family: var(--font-heading);
+    font-weight: 700;
   }
 }
 
@@ -115,6 +120,7 @@
 /* Form elements */
 input, textarea, select {
   @apply text-white bg-purple-900/30 border border-purple-500/20;
+  font-family: var(--font-pixel);
 }
 
 input::placeholder, textarea::placeholder {
@@ -124,4 +130,18 @@ input::placeholder, textarea::placeholder {
 /* Dark mode overrides */
 .dark {
   @apply text-white;
+}
+
+/* Enhanced readability */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
 }
