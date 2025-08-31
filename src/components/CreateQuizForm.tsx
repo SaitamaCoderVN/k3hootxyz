@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useK3HootClient, QuestionData } from '../lib/solana-client';
 import { TopicWithStats } from '@/lib/solana-client';
 import { useTopics } from '@/hooks/useTopics';
+import { FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
 
 interface Question {
   question: string;
@@ -15,9 +16,10 @@ interface Question {
 
 interface CreateQuizFormProps {
   availableTopics: TopicWithStats[];
+  userOwnedTopics: TopicWithStats[];
 }
 
-export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps) {
+export default function CreateQuizForm({ availableTopics, userOwnedTopics }: CreateQuizFormProps) {
   const { connected } = useWallet();
   const router = useRouter();
   const client = useK3HootClient();
@@ -28,18 +30,20 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
   const [description, setDescription] = useState('');
   const [reward, setReward] = useState('0.1');
   const [questions, setQuestions] = useState<Question[]>([
+    { question: '', choices: ['', '', '', ''], correctAnswer: '' },
+    { question: '', choices: ['', '', '', ''], correctAnswer: '' },
     { question: '', choices: ['', '', '', ''], correctAnswer: '' }
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Auto-select first topic if available
+  // Auto-select first user-owned topic if available
   useEffect(() => {
-    if (availableTopics.length > 0 && !selectedTopic) {
-      setSelectedTopic(availableTopics[0].name);
+    if (userOwnedTopics.length > 0 && !selectedTopic) {
+      setSelectedTopic(userOwnedTopics[0].name);
     }
-  }, [availableTopics, selectedTopic]);
+  }, [userOwnedTopics, selectedTopic]);
 
   const addQuestion = () => {
     if (questions.length < 10) {
@@ -48,7 +52,7 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
   };
 
   const removeQuestion = (index: number) => {
-    if (questions.length > 1) {
+    if (questions.length > 3) {
       const newQuestions = questions.filter((_, i) => i !== index);
       setQuestions(newQuestions);
     }
@@ -75,12 +79,27 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
       setError('Please select a topic');
       return false;
     }
+    
+    // Ensure selected topic is owned by user
+    if (!userOwnedTopics.find(topic => topic.name === selectedTopic)) {
+      setError('Please select a valid topic that you own');
+      return false;
+    }
+    
     if (!title.trim()) {
       setError('Please enter a quiz title');
       return false;
     }
+    
+    // Check minimum reward amount
     if (parseFloat(reward) < 0.01) {
       setError('Reward must be at least 0.01 SOL');
+      return false;
+    }
+    
+    // Check minimum question count
+    if (questions.length < 3) {
+      setError('Quiz must have at least 3 questions');
       return false;
     }
 
@@ -103,6 +122,7 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
         return false;
       }
     }
+
     return true;
   };
 
@@ -132,6 +152,7 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
       console.log(`📊 Total questions: ${questions.length}`);
       console.log(`💰 Reward: ${reward} SOL`);
       console.log(`📝 Topic: ${selectedTopic}`);
+      console.log(`✨ Single transaction - only one signature required!`);
 
       // Transform questions to match QuestionData interface
       const questionData: QuestionData[] = questions.map(q => ({
@@ -194,6 +215,24 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
     }
   };
 
+  // If no user-owned topics available, show message
+  if (userOwnedTopics.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="bg-yellow-900/20 border border-yellow-500/20 rounded-lg p-8">
+          <FaExclamationTriangle className="text-4xl text-yellow-400 mx-auto mb-4" />
+          <h3 className="text-xl font-bold mb-2 text-yellow-300">No Topics Available</h3>
+          <p className="text-yellow-200 mb-4">
+            You don't have any topics yet. Please create a topic first before creating a quiz.
+          </p>
+          <p className="text-sm text-yellow-300/80">
+            Topics help organize your quizzes and set minimum requirements for questions and rewards.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!connected) {
     return (
       <div className="max-w-2xl mx-auto p-6 bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-700">
@@ -217,21 +256,26 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
         
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Topic Selection */}
-          <div>
-            <label className="block text-white font-medium mb-3">Topic</label>
+          <div className="bg-purple-900/20 border border-purple-500/20 rounded-lg p-6">
+            <label className="block text-sm font-medium text-purple-300 mb-2">
+              Select Topic *
+            </label>
             <select
               value={selectedTopic}
               onChange={(e) => setSelectedTopic(e.target.value)}
-              className="w-full p-4 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-purple-900/30 border border-purple-500/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             >
-              <option value="">Select a topic</option>
-              {availableTopics.map((topic) => (
+              <option value="">Choose a topic...</option>
+              {userOwnedTopics.map((topic) => (
                 <option key={topic.name} value={topic.name}>
-                  {topic.name} ({topic.totalQuizzes} quizzes)
+                  {topic.name} (Min: {topic.minQuestionCount} questions, {topic.minRewardAmount} SOL)
                 </option>
               ))}
             </select>
+            <p className="text-xs text-purple-300/70 mt-2">
+              Only topics you own are shown. Each topic has specific requirements for questions and rewards.
+            </p>
           </div>
 
           {/* Quiz Details */}
@@ -259,6 +303,9 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
                 placeholder="0.1"
                 required
               />
+              <p className="text-xs text-gray-400 mt-2">
+                Minimum reward: 0.01 SOL
+              </p>
             </div>
           </div>
 
@@ -277,7 +324,12 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
           {/* Questions */}
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-white">Questions ({questions.length})</h3>
+              <div>
+                <h3 className="text-xl font-bold text-white">Questions ({questions.length})</h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  Minimum: 3 questions | Maximum: 10 questions
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={addQuestion}
@@ -293,7 +345,7 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
                 <div key={questionIndex} className="p-6 bg-gray-800/50 rounded-lg border border-gray-600">
                   <div className="flex justify-between items-center mb-4">
                     <h4 className="text-lg font-medium text-white">Question {questionIndex + 1}</h4>
-                    {questions.length > 1 && (
+                    {questions.length > 3 ? (
                       <button
                         type="button"
                         onClick={() => removeQuestion(questionIndex)}
@@ -301,6 +353,10 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
                       >
                         Remove
                       </button>
+                    ) : (
+                      <span className="text-xs text-gray-500">
+                        Cannot remove (minimum 3 questions)
+                      </span>
                     )}
                   </div>
 
@@ -357,6 +413,42 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
             </div>
           </div>
 
+          {/* Requirements Check */}
+          <div className={`p-4 rounded-lg border ${
+            questions.length >= 3 && parseFloat(reward) >= 0.01
+              ? 'bg-green-900/20 border-green-500/30'
+              : 'bg-yellow-900/20 border-yellow-500/30'
+          }`}>
+            <div className="flex items-center gap-2 mb-2">
+              {questions.length >= 3 && parseFloat(reward) >= 0.01 ? (
+                <FaCheckCircle className="text-green-400" />
+              ) : (
+                <FaExclamationTriangle className="text-yellow-400" />
+              )}
+              <span className={`font-medium ${
+                questions.length >= 3 && parseFloat(reward) >= 0.01
+                  ? 'text-green-300'
+                  : 'text-yellow-300'
+              }`}>
+                Requirements Check
+              </span>
+            </div>
+            <div className="text-sm space-y-1">
+              <div className={`flex items-center gap-2 ${
+                questions.length >= 3 ? 'text-green-300' : 'text-yellow-300'
+              }`}>
+                {questions.length >= 3 ? <FaCheckCircle className="text-xs" /> : <FaExclamationTriangle className="text-xs" />}
+                Questions: {questions.length}/3 minimum
+              </div>
+              <div className={`flex items-center gap-2 ${
+                parseFloat(reward) >= 0.01 ? 'text-green-300' : 'text-yellow-300'
+              }`}>
+                {parseFloat(reward) >= 0.01 ? <FaCheckCircle className="text-xs" /> : <FaExclamationTriangle className="text-xs" />}
+                Reward: {reward} SOL (minimum: 0.01 SOL)
+              </div>
+            </div>
+          </div>
+
           {/* Error and Success Messages */}
           {error && (
             <div className="p-4 bg-red-900/50 border border-red-500 rounded-lg">
@@ -373,13 +465,13 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting || !connected}
+            disabled={isSubmitting || !connected || questions.length < 3 || parseFloat(reward) < 0.01}
             className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                Creating Quiz...
+                Creating Quiz (Single Transaction)...
               </div>
             ) : (
               `Create Quiz (${reward} SOL)`
@@ -396,6 +488,7 @@ export default function CreateQuizForm({ availableTopics }: CreateQuizFormProps)
             <li>• Each question uses a unique nonce for maximum security</li>
             <li>• All data stored directly on Solana blockchain</li>
             <li>• Winner verification happens on-chain without decryption</li>
+            <li>• Optimized single transaction - only one signature required!</li>
           </ul>
         </div>
       </div>

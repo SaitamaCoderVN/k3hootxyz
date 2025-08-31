@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FaBell, FaSearch, FaBars, FaTimes, FaHome, FaPlus, FaGamepad, FaTrophy } from 'react-icons/fa';
 import { useWallet } from '@solana/wallet-adapter-react';
 import WalletButton from '@/components/WalletButton';
+import { BrandLogo } from '@/components/ui/Logo';
 
 export default function Header() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -24,8 +25,8 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold gradient-text">K3HOOT</span>
+          <Link href="/" className="flex items-center">
+            <BrandLogo size="md" />
           </Link>
 
           {/* Desktop Navigation */}

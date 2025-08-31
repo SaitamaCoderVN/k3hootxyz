@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useK3HootClient, TopicWithStats } from '@/lib/solana-client';
 import { PublicKey } from '@solana/web3.js';
+import { useProgressiveLoad } from './useProgressiveLoad';
 
 export interface LeaderboardEntry {
   userAddress: string;
@@ -29,8 +30,8 @@ export function useLeaderboard() {
 
   const client = useK3HootClient();
 
-  // Load all topics from blockchain
-  const loadTopics = async () => {
+  // Load all topics from blockchain with retry
+  const loadTopics = async (retryCount = 0) => {
     if (!client) {
       setLoading(false);
       return;
@@ -113,14 +114,26 @@ export function useLeaderboard() {
 
     } catch (err: any) {
       console.error('❌ Error loading topics:', err);
-      setError(err.message || 'Failed to load topics');
+      
+      // Retry logic for network/blockchain errors
+      if (retryCount < 2 && (
+        err.message?.includes('fetch') || 
+        err.message?.includes('network') ||
+        err.message?.includes('timeout')
+      )) {
+        setTimeout(() => {
+          loadTopics(retryCount + 1);
+        }, 1000 * (retryCount + 1)); // Exponential backoff
+      } else {
+        setError(err.message || 'Failed to load topics from blockchain');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Load leaderboard for selected topic
-  const loadTopicLeaderboard = async (topic: TopicWithStats) => {
+  // Load leaderboard for selected topic with retry
+  const loadTopicLeaderboard = async (topic: TopicWithStats, retryCount = 0) => {
     if (!client) return;
 
     try {
@@ -197,7 +210,19 @@ export function useLeaderboard() {
 
     } catch (err: any) {
       console.error('❌ Error loading topic leaderboard:', err);
-      setError(err.message || 'Failed to load leaderboard');
+      
+      // Retry logic for network/blockchain errors
+      if (retryCount < 2 && (
+        err.message?.includes('fetch') || 
+        err.message?.includes('network') ||
+        err.message?.includes('timeout')
+      )) {
+        setTimeout(() => {
+          loadTopicLeaderboard(topic, retryCount + 1);
+        }, 1000 * (retryCount + 1)); // Exponential backoff
+      } else {
+        setError(err.message || 'Failed to load leaderboard from blockchain');
+      }
     } finally {
       setLoadingLeaderboard(false);
     }
@@ -227,6 +252,14 @@ export function useLeaderboard() {
     loadTopics();
   }, [client]);
 
+  // Manual retry functions
+  const retryTopics = () => loadTopics(0);
+  const retryLeaderboard = () => {
+    if (selectedTopic) {
+      loadTopicLeaderboard(selectedTopic, 0);
+    }
+  };
+
   return {
     // Data
     topics: filteredTopics,
@@ -244,6 +277,8 @@ export function useLeaderboard() {
     selectTopic,
     backToTopics,
     loadTopics,
+    retryTopics,
+    retryLeaderboard,
     
     // Stats
     totalTopics: topics.length,

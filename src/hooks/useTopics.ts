@@ -8,6 +8,8 @@ export function useTopics() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [maxRetries] = useState(3);
   
   const client = useK3HootClient();
 
@@ -82,12 +84,27 @@ export function useTopics() {
       }
 
       setTopics(transformedTopics);
+      setRetryCount(0); // Reset retry count on success
       
     } catch (err: any) {
       console.error('❌ Error fetching topics:', err);
-      setError(err.message || 'Failed to fetch topics');
+      const newRetryCount = retryCount + 1;
+      setRetryCount(newRetryCount);
+      
+      if (newRetryCount >= maxRetries) {
+        setError(`Failed to fetch topics after ${maxRetries} attempts. ${err.message || 'Please try again later.'}`);
+      } else {
+        setError(`Failed to fetch topics (attempt ${newRetryCount}/${maxRetries}): ${err.message || 'Unknown error'}`);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Retry fetching topics
+  const retryFetchTopics = async () => {
+    if (retryCount < maxRetries) {
+      await fetchTopics();
     }
   };
 
@@ -132,6 +149,12 @@ export function useTopics() {
   const getMyTopics = (userPublicKey?: string): TopicWithStats[] => {
     if (!userPublicKey) return [];
     return topics.filter(topic => topic.owner === userPublicKey);
+  };
+
+  // Get user-owned active topics for quiz creation
+  const getUserOwnedActiveTopics = (userPublicKey?: string): TopicWithStats[] => {
+    if (!userPublicKey) return [];
+    return topics.filter(topic => topic.owner === userPublicKey && topic.isActive);
   };
 
   // Initial fetch on client ready
@@ -268,13 +291,17 @@ export function useTopics() {
     loading,
     error,
     creating,
+    retryCount,
+    maxRetries,
     
     // Actions
     fetchTopics,
+    retryFetchTopics,
     createTopic,
     createDemoTopics,
     checkTopicExists,
     getMyTopics,
+    getUserOwnedActiveTopics,
     transferTopicOwnership,
     toggleTopicStatus,
     getTopicByName,

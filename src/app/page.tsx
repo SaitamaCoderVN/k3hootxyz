@@ -14,6 +14,7 @@ import { FaRocket, FaGamepad, FaTrophy, FaUsers, FaChartLine, FaShieldAlt } from
 import CountUp from 'react-countup';
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { PageWrapper, LoadingContainer } from '@/components/layout/MinHeightContainer';
 
 const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
   ssr: false,
@@ -58,13 +59,6 @@ const features = [
   }
 ];
 
-const stats = [
-  { label: 'Active Players', value: 50000, suffix: '+' },
-  { label: 'Quizzes Created', value: 10000, suffix: '+' },
-  { label: 'SOL Distributed', value: 1000, suffix: '' },
-  { label: 'Daily Games', value: 5000, suffix: '+' }
-];
-
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -73,7 +67,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden">
+    <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
       <PixelEffect />
       <SpaceBackground />
       <Stars />
@@ -172,41 +166,6 @@ export default function Home() {
         />
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 sm:py-20 relative">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isVisible ? 1 : 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                className="text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text mb-2">
-                  {isVisible && (
-                    <CountUp
-                      start={0}
-                      end={stat.value}
-                      duration={2.5}
-                      separator=","
-                      suffix={stat.suffix}
-                    />
-                  )}
-                </h3>
-                <p className="text-purple-300 text-sm sm:text-base">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
       {/* Features Grid */}
       <section className="py-16 sm:py-20 lg:py-24 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -291,42 +250,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Interactive Game Section */}
-      <section className="py-16 sm:py-20 lg:py-24 relative">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="text-center mb-8 sm:mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold gradient-text mb-4 sm:mb-6">
-              Mini Game Preview
-            </h2>
-            <p className="text-lg sm:text-xl text-purple-300 max-w-2xl mx-auto leading-relaxed">
-              Get a taste of our interactive features before diving into quiz rooms!
-            </p>
-          </motion.div>
-          
-          <div className="relative min-h-[300px] sm:min-h-[400px] flex flex-col items-center justify-center">
-            <CatchableRocket />
-            <motion.div
-              className="text-center mt-6 sm:mt-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              <h3 className="text-xl sm:text-2xl font-bold gradient-text mb-3 sm:mb-4">
-                Try to catch the rocket! 🚀
-              </h3>
-              <p className="text-lg sm:text-xl text-purple-300 leading-relaxed">
-                More mini-games and surprises await in our quiz rooms!
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
       {/* Tokenomics Section */}
       <Tokenomics />
 
@@ -358,6 +281,6 @@ export default function Home() {
       </section>
 
       <Footer />
-    </main>
+    </PageWrapper>
   );
 }

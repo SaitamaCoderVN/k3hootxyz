@@ -13,6 +13,8 @@ import GlowingButton from '@/components/ui/GlowingButton';
 import CreateQuizForm from '@/components/CreateQuizForm';
 import { FaRocket, FaQuestionCircle, FaPlus, FaList, FaSpinner, FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
 import { useTopics } from '@/hooks/useTopics';
+import { BlockchainLoadingIndicator } from '@/components/ui/LoadingStates';
+import { LoadingContainer, PageWrapper } from '@/components/layout/MinHeightContainer';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
@@ -22,6 +24,7 @@ const WalletMultiButton = dynamic(
 export default function CreatePage() {
   const { connected, publicKey } = useWallet();
   const [mounted, setMounted] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'create' | 'topics'>('topics');
   const [newTopicName, setNewTopicName] = useState('');
   const [showCreateTopicForm, setShowCreateTopicForm] = useState(false);
@@ -35,15 +38,26 @@ export default function CreatePage() {
     createTopic,
     checkTopicExists,
     getMyTopics,
+    getUserOwnedActiveTopics,
     fetchTopics,
+    retryFetchTopics,
+    retryCount,
+    maxRetries,
     totalTopics,
     activeTopicsCount
   } = useTopics();
 
   const myTopics = getMyTopics(publicKey?.toString());
+  const userOwnedActiveTopics = getUserOwnedActiveTopics(publicKey?.toString());
 
   useEffect(() => {
     setMounted(true);
+    // Simulate initial loading time to match other pages
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const handleCreateTopic = async () => {
@@ -61,8 +75,10 @@ export default function CreatePage() {
     }
   };
 
+  if (!mounted) return null;
+
   return (
-    <main className="min-h-screen bg-black text-white overflow-hidden">
+    <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
       <SpaceBackground />
       <Stars />
       <Header />
@@ -163,6 +179,9 @@ export default function CreatePage() {
                 >
                   <FaPlus className="text-sm" />
                   Create Quiz
+                  {topicsLoading && activeTab !== 'create' && (
+                    <FaSpinner className="text-xs animate-spin ml-1" />
+                  )}
                 </button>
               </div>
 
@@ -249,21 +268,45 @@ export default function CreatePage() {
                     </div>
                     
                     {topicsLoading ? (
-                      <div className="text-center py-8 text-green-300">
-                        <FaSpinner className="text-4xl mx-auto mb-4 animate-spin opacity-50" />
-                        <p>Loading topics from blockchain...</p>
+                      <div className="py-8">
+                        <BlockchainLoadingIndicator 
+                          message="Loading topics from blockchain..."
+                          showProgress={false}
+                        />
                       </div>
                     ) : topicsError ? (
-                      <div className="text-center py-8 text-red-300">
-                        <FaExclamationTriangle className="text-4xl mx-auto mb-4 opacity-50" />
-                        <p>Error loading topics: {topicsError}</p>
-                        <button
-                          onClick={fetchTopics}
-                          className="mt-4 px-4 py-2 bg-red-600/20 border border-red-500/20 rounded text-red-300 hover:text-red-200"
-                        >
-                          Try Again
-                        </button>
-                      </div>
+                                              <div className="text-center py-8 text-red-300">
+                          <FaExclamationTriangle className="text-4xl mx-auto mb-4 opacity-50" />
+                          <p className="mb-4">Error loading topics: {topicsError}</p>
+                          {retryCount >= maxRetries ? (
+                            <div className="space-y-4">
+                              <p className="text-yellow-300">
+                                Failed to load topics after {maxRetries} attempts. You may not have any topics yet.
+                              </p>
+                              <div className="flex gap-3 justify-center">
+                                <button
+                                  onClick={retryFetchTopics}
+                                  className="px-4 py-2 bg-blue-600/20 border border-blue-500/20 rounded text-blue-300 hover:text-blue-200"
+                                >
+                                  Try Again
+                                </button>
+                                <button
+                                  onClick={() => setShowCreateTopicForm(true)}
+                                  className="px-4 py-2 bg-green-600/20 border border-green-500/20 rounded text-green-300 hover:text-green-200"
+                                >
+                                  Create Your First Topic
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={retryFetchTopics}
+                              className="px-4 py-2 bg-red-600/20 border border-red-500/20 rounded text-red-300 hover:text-red-200"
+                            >
+                              Try Again (Attempt {retryCount + 1}/{maxRetries})
+                            </button>
+                          )}
+                        </div>
                     ) : topics.length === 0 ? (
                       <div className="text-center py-8 text-green-300">
                         <FaList className="text-4xl mx-auto mb-4 opacity-50" />
@@ -321,7 +364,20 @@ export default function CreatePage() {
                     </p>
                   </div>
                   
-                  <CreateQuizForm availableTopics={activeTopics} />
+                  {/* Show loading state while fetching user topics */}
+                  {topicsLoading ? (
+                    <div className="py-8">
+                      <BlockchainLoadingIndicator 
+                        message="Loading your topics..."
+                        showProgress={false}
+                      />
+                    </div>
+                  ) : (
+                    <CreateQuizForm 
+                      availableTopics={activeTopics} 
+                      userOwnedTopics={userOwnedActiveTopics}
+                    />
+                  )}
                 </div>
               )}
 
@@ -352,6 +408,6 @@ export default function CreatePage() {
       </div>
 
       <Footer />
-    </main>
+    </PageWrapper>
   );
 } 

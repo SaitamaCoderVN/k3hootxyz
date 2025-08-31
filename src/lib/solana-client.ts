@@ -1,13 +1,21 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { K3HootProgramArcium } from "../types/k_3_hoot_program_arcium";
-import { PublicKey, Keypair, SystemProgram, Connection, Commitment } from "@solana/web3.js";
+import { PublicKey, Keypair, SystemProgram, Connection, Commitment, Transaction } from "@solana/web3.js";
 import { randomBytes } from 'crypto';
 import { BN } from "@coral-xyz/anchor";
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { useMemo } from 'react';
 import { AnchorProvider } from '@coral-xyz/anchor';
 import IDL from '../idl/k_3_hoot_program_arcium.json';
+
+// RPC endpoints for fallback
+const RPC_ENDPOINTS = [
+  'https://api.devnet.solana.com',
+  'https://devnet.helius-rpc.com/?api-key=cc3ee1a5-c88c-4e5c-9a3b-96fb7ae2d02e',
+  'https://solana-devnet.g.alchemy.com/v2/ALqgEGJGJJnfQBE8M-8bOFmW4q2zjdH5',
+  'https://rpc-devnet.helius.xyz/?api-key=cc3ee1a5-c88c-4e5c-9a3b-96fb7ae2d02e'
+];
 
 // RPC Endpoints from environment
 export const SOLANA_RPC = {
@@ -96,12 +104,32 @@ export interface TopicWithStats {
 export class SecureQuizEncryptor {
   private program: Program<K3HootProgramArcium>;
   private connection: Connection;
+  private provider: AnchorProvider;
   private authority?: Keypair; // Optional Keypair for server-side usage
 
-  constructor(program: Program<K3HootProgramArcium>, connection: Connection, authority?: Keypair) {
+  constructor(program: Program<K3HootProgramArcium>, connection: Connection, provider: AnchorProvider, authority?: Keypair) {
     this.program = program;
     this.connection = connection;
+    this.provider = provider;
     this.authority = authority;
+  }
+
+  // Static factory method with robust connection
+  static async create(
+    wallet: any,
+    commitment: Commitment = 'confirmed',
+    authority?: Keypair
+  ): Promise<SecureQuizEncryptor> {
+    try {
+      const connection = await SecureQuizEncryptor.createRobustConnection(commitment);
+      const provider = new AnchorProvider(connection, wallet, { commitment });
+      const program = new Program(IDL as K3HootProgramArcium, provider) as Program<K3HootProgramArcium>;
+      
+      return new SecureQuizEncryptor(program, connection, provider, authority);
+    } catch (error) {
+      console.error('Failed to create SecureQuizEncryptor:', error);
+      throw error;
+    }
   }
 
   // Helper method to get the public key from wallet or authority
@@ -245,7 +273,10 @@ export class SecureQuizEncryptor {
   }
 
   // List all topics - cleaned up version
-  async getAllTopics(): Promise<Topic[]> {
+  async getAllTopics(retryCount = 0): Promise<Topic[]> {
+    const maxRetries = 3;
+    const retryDelay = 1000 * (retryCount + 1);
+    
     try {
       // Try using .all() first
       const allTopics = await this.program.account.topic.all();
@@ -286,8 +317,16 @@ export class SecureQuizEncryptor {
         
         return validTopics;
         
-      } catch (fallbackError) {
+      } catch (fallbackError: any) {
         console.error("❌ Both .all() and getProgramAccounts failed:", fallbackError);
+        
+        // Retry logic for network errors
+        if (retryCount < maxRetries && this.isNetworkError(fallbackError)) {
+          console.warn(`🔄 Retrying getAllTopics (${retryCount + 1}/${maxRetries}) in ${retryDelay}ms...`);
+          await this.delay(retryDelay);
+          return this.getAllTopics(retryCount + 1);
+        }
+        
         return [];
       }
     }
@@ -519,7 +558,7 @@ export class SecureQuizEncryptor {
     }
   }
 
-  // Cập nhật createCompleteQuiz method để sử dụng ít transaction hơn
+  // Cập nhật createCompleteQuiz method để sử dụng một transaction duy nhất
   async createCompleteQuiz(
     topicName: string,
     baseName: string, 
@@ -532,103 +571,162 @@ export class SecureQuizEncryptor {
     
     const transactions: string[] = [];
     
-    // Step 1: Create quiz set
-    const quizSetPda = await this.createQuizSet(topicName, baseName, questions.length, rewardAmount);
+    // Generate unique ID for quiz set
+    const uniqueId = Math.floor(Math.random() * 256);
     
-    // Step 2: Add ALL questions in BATCHED transactions (reduce signing)
+    // Derive all PDAs upfront
+    const [quizSetPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("quiz_set"),
+        this.getAuthorityPublicKey().toBuffer(),
+        Buffer.from([uniqueId])
+      ],
+      this.program.programId
+    );
+
+    const [topicPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("topic"), Buffer.from(topicName)],
+      this.program.programId
+    );
+
+    const [vaultPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("vault"),
+        quizSetPda.toBuffer()
+      ],
+      this.program.programId
+    );
     
+    // Create all instructions
+    const instructions = [];
+    
+    // 1. Create quiz set instruction
+    const createQuizSetIx = await this.program.methods
+      .createQuizSet(uniqueName, questions.length, uniqueId, new BN(rewardAmount * 1_000_000_000))
+      .accountsPartial({
+        quizSet: quizSetPda,
+        topic: topicPda,
+        vault: vaultPda,
+        authority: this.getAuthorityPublicKey(),
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+    
+    instructions.push(createQuizSetIx);
+    
+    // 2. Create all question instructions
     const questionBlocks = [];
     
-    // Process questions in batches to reduce transaction count
-    const BATCH_SIZE = 3; // Process 3 questions per transaction
-    for (let batchStart = 0; batchStart < questions.length; batchStart += BATCH_SIZE) {
-      const batchEnd = Math.min(batchStart + BATCH_SIZE, questions.length);
-      const batch = questions.slice(batchStart, batchEnd);
+    for (let i = 0; i < questions.length; i++) {
+      const questionIndex = i + 1;
+      const questionData = questions[i];
       
-      // Create instructions for this batch
-      const instructions = [];
-      
-      for (let i = 0; i < batch.length; i++) {
-        const questionIndex = batchStart + i + 1;
-        const questionData = batch[i];
-        
-        // Create question block PDA
-        const [questionBlockPda] = PublicKey.findProgramAddressSync(
-          [
-            Buffer.from("question_block"),
-            new PublicKey(quizSetPda).toBuffer(),
-            Buffer.from([questionIndex])
-          ],
-          this.program.programId
-        );
+      // Create question block PDA
+      const [questionBlockPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("question_block"),
+          quizSetPda.toBuffer(),
+          Buffer.from([questionIndex])
+        ],
+        this.program.programId
+      );
 
-        // Encrypt data with unique nonce
-        const uniqueNonce = new BN(Date.now() + questionIndex + Math.floor(Math.random() * 100));
-        const encryptedX = await this.encryptQuestionDataOnchain(questionData, uniqueNonce);
-        const encryptedY = this.encryptCorrectAnswer(questionData.correctAnswer, uniqueNonce);
-        const arciumPubkey = randomBytes(32);
+      // Encrypt data with unique nonce
+      const uniqueNonce = new BN(Date.now() + questionIndex + Math.floor(Math.random() * 100));
+      const encryptedX = await this.encryptQuestionDataOnchain(questionData, uniqueNonce);
+      const encryptedY = this.encryptCorrectAnswer(questionData.correctAnswer, uniqueNonce);
+      const arciumPubkey = randomBytes(32);
 
-        // Create instruction for this question
-        const instruction = this.program.methods
-          .addEncryptedQuestionBlock(
-            questionIndex,
-            Array.from(encryptedX),
-            Array.from(encryptedY),
-            Array.from(arciumPubkey),
-            uniqueNonce
-          )
-          .accountsPartial({
-            questionBlock: questionBlockPda,
-            quizSet: new PublicKey(quizSetPda),
-            authority: this.getAuthorityPublicKey(),
-            systemProgram: SystemProgram.programId,
-          });
-
-        // Add signers if using Keypair
-        const signers = this.getSigners();
-        if (signers.length > 0) {
-          instruction.signers(signers);
-        }
-
-        instructions.push(instruction);
-        
-        questionBlocks.push({
+      // Create instruction for this question
+      const addQuestionIx = await this.program.methods
+        .addEncryptedQuestionBlock(
           questionIndex,
-          question: questionData.question,
-          choices: questionData.choices,
-          correctAnswer: questionData.correctAnswer
+          Array.from(encryptedX),
+          Array.from(encryptedY),
+          Array.from(arciumPubkey),
+          uniqueNonce
+        )
+        .accountsPartial({
+          questionBlock: questionBlockPda,
+          quizSet: quizSetPda,
+          authority: this.getAuthorityPublicKey(),
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+
+      instructions.push(addQuestionIx);
+      
+      questionBlocks.push({
+        questionIndex,
+        question: questionData.question,
+        choices: questionData.choices,
+        correctAnswer: questionData.correctAnswer
+      });
+    }
+    
+    // Send all instructions in a single transaction
+    try {
+      console.log(`📦 Batching ${instructions.length} instructions into single transaction...`);
+      
+      // Get latest blockhash
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      
+      // Create transaction
+      const transaction = new anchor.web3.Transaction();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = this.getAuthorityPublicKey();
+      
+      // Add all instructions
+      transaction.add(...instructions);
+      
+      // Send transaction
+      const signers = this.getSigners();
+      let signature: string;
+      
+      if (signers.length > 0) {
+        // Server-side with keypair
+        transaction.sign(...signers);
+        signature = await this.connection.sendRawTransaction(transaction.serialize(), {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed'
+        });
+      } else {
+        // Client-side with wallet
+        signature = await this.provider.sendAndConfirm(transaction, [], {
+          skipPreflight: false,
+          commitment: 'confirmed'
         });
       }
       
-      // Execute all instructions in this batch as a single transaction
-      if (instructions.length === 1) {
-        // Single instruction - execute directly
-        const tx = await instructions[0].rpc({ commitment: "confirmed" });
-        transactions.push(tx);
-      } else if (instructions.length > 1) {
-        // Multiple instructions - combine into one transaction
-        try {
-          // For multiple instructions, we need to build and send transaction manually
-          
-          // Execute them one by one for now (simpler approach)
-          for (let j = 0; j < instructions.length; j++) {
-            const tx = await instructions[j].rpc({ commitment: "confirmed" });
-            transactions.push(tx);
-          }
-        } catch (batchError) {
-          console.error(`❌ Batch failed:`, batchError);
-          throw batchError;
-        }
+      // Wait for confirmation
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      
+      console.log(`✅ Quiz created with single transaction: ${signature}`);
+      transactions.push(signature);
+      
+      // Update topic stats
+      await this.updateTopicStats(topicName);
+      
+    } catch (error: any) {
+      console.error(`❌ Failed to create quiz:`, error);
+      
+      if (error.message?.includes('User rejected') || error.message?.includes('canceled')) {
+        throw new Error('Transaction was canceled by user');
       }
+      
+      throw error;
     }
 
-    return { quizSetPda, questionBlocks, transactions };
+    return { quizSetPda: quizSetPda.toString(), questionBlocks, transactions };
   }
 
   /**
    * Get all quiz sets - cleaned up
    */
-  async getAllQuizSets(): Promise<QuizSet[]> {
+  async getAllQuizSets(retryCount = 0): Promise<QuizSet[]> {
+    const maxRetries = 3;
+    const retryDelay = 1000 * (retryCount + 1); // Exponential backoff
+    
     try {
       const allQuizSets = await this.program.account.quizSet.all();
       
@@ -668,10 +766,78 @@ export class SecureQuizEncryptor {
         
         return validQuizSets;
         
-      } catch (fallbackError) {
+      } catch (fallbackError: any) {
         console.error('❌ Both .all() and getProgramAccounts failed for quiz sets:', fallbackError);
+        
+        // Retry logic for network errors
+        if (retryCount < maxRetries && this.isNetworkError(fallbackError)) {
+          console.warn(`🔄 Retrying getAllQuizSets (${retryCount + 1}/${maxRetries}) in ${retryDelay}ms...`);
+          await this.delay(retryDelay);
+          return this.getAllQuizSets(retryCount + 1);
+        }
+        
         return [];
       }
+    }
+  }
+
+  // Helper method to identify network errors
+  private isNetworkError(error: any): boolean {
+    const errorMessage = error?.message?.toLowerCase() || '';
+    return (
+      errorMessage.includes('failed to fetch') ||
+      errorMessage.includes('network error') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('connection') ||
+      error?.code === 'NETWORK_ERROR' ||
+      error?.code === 'TIMEOUT'
+    );
+  }
+
+  // Helper method for delays
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Create a robust connection with fallback RPC endpoints
+  private static async createRobustConnection(
+    commitment: Commitment = 'confirmed'
+  ): Promise<Connection> {
+    for (const endpoint of RPC_ENDPOINTS) {
+      try {
+        const connection = new Connection(endpoint, commitment);
+        
+        // Test the connection
+        await connection.getLatestBlockhash();
+        
+        console.log(`✅ Connected to Solana RPC: ${endpoint}`);
+        return connection;
+        
+      } catch (error) {
+        console.warn(`⚠️ Failed to connect to ${endpoint}:`, error);
+        continue;
+      }
+    }
+    
+    // If all fail, return default connection
+    console.warn('⚠️ All RPC endpoints failed, using default connection');
+    return new Connection(RPC_ENDPOINTS[0], commitment);
+  }
+
+  // Method to refresh connection if needed
+  async refreshConnection(): Promise<void> {
+    try {
+      this.connection = await SecureQuizEncryptor.createRobustConnection();
+      // Update provider and program with new connection
+      const provider = new AnchorProvider(
+        this.connection,
+        this.provider.wallet,
+        { commitment: 'confirmed' }
+      );
+      this.provider = provider;
+      this.program = new Program(IDL as K3HootProgramArcium, this.provider);
+    } catch (error) {
+      console.error('Failed to refresh connection:', error);
     }
   }
 
@@ -1045,7 +1211,7 @@ export class SecureQuizEncryptor {
     return true;
   }
 
-  // Cập nhật claimReward để optimize transaction
+  // Cập nhật claimReward để sử dụng một transaction duy nhất
   async claimReward(quizSetPda: string): Promise<{ success: boolean; txSignature?: string; error?: string }> {
     try {
       const quizSetPubkey = new PublicKey(quizSetPda);
@@ -1066,11 +1232,14 @@ export class SecureQuizEncryptor {
         return { success: false, error: 'Reward already claimed' };
       }
       
-      // If no winner set, set winner and claim in sequence (but minimize transactions)
+      // Create instructions array
+      const instructions = [];
+      
+      // If no winner set, add set winner instruction
       if (!quizSetAccount.winner) {
+        console.log(`📝 Adding setWinner instruction to batch...`);
         
-        // Set winner first
-        const setWinnerInstruction = this.program.methods
+        const setWinnerIx = await this.program.methods
           .setWinnerForUser(
             this.getAuthorityPublicKey(),
             quizSetAccount.questionCount // Assume perfect score
@@ -1079,38 +1248,74 @@ export class SecureQuizEncryptor {
             quizSet: quizSetPubkey,
             setter: this.getAuthorityPublicKey(),
             systemProgram: SystemProgram.programId,
-          });
-
-        const signers = this.getSigners();
-        if (signers.length > 0) {
-          setWinnerInstruction.signers(signers);
-        }
-
-        const setWinnerTx = await setWinnerInstruction.rpc({ commitment: "confirmed" });
+          })
+          .instruction();
+        
+        instructions.push(setWinnerIx);
       }
       
-      // Claim reward
-      const instruction = this.program.methods
+      // Add claim reward instruction
+      console.log(`💰 Adding claimReward instruction to batch...`);
+      
+      const claimRewardIx = await this.program.methods
         .claimReward()
         .accountsPartial({
           quizSet: quizSetPubkey,
           vault: vaultPda,
           claimer: this.getAuthorityPublicKey(),
           systemProgram: SystemProgram.programId,
-        });
-
-      const signers = this.getSigners();
-      if (signers.length > 0) {
-        instruction.signers(signers);
-      }
-
-      const tx = await instruction.rpc({ commitment: "confirmed" });
-
-      await this.connection.confirmTransaction(tx, "confirmed");
+        })
+        .instruction();
       
-      return { success: true, txSignature: tx };
+      instructions.push(claimRewardIx);
+      
+      // Send all instructions in a single transaction
+      console.log(`📦 Batching ${instructions.length} instructions into single transaction...`);
+      console.log(`✨ Single transaction - only one signature required!`);
+      
+      // Get latest blockhash
+      const { blockhash } = await this.connection.getLatestBlockhash('confirmed');
+      
+      // Create transaction
+      const transaction = new Transaction();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = this.getAuthorityPublicKey();
+      
+      // Add all instructions
+      transaction.add(...instructions);
+      
+      // Send transaction
+      const signers = this.getSigners();
+      let signature: string;
+      
+      if (signers.length > 0) {
+        // Server-side with keypair
+        transaction.sign(...signers);
+        signature = await this.connection.sendRawTransaction(transaction.serialize(), {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed'
+        });
+      } else {
+        // Client-side with wallet
+        signature = await this.provider.sendAndConfirm(transaction, [], {
+          skipPreflight: false,
+          commitment: 'confirmed'
+        });
+      }
+      
+      // Wait for confirmation
+      await this.connection.confirmTransaction(signature, 'confirmed');
+      
+      console.log(`✅ Reward claimed with single transaction: ${signature}`);
+      
+      return { success: true, txSignature: signature };
     } catch (error: any) {
       console.error(`❌ Failed to claim reward:`, error);
+      
+      if (error.message?.includes('User rejected') || error.message?.includes('canceled')) {
+        return { success: false, error: 'Transaction was canceled by user' };
+      }
+      
       return { success: false, error: error.message || 'Unknown error' };
     }
   }
@@ -1123,6 +1328,42 @@ export function useK3HootClient(network: 'devnet' | 'mainnet' = 'devnet') {
   if (!wallet) return null;
   
   const client = useMemo(() => {
+    let instance: SecureQuizEncryptor | null = null;
+    
+    // Create client asynchronously
+    (async () => {
+      try {
+        instance = await SecureQuizEncryptor.create(wallet, 'confirmed');
+      } catch (error) {
+        console.error('Failed to initialize robust SecureQuizEncryptor:', error);
+        
+        // Fallback to simple connection
+        try {
+          const rpcEndpoint = network === 'devnet' 
+            ? SOLANA_RPC.devnet
+            : SOLANA_RPC[network];
+            
+          const connection = new Connection(rpcEndpoint, {
+            commitment: 'confirmed',
+            confirmTransactionInitialTimeout: 60000
+          });
+          
+          const provider = new AnchorProvider(connection, wallet, {
+            commitment: 'confirmed',
+            preflightCommitment: 'confirmed',
+          });
+          
+          const program = new Program(IDL as any, provider) as Program<K3HootProgramArcium>;
+          
+          instance = new SecureQuizEncryptor(program, connection, provider);
+        } catch (fallbackError) {
+          console.error('Fallback connection also failed:', fallbackError);
+          instance = null;
+        }
+      }
+    })();
+    
+    // For now, return simple connection synchronously to avoid breaking changes
     try {
       const rpcEndpoint = network === 'devnet' 
         ? SOLANA_RPC.devnet
@@ -1140,7 +1381,7 @@ export function useK3HootClient(network: 'devnet' | 'mainnet' = 'devnet') {
       
       const program = new Program(IDL as any, provider) as Program<K3HootProgramArcium>;
       
-      return new SecureQuizEncryptor(program, connection);
+      return new SecureQuizEncryptor(program, connection, provider);
     } catch (error) {
       console.error('Failed to initialize SecureQuizEncryptor:', error);
       return null;
@@ -1156,9 +1397,20 @@ export function createK3HootClientWithKeypair(
   network: 'devnet' | 'mainnet' = 'devnet'
 ): SecureQuizEncryptor {
   const connection = new Connection(SOLANA_RPC[network], 'confirmed');
-  const wallet = new anchor.Wallet(authority);
-  const provider = new AnchorProvider(connection, wallet, { commitment: 'confirmed' });
+  // Create a simple wallet object that implements the required interface
+  const wallet = {
+    publicKey: authority.publicKey,
+    signTransaction: async (tx: Transaction) => {
+      tx.sign(authority);
+      return tx;
+    },
+    signAllTransactions: async (txs: Transaction[]) => {
+      txs.forEach(tx => tx.sign(authority));
+      return txs;
+    }
+  };
+  const provider = new AnchorProvider(connection, wallet as any, { commitment: 'confirmed' });
   const program = new Program(IDL as any, provider) as Program<K3HootProgramArcium>;
   
-  return new SecureQuizEncryptor(program, connection, authority);
+  return new SecureQuizEncryptor(program, connection, provider, authority);
 }
