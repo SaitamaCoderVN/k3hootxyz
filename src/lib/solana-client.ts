@@ -9,14 +9,6 @@ import { useMemo } from 'react';
 import { AnchorProvider } from '@coral-xyz/anchor';
 import IDL from '../idl/k_3_hoot_program_arcium.json';
 
-// RPC endpoints for fallback
-const RPC_ENDPOINTS = [
-  'https://api.devnet.solana.com',
-  'https://devnet.helius-rpc.com/?api-key=cc3ee1a5-c88c-4e5c-9a3b-96fb7ae2d02e',
-  'https://solana-devnet.g.alchemy.com/v2/ALqgEGJGJJnfQBE8M-8bOFmW4q2zjdH5',
-  'https://rpc-devnet.helius.xyz/?api-key=cc3ee1a5-c88c-4e5c-9a3b-96fb7ae2d02e'
-];
-
 // RPC Endpoints from environment
 export const SOLANA_RPC = {
   devnet: process.env.NEXT_PUBLIC_SOLANA_DEVNET_RPC || 'https://api.devnet.solana.com',
@@ -803,7 +795,7 @@ export class SecureQuizEncryptor {
   private static async createRobustConnection(
     commitment: Commitment = 'confirmed'
   ): Promise<Connection> {
-    for (const endpoint of RPC_ENDPOINTS) {
+    for (const endpoint of Object.values(SOLANA_RPC)) {
       try {
         const connection = new Connection(endpoint, commitment);
         
@@ -821,7 +813,7 @@ export class SecureQuizEncryptor {
     
     // If all fail, return default connection
     console.warn('⚠️ All RPC endpoints failed, using default connection');
-    return new Connection(RPC_ENDPOINTS[0], commitment);
+    return new Connection(SOLANA_RPC.devnet, commitment);
   }
 
   // Method to refresh connection if needed
