@@ -1,5 +1,5 @@
 {
-  "address": "DWamNnSs9wjxndPrHAqfD747uvynZYyyq45FXu3RKNrP",
+  "address": "4K3zoVTLgNxm7eyNkHhQQUvQgoq5T4wTmrnkH7nZ6XJa",
   "metadata": {
     "name": "k_3_hoot_program_arcium",
     "version": "0.1.0",
@@ -283,11 +283,6 @@
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "arcium_program",
           "address": "BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6"
         },
@@ -340,6 +335,32 @@
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "sign_pda_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  83,
+                  105,
+                  103,
+                  110,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "question_block"
@@ -418,11 +439,6 @@
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "arcium_program",
           "address": "BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6"
         },
@@ -475,6 +491,32 @@
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "sign_pda_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  83,
+                  105,
+                  103,
+                  110,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "question_block"
@@ -804,10 +846,6 @@
       ],
       "args": [
         {
-          "name": "timestamp_seed",
-          "type": "u64"
-        },
-        {
           "name": "is_winner",
           "type": "bool"
         },
@@ -1097,6 +1135,32 @@
           "signer": true
         },
         {
+          "name": "sign_pda_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  83,
+                  105,
+                  103,
+                  110,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "question_block"
         },
         {
@@ -1261,6 +1325,19 @@
         117,
         148,
         6
+      ]
+    },
+    {
+      "name": "SignerAccount",
+      "discriminator": [
+        127,
+        212,
+        7,
+        180,
+        17,
+        50,
+        249,
+        193
       ]
     },
     {
@@ -1793,15 +1870,6 @@
               "defined": {
                 "name": "ComputationSignature"
               }
-            }
-          },
-          {
-            "name": "callback_discriminator",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
             }
           }
         ]
@@ -2532,6 +2600,18 @@
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SignerAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }

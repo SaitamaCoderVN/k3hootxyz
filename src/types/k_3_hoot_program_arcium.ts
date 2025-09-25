@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/k_3_hoot_program_arcium.json`.
  */
 export type K3HootProgramArcium = {
-  "address": "DWamNnSs9wjxndPrHAqfD747uvynZYyyq45FXu3RKNrP",
+  "address": "4K3zoVTLgNxm7eyNkHhQQUvQgoq5T4wTmrnkH7nZ6XJa",
   "metadata": {
     "name": "k3HootProgramArcium",
     "version": "0.1.0",
@@ -289,11 +289,6 @@ export type K3HootProgramArcium = {
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "arciumProgram",
           "address": "BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6"
         },
@@ -346,6 +341,32 @@ export type K3HootProgramArcium = {
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "signPdaAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  83,
+                  105,
+                  103,
+                  110,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "questionBlock"
@@ -424,11 +445,6 @@ export type K3HootProgramArcium = {
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
           "name": "arciumProgram",
           "address": "BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6"
         },
@@ -481,6 +497,32 @@ export type K3HootProgramArcium = {
           "name": "payer",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "signPdaAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  83,
+                  105,
+                  103,
+                  110,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "questionBlock"
@@ -810,10 +852,6 @@ export type K3HootProgramArcium = {
       ],
       "args": [
         {
-          "name": "timestampSeed",
-          "type": "u64"
-        },
-        {
           "name": "isWinner",
           "type": "bool"
         },
@@ -1103,6 +1141,32 @@ export type K3HootProgramArcium = {
           "signer": true
         },
         {
+          "name": "signPdaAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  83,
+                  105,
+                  103,
+                  110,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "questionBlock"
         },
         {
@@ -1267,6 +1331,19 @@ export type K3HootProgramArcium = {
         117,
         148,
         6
+      ]
+    },
+    {
+      "name": "signerAccount",
+      "discriminator": [
+        127,
+        212,
+        7,
+        180,
+        17,
+        50,
+        249,
+        193
       ]
     },
     {
@@ -1799,15 +1876,6 @@ export type K3HootProgramArcium = {
               "defined": {
                 "name": "computationSignature"
               }
-            }
-          },
-          {
-            "name": "callbackDiscriminator",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
             }
           }
         ]
@@ -2538,6 +2606,18 @@ export type K3HootProgramArcium = {
                 }
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "signerAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
