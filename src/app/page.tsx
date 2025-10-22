@@ -222,7 +222,7 @@ export default function Home() {
                 { step: 'Connect Wallet', desc: 'Link your Solana wallet to get started', icon: '🔗' },
                 { step: 'Choose or Create', desc: 'Join an existing quiz or create your own', icon: '🎯' },
                 { step: 'Play & Compete', desc: 'Answer questions and race against time', icon: '⚡' },
-                { step: 'Earn Rewards', desc: 'Win SOL tokens and climb the leaderboard', icon: '💰' }
+                { step: 'Earn Rewards', desc: 'Win SOL tokens by answering correctly', icon: '💰' }
               ].map((item, index) => (
                 <motion.div
                   key={index}

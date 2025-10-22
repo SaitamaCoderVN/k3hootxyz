@@ -1,7 +1,6 @@
 import './globals.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import { WalletContextProvider } from '@/contexts/WalletContextProvider';
-import { GameProvider } from '@/contexts/GameContext';
 import { VT323, Orbitron } from 'next/font/google';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
@@ -59,11 +58,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <WalletContextProvider>
-              <GameProvider>
-                <Suspense fallback={<PageLoader message="Loading K3HOOT..." />}>
-                  {children}
-                </Suspense>
-              </GameProvider>
+              <Suspense fallback={<PageLoader message="Loading K3HOOT..." />}>
+                {children}
+              </Suspense>
             </WalletContextProvider>
           </ToastProvider>
         </ErrorBoundary>

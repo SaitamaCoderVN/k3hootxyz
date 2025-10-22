@@ -17,7 +17,6 @@ export default function Header() {
     { name: 'Home', href: '/', icon: <FaHome className="w-4 h-4" /> },
     { name: 'Play', href: '/play', icon: <FaGamepad className="w-4 h-4" /> },
     { name: 'Create', href: '/create', icon: <FaPlus className="w-4 h-4" /> },
-    { name: 'Leaderboard', href: '/leaderboard', icon: <FaTrophy className="w-4 h-4" /> },
   ];
 
   return (

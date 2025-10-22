@@ -3,305 +3,105 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useParams, useRouter } from 'next/navigation';
-import { PublicKey } from '@solana/web3.js';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaCheck, FaTimes, FaTrophy, FaRocket, FaLock, FaUnlock } from 'react-icons/fa';
-import { useK3HootClient, DecryptedQuestion, QuestionBlock } from '@/lib/solana-client';
+import { FaArrowLeft, FaTrophy, FaRocket } from 'react-icons/fa';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SpaceBackground from '@/components/animations/SpaceBackground';
 import Stars from '@/components/animations/Stars';
-import GlowingButton from '@/components/ui/GlowingButton';
-import { LoadingContainer, PageWrapper } from '@/components/layout/MinHeightContainer';
-import { BlockchainLoadingIndicator } from '@/components/ui/LoadingStates';
+import { AnswerButton } from '@/components/AnswerButton';
+import { ClaimButton } from '@/components/ClaimButton';
+import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
+import { PageWrapper } from '@/components/layout/MinHeightContainer';
+import dynamic from 'next/dynamic';
 
-interface QuizSet {
-  authority: PublicKey;
-  name: string;
-  questionCount: number;
-  uniqueId: number;
-  createdAt: any;
-  isInitialized: boolean;
-}
+const WalletMultiButton = dynamic(
+  () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
+  { ssr: false }
+);
 
-export default function QuizDetail() {
+export default function QuizPlayPage() {
   const { id } = useParams();
   const router = useRouter();
   const { connected } = useWallet();
-  const client = useK3HootClient();
   
-  const [quizSet, setQuizSet] = useState<QuizSet | null>(null);
-  const [questionBlocks, setQuestionBlocks] = useState<QuestionBlock[]>([]);
-  const [decryptedQuestions, setDecryptedQuestions] = useState<DecryptedQuestion[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [decrypting, setDecrypting] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [quizCompleted, setQuizCompleted] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    currentQuiz,
+    loading,
+    error,
+    submitting,
+    claiming,
+    fetchQuizById,
+    submitAnswer,
+    claimReward,
+    isUserWinner,
+    clearError
+  } = useSimpleQuiz();
+
+  const [mounted, setMounted] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<"A" | "B" | "C" | "D" | null>(null);
+  const [quizResult, setQuizResult] = useState<{ isWinner: boolean; message: string } | null>(null);
 
   useEffect(() => {
-    const loadQuizData = async () => {
-      if (!client || !id) return;
+    setMounted(true);
+  }, []);
 
-      try {
-        setLoading(true);
-        const quizSetAddress = new PublicKey(id as string);
-        
-        // Get complete quiz data including decrypted questions
-        const completeQuiz = await client.getCompleteQuiz(quizSetAddress);
-        if (!completeQuiz) {
-          setError('Quiz not found or no questions available');
-          setLoading(false);
-          return;
-        }
-        
-        setQuizSet(completeQuiz.quizSet);
-        setQuestionBlocks(completeQuiz.questionBlocks);
-        setDecryptedQuestions(completeQuiz.decryptedQuestions);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading quiz data:', error);
-        setError('Failed to load quiz');
-        setLoading(false);
-      }
-    };
-
-    if (connected && client) {
-      loadQuizData();
+  // Fetch quiz ONCE when page loads
+  useEffect(() => {
+    if (connected && id) {
+      const quizId = parseInt(id as string);
+      console.log('📥 Loading quiz:', quizId);
+      fetchQuizById(quizId);
     }
-  }, [id, client, connected]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, connected]); // Only trigger when id or connected changes, NOT fetchQuizById
 
-  const handleAnswerSelect = (answer: string) => {
-    const newAnswers = [...selectedAnswers];
-    newAnswers[currentQuestion] = answer;
-    setSelectedAnswers(newAnswers);
-  };
+  const handleAnswerSubmit = async () => {
+    if (!selectedAnswer || !currentQuiz) return;
 
-  const handleNext = () => {
-    if (currentQuestion < decryptedQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+    const result = await submitAnswer(currentQuiz.quizId, selectedAnswer);
+    
+    if (result) {
+      setQuizResult({
+        isWinner: result.isWinner,
+        message: result.isWinner 
+          ? '🎉 Congratulations! You answered correctly!' 
+          : '❌ Sorry, that\'s not correct. Try another quiz!'
+      });
     }
   };
 
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
+  const handleClaimReward = async () => {
+    if (!currentQuiz) return;
+    
+    const result = await claimReward(currentQuiz.quizId);
+    
+    if (result.success) {
+      // Redirect back to quiz list after claiming
+      router.push('/play');
     }
   };
 
-  const handleSubmit = async () => {
-    if (!client || !quizSet || selectedAnswers.length !== decryptedQuestions.length) {
-      setError('Please answer all questions before submitting.');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      // For now, use local verification since we're on devnet
-      // In production, this would use Arcium on-chain verification
-      let correctCount = 0;
-      
-      for (let i = 0; i < questionBlocks.length; i++) {
-        const questionBlock = questionBlocks[i];
-        const userAnswer = selectedAnswers[i] || "";
-        
-        // Decrypt correct answer from Y-coordinate for verification
-        const nonce = questionBlock.nonce.toNumber();
-        const encryptedY = questionBlock.encryptedYCoordinate;
-        
-        // Decrypt Y-coordinate (correct answer) using XOR
-        const decryptedY = Buffer.alloc(64);
-        for (let j = 0; j < 64; j++) {
-          decryptedY[j] = encryptedY[j] ^ (nonce & 0xFF);
-        }
-        
-        // Convert decrypted bytes to string
-        const correctAnswer = decryptedY.toString('utf8').replace(/\0/g, '');
-        
-        if (userAnswer === correctAnswer) {
-          correctCount++;
-        }
-      }
-      
-      const finalScore = (correctCount / questionBlocks.length) * 100;
-      setScore(finalScore);
-      setQuizCompleted(true);
-      
-    } catch (error: any) {
-      console.error('Error submitting answers:', error);
-      setError(error.message || 'Failed to submit answers. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setSelectedAnswers([]);
-    setQuizCompleted(false);
-    setScore(null);
-    setError(null);
-  };
-
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-black text-white overflow-hidden">
-        <SpaceBackground />
-        <Stars />
-        <Header />
-        <LoadingContainer>
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                🧩 Loading Quiz
-              </h1>
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
-                Fetching quiz data from Solana blockchain...
-              </p>
-              <BlockchainLoadingIndicator 
-                message="Decrypting questions from blockchain..."
-                showProgress={false}
-              />
-            </motion.div>
-          </div>
-        </LoadingContainer>
-        <Footer />
-      </main>
-    );
-  }
+  if (!mounted) return null;
 
   if (!connected) {
-    return (
-      <main className="min-h-screen bg-black text-white overflow-hidden">
-        <SpaceBackground />
-        <Stars />
-        <Header />
-        <LoadingContainer>
-          <div className="text-center max-w-md">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FaRocket className="text-6xl text-purple-400 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
-              <p className="text-purple-300 mb-6">
-                Please connect your Solana wallet to participate in this quiz.
-              </p>
-              <GlowingButton
-                onClick={() => router.push('/')}
-                variant="primary"
-                className="px-6 py-3"
-              >
-                Go to Home
-              </GlowingButton>
-            </motion.div>
-          </div>
-        </LoadingContainer>
-        <Footer />
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="min-h-screen bg-black text-white overflow-hidden">
-        <SpaceBackground />
-        <Stars />
-        <Header />
-        <LoadingContainer>
-          <div className="text-center max-w-md">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FaTimes className="text-6xl text-red-400 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold mb-4 text-red-200">Error</h2>
-              <p className="text-red-300 mb-6">{error}</p>
-              <div className="space-y-3">
-                <GlowingButton
-                  onClick={() => router.push('/play')}
-                  variant="secondary"
-                  className="px-6 py-3"
-                >
-                  Browse Quizzes
-                </GlowingButton>
-                <GlowingButton
-                  onClick={() => window.location.reload()}
-                  variant="primary"
-                  className="px-6 py-3"
-                >
-                  Try Again
-                </GlowingButton>
-              </div>
-            </motion.div>
-          </div>
-        </LoadingContainer>
-        <Footer />
-      </main>
-    );
-  }
-
-  if (quizCompleted && score !== null) {
     return (
       <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
         <SpaceBackground />
         <Stars />
         <Header />
-        <div className="container mx-auto px-4 pt-24 pb-16">
+        <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-2xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md mx-auto bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border-2 border-cyan-500/30"
           >
-            <div className="bg-purple-900/20 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20">
-              <FaTrophy className="text-8xl text-yellow-400 mx-auto mb-6" />
-              <h1 className="text-4xl font-bold mb-4 text-white">Quiz Completed! 🎉</h1>
-              
-              <div className="mb-8">
-                <div className="text-6xl font-bold text-purple-400 mb-2">{score.toFixed(1)}%</div>
-                <p className="text-xl text-purple-300">Your Score</p>
-              </div>
-
-              <div className="space-y-4 mb-8">
-                <div className="bg-purple-800/30 rounded-lg p-4">
-                  <p className="text-purple-200">
-                    <span className="font-semibold">Quiz:</span> {quizSet?.name}
-                  </p>
-                  <p className="text-purple-200">
-                    <span className="font-semibold">Questions:</span> {decryptedQuestions.length}
-                  </p>
-                  <p className="text-purple-200">
-                    <span className="font-semibold">Correct Answers:</span> {Math.round((score / 100) * decryptedQuestions.length)}/{decryptedQuestions.length}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <GlowingButton
-                  onClick={() => router.push('/browse')}
-                  variant="primary"
-                  className="w-full px-8 py-4 text-lg"
-                >
-                  Take Another Quiz
-                </GlowingButton>
-                <GlowingButton
-                  onClick={resetQuiz}
-                  variant="secondary"
-                  className="w-full px-8 py-4 text-lg"
-                >
-                  Retry This Quiz
-                </GlowingButton>
-              </div>
-            </div>
+            <FaRocket className="text-6xl text-cyan-400 mx-auto mb-6" />
+            <h2 className="text-3xl font-bold mb-4">Connect Your Wallet</h2>
+            <p className="text-gray-300 mb-6">
+              Please connect your Solana wallet to play quizzes
+            </p>
+            <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !text-white !font-bold !px-8 !py-4 !rounded-xl" />
           </motion.div>
         </div>
         <Footer />
@@ -309,38 +109,51 @@ export default function QuizDetail() {
     );
   }
 
-  if (!quizSet || decryptedQuestions.length === 0) {
+  if (loading) {
     return (
-      <main className="min-h-screen bg-black text-white overflow-hidden">
+      <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
         <SpaceBackground />
         <Stars />
         <Header />
-        <LoadingContainer>
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FaTimes className="text-6xl text-red-400 mx-auto mb-6" />
-              <p className="text-lg text-red-400">Quiz not found or no questions available</p>
-              <GlowingButton
-                onClick={() => router.push('/play')}
-                variant="primary"
-                className="px-6 py-3 mt-4"
-              >
-                Browse Quizzes
-              </GlowingButton>
-            </motion.div>
-          </div>
-        </LoadingContainer>
+        <div className="container mx-auto px-4 pt-32 pb-16 text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-cyan-400 mb-4"></div>
+          <p className="text-xl text-gray-300">Loading quiz...</p>
+        </div>
         <Footer />
-      </main>
+      </PageWrapper>
     );
   }
 
-  const currentQuestionData = decryptedQuestions[currentQuestion];
-  const progressPercentage = ((currentQuestion + 1) / decryptedQuestions.length) * 100;
+  if (error || !currentQuiz) {
+    return (
+      <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
+        <SpaceBackground />
+        <Stars />
+        <Header />
+        <div className="container mx-auto px-4 pt-32 pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md mx-auto bg-red-500/10 border border-red-500/30 rounded-2xl p-8 text-center"
+          >
+            <h2 className="text-2xl font-bold mb-4 text-red-300">Error</h2>
+            <p className="text-red-200 mb-6">{error || 'Quiz not found'}</p>
+            <button
+              onClick={() => router.push('/play')}
+              className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors"
+            >
+              <FaArrowLeft className="inline mr-2" />
+              Back to Quizzes
+            </button>
+          </motion.div>
+        </div>
+        <Footer />
+      </PageWrapper>
+    );
+  }
+
+  const isWinner = isUserWinner(currentQuiz);
+  const hasAnswered = quizResult !== null;
 
   return (
     <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
@@ -348,155 +161,181 @@ export default function QuizDetail() {
       <Stars />
       <Header />
 
-      <div className="container mx-auto px-4 pt-24 pb-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-3xl mx-auto"
         >
-          {/* Quiz Header */}
-          <div className="mb-8 text-center">
-            <div className="flex items-center justify-center mb-4">
-              <GlowingButton
-                onClick={() => router.push('/browse')}
-                variant="secondary"
-                className="mr-4"
-              >
-                <FaArrowLeft className="mr-2" />
-                Back to Quizzes
-              </GlowingButton>
-            </div>
-            
-            <h1 className="text-4xl font-bold mb-4 text-white">{quizSet.name}</h1>
-            <div className="flex items-center justify-center gap-6 text-purple-300">
-              <span>Questions: {decryptedQuestions.length}</span>
-              <span>Creator: {quizSet.authority.toString().slice(0, 8)}...{quizSet.authority.toString().slice(-8)}</span>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
+          {/* Header */}
           <div className="mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-purple-300">Progress</span>
-              <span className="text-purple-300">{Math.round(progressPercentage)}%</span>
-            </div>
-            <div className="w-full bg-purple-800/30 rounded-full h-3">
-              <motion.div
-                className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercentage}%` }}
-                transition={{ duration: 0.5 }}
-              />
+            <button
+              onClick={() => router.push('/play')}
+              className="mb-6 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              <FaArrowLeft />
+              <span>Back to Quizzes</span>
+            </button>
+
+            <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-lg rounded-xl p-6 border border-cyan-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">Quiz #{currentQuiz.quizId}</h1>
+                  <p className="text-gray-400">Answer correctly to win SOL!</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-cyan-400">{currentQuiz.rewardAmount} SOL</div>
+                  <div className="text-sm text-gray-400">Reward</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Question Card */}
-          <motion.div
-            key={currentQuestion}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-purple-900/20 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20"
-          >
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-white">
-                Question {currentQuestion + 1} of {decryptedQuestions.length}
-              </h2>
-              <p className="text-purple-300">
-                {currentQuestion + 1} of {decryptedQuestions.length} questions completed
+          {/* Quiz Complete - Winner */}
+          {isWinner && !hasAnswered && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-lg rounded-2xl p-8 border-2 border-yellow-500/50 text-center"
+            >
+              <FaTrophy className="text-6xl text-yellow-400 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold mb-4">You Already Won This Quiz!</h2>
+              <p className="text-xl text-gray-300 mb-6">
+                {currentQuiz.isClaimed 
+                  ? 'You have already claimed your reward!' 
+                  : 'Claim your reward now!'}
               </p>
-            </div>
-
-            <div className="mb-8">
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <FaUnlock className="text-green-400" />
-                  <span className="text-green-400 text-sm font-medium">Decrypted from Blockchain</span>
-                </div>
-                <p className="text-lg text-white leading-relaxed">
-                  {currentQuestionData.question}
-                </p>
-              </div>
               
-              <div className="space-y-3">
-                {currentQuestionData.choices.map((choice, index) => (
-                  <button
+              {!currentQuiz.isClaimed && (
+                <ClaimButton
+                  rewardAmount={currentQuiz.rewardAmount}
+                  onClaim={handleClaimReward}
+                  isClaimed={currentQuiz.isClaimed}
+                />
+              )}
+
+              <button
+                onClick={() => router.push('/play')}
+                className="mt-4 text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                Browse more quizzes →
+              </button>
+            </motion.div>
+          )}
+
+          {/* Quiz has winner (not current user) */}
+          {currentQuiz.winner && !isWinner && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border border-gray-700 text-center"
+            >
+              <h2 className="text-2xl font-bold mb-4">Quiz Already Completed</h2>
+              <p className="text-gray-300 mb-2">This quiz has already been won by:</p>
+              <p className="text-cyan-400 font-mono mb-6">
+                {currentQuiz.winner.toString().slice(0, 8)}...{currentQuiz.winner.toString().slice(-8)}
+              </p>
+              <button
+                onClick={() => router.push('/play')}
+                className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors"
+              >
+                Try Another Quiz
+              </button>
+            </motion.div>
+          )}
+
+          {/* Play Quiz */}
+          {!currentQuiz.winner && !hasAnswered && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-gray-800/70 to-gray-900/70 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/30"
+            >
+              {/* Question */}
+              <div className="mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-white leading-relaxed">
+                  {currentQuiz.question}
+                </h2>
+              </div>
+
+              {/* Answer Options */}
+              <div className="space-y-4 mb-8">
+                {currentQuiz.options.map((option, index) => (
+                  <AnswerButton
                     key={index}
-                    className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
-                      selectedAnswers[currentQuestion] === choice
-                        ? 'bg-purple-100 border-purple-500 text-purple-900 shadow-lg'
-                        : 'hover:bg-purple-900/30 border-purple-500/30 text-white hover:border-purple-400/50'
-                    }`}
-                    onClick={() => handleAnswerSelect(choice)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <span className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-500/20 text-lg font-bold text-purple-300">
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                      <span className="text-base">{choice}</span>
-                    </div>
-                  </button>
+                    letter={["A", "B", "C", "D"][index] as "A" | "B" | "C" | "D"}
+                    text={option}
+                    selected={selectedAnswer === ["A", "B", "C", "D"][index]}
+                    onClick={() => setSelectedAnswer(["A", "B", "C", "D"][index] as "A" | "B" | "C" | "D")}
+                    disabled={submitting}
+                  />
                 ))}
               </div>
 
-              {/* Encryption Info */}
-              <div className="mt-6 p-4 bg-blue-900/20 border border-blue-500/20 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <FaLock className="text-blue-400" />
-                  <span className="text-blue-400 text-sm font-medium">Security Info</span>
-                </div>
-                <p className="text-xs text-blue-300">
-                  This question was encrypted using XOR encryption with a unique nonce and stored on Solana blockchain. 
-                  The correct answer remains encrypted and will be verified on-chain without exposure.
-                </p>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="flex justify-between items-center">
-              <GlowingButton
-                onClick={handlePrevious}
-                disabled={currentQuestion === 0}
-                variant="secondary"
-                className="px-6 py-3"
+              {/* Submit Button */}
+              <button
+                onClick={handleAnswerSubmit}
+                disabled={!selectedAnswer || submitting}
+                className={`
+                  w-full py-4 px-6 rounded-xl font-bold text-lg
+                  transition-all duration-300
+                  ${!selectedAnswer || submitting
+                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white shadow-lg hover:shadow-cyan-500/50'
+                  }
+                `}
               >
-                Previous
-              </GlowingButton>
+                {submitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Submitting...
+                  </span>
+                ) : (
+                  'Submit Answer'
+                )}
+              </button>
+            </motion.div>
+          )}
 
-              {currentQuestion === decryptedQuestions.length - 1 ? (
-                <GlowingButton
-                  onClick={handleSubmit}
-                  disabled={submitting || selectedAnswers.length !== decryptedQuestions.length}
-                  variant="primary"
-                  className="px-8 py-3"
-                >
-                  {submitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <FaCheck className="mr-2" />
-                      Submit Quiz
-                    </>
-                  )}
-                </GlowingButton>
+          {/* Result Display */}
+          {quizResult && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={`mt-8 rounded-2xl p-8 border-2 text-center ${
+                quizResult.isWinner
+                  ? 'bg-green-500/20 border-green-500'
+                  : 'bg-red-500/20 border-red-500'
+              }`}
+            >
+              <div className="text-6xl mb-4">{quizResult.isWinner ? '🎉' : '😔'}</div>
+              <h3 className="text-3xl font-bold mb-4">{quizResult.message}</h3>
+              
+              {quizResult.isWinner ? (
+                <div className="space-y-4">
+                  <p className="text-xl text-green-300 mb-6">
+                    You won {currentQuiz.rewardAmount} SOL!
+                  </p>
+                  <ClaimButton
+                    rewardAmount={currentQuiz.rewardAmount}
+                    onClaim={handleClaimReward}
+                    isClaimed={currentQuiz.isClaimed}
+                  />
+                </div>
               ) : (
-                <GlowingButton
-                  onClick={handleNext}
-                  disabled={selectedAnswers[currentQuestion] === undefined}
-                  variant="primary"
-                  className="px-6 py-3"
+                <button
+                  onClick={() => router.push('/play')}
+                  className="mt-4 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors"
                 >
-                  Next
-                </GlowingButton>
+                  Try Another Quiz
+                </button>
               )}
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </motion.div>
       </div>
 
       <Footer />
     </PageWrapper>
   );
-} 
+}
