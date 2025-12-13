@@ -3,5 +3,7 @@
   "createdAt": 1765639690247,
   "startupCommands": [
     "pnpm install; pnpm run dev"
-  ]
+  ],
+  "vercelProjectId": "prj_bEPJxhJkzgZrcvnsrt1IGulS36N8",
+  "deployedWithUserToken": false
 }
