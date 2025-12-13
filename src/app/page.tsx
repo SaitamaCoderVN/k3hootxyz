@@ -2,7 +2,7 @@
 
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { SectionNav } from '@/components/layout/SectionNav';
@@ -53,9 +53,11 @@ function AnimatedStat({ value, label, prefix = '', suffix = '' }: { value: numbe
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { count, start } = useCountAnimation(value, 2000, true);
 
-  if (isInView && count === 0) {
-    start();
-  }
+  useEffect(() => {
+    if (isInView && count === 0) {
+      start();
+    }
+  }, [isInView, count, start]);
 
   return (
     <div ref={ref}>
