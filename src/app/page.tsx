@@ -4,277 +4,205 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import SpaceBackground from '@/components/animations/SpaceBackground';
+import LuminousWaves from '@/components/animations/LuminousWaves';
 import Stars from '@/components/animations/Stars';
-import GlowingButton from '@/components/ui/GlowingButton';
-import CatchableRocket from '@/components/interactive/CatchableRocket';
-import Tokenomics from '@/components/sections/Tokenomics';
-import Roadmap from '@/components/sections/Roadmap';
-import { FaRocket, FaGamepad, FaTrophy, FaUsers, FaChartLine, FaShieldAlt } from 'react-icons/fa';
-import CountUp from 'react-countup';
-import { useState, useEffect } from 'react';
+import NeonLogo from '@/components/ui/NeonLogo';
+import BentoGrid from '@/components/ui/BentoGrid';
+import LiveJackpot from '@/components/sections/LiveJackpot';
+import TopWinners from '@/components/sections/TopWinners';
+import RoadmapBento from '@/components/sections/RoadmapBento';
+import TokenomicsBento from '@/components/sections/TokenomicsBento';
+import BentoCard from '@/components/ui/BentoCard';
+import { FaGamepad, FaRocket } from 'react-icons/fa';
 import dynamic from 'next/dynamic';
-import { PageWrapper, LoadingContainer } from '@/components/layout/MinHeightContainer';
+import { PageWrapper } from '@/components/layout/MinHeightContainer';
 
 const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
   ssr: false,
 });
 
-const features = [
-  {
-    icon: <FaRocket className="w-6 h-6 sm:w-8 sm:h-8" />,
-    title: 'Web3 Powered',
-    description: 'Built on Solana for lightning-fast transactions and true ownership',
-    gradient: 'from-purple-500 to-pink-500'
-  },
-  {
-    icon: <FaGamepad className="w-6 h-6 sm:w-8 sm:h-8" />,
-    title: 'Real-time Multiplayer (Soon)',
-    description: 'Compete with players worldwide in exciting quiz battles by Magicblock infrastructure',
-    gradient: 'from-blue-500 to-purple-500'
-  },
-  {
-    icon: <FaTrophy className="w-6 h-6 sm:w-8 sm:h-8" />,
-    title: 'Earn Rewards',
-    description: 'Win SOL tokens and exclusive NFTs for your achievements',
-    gradient: 'from-yellow-500 to-orange-500'
-  },
-  {
-    icon: <FaUsers className="w-6 h-6 sm:w-8 sm:h-8" />,
-    title: 'Community Driven',
-    description: 'Create and share your own quizzes with the community',
-    gradient: 'from-green-500 to-blue-500'
-  },
-  {
-    icon: <FaChartLine className="w-6 h-6 sm:w-8 sm:h-8" />,
-    title: 'Play to Earn',
-    description: 'Turn your knowledge into real crypto rewards',
-    gradient: 'from-red-500 to-purple-500'
-  },
-  {
-    icon: <FaShieldAlt className="w-6 h-6 sm:w-8 sm:h-8" />,
-    title: 'Secure & Fair',
-    description: 'Blockchain-verified results ensure transparent gameplay',
-    gradient: 'from-indigo-500 to-purple-500'
-  }
-];
-
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
   return (
-    <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
+    <PageWrapper minHeight="screen" className="text-white overflow-hidden" style={{ backgroundColor: '#0A001F' }}>
       <PixelEffect />
-      <SpaceBackground />
+      <LuminousWaves />
       <Stars />
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 overflow-hidden">
+      <section className="relative pt-32 pb-24 overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto text-center">
+          <div className="max-w-6xl mx-auto text-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
-              className="mb-6 sm:mb-8"
+              className="mb-8 flex justify-center"
             >
-              <span className="inline-block px-3 sm:px-4 py-2 mb-4 sm:mb-6 text-xs sm:text-sm font-medium text-purple-300 bg-purple-900/30 rounded-full border border-purple-500/30">
-                🚀 Launch Week: Double Rewards for Early Players!
-              </span>
+              <NeonLogo />
             </motion.div>
             
             <motion.h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 gradient-text leading-tight"
-              initial={{ opacity: 0, y: 20 }}
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold mb-8 leading-none"
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              style={{
+                fontFamily: 'var(--font-display)',
+                background: 'linear-gradient(135deg, #f97316 0%, #a855f7 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '-0.02em',
+              }}
             >
-              K3HOOT.XYZ
+              THE ULTIMATE<br />WEB3 QUIZ<br />PLATFORM
             </motion.h1>
             
             <motion.p
-              className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-purple-300 mb-3 sm:mb-4 font-light"
+              className="text-xl md:text-2xl text-purple-300/80 mb-12 max-w-3xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
             >
-              The Ultimate Web3 Quiz Platform
-            </motion.p>
-            
-            <motion.p
-              className="text-base sm:text-lg md:text-xl lg:text-2xl text-purple-400 mb-8 sm:mb-10 lg:mb-12 max-w-2xl mx-auto leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              Challenge your knowledge, compete with players worldwide, and earn crypto rewards on the fastest blockchain
+              Challenge your knowledge on Solana. Compete globally. Earn crypto rewards.
             </motion.p>
             
             <motion.div
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
+              className="flex flex-col sm:flex-row items-center justify-center gap-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
             >
               <Link href="/play" className="w-full sm:w-auto">
-                <GlowingButton variant="primary" className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto">
-                  <FaGamepad className="inline-block mr-2" />
-                  Play Now
-                </GlowingButton>
+                <button 
+                  className="group relative px-10 py-5 text-xl font-bold rounded-3xl overflow-hidden w-full sm:w-auto transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    background: 'linear-gradient(135deg, #f97316, #fb923c)',
+                    boxShadow: '0 0 40px rgba(249, 115, 22, 0.5), 0 20px 40px rgba(0, 0, 0, 0.4)',
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative flex items-center justify-center gap-2">
+                    <FaGamepad className="w-5 h-5" />
+                    Play Now
+                  </span>
+                </button>
               </Link>
+              
               <Link href="/create" className="w-full sm:w-auto">
-                <GlowingButton variant="secondary" className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto">
-                  <FaRocket className="inline-block mr-2" />
-                  Create Quiz
-                </GlowingButton>
+                <button 
+                  className="group relative px-10 py-5 text-xl font-bold rounded-3xl overflow-hidden w-full sm:w-auto backdrop-blur-xl transition-all duration-300 hover:-translate-y-1"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '2px solid rgba(168, 85, 247, 0.3)',
+                    boxShadow: '0 0 40px rgba(168, 85, 247, 0.3), 0 20px 40px rgba(0, 0, 0, 0.4)',
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative flex items-center justify-center gap-2">
+                    <FaRocket className="w-5 h-5" />
+                    Create Quiz
+                  </span>
+                </button>
               </Link>
             </motion.div>
           </div>
         </div>
 
-        {/* Animated background elements */}
         <motion.div
-          className="absolute top-1/3 -left-16 sm:-left-32 w-32 sm:w-48 lg:w-64 h-32 sm:h-48 lg:h-64 bg-purple-500/20 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[120px]"
           animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-            scale: [1, 1.5, 1],
+            scale: [1, 1.2, 1],
+            x: [0, 50, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        <motion.div
+          className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[140px]"
+          animate={{
+            scale: [1.2, 0.8, 1.2],
+            x: [0, -50, 0],
           }}
           transition={{
             duration: 20,
             repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute top-1/4 -right-16 sm:-right-32 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-pink-500/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 50, 0],
-            scale: [1.2, 0.8, 1.2],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut"
+            ease: 'easeInOut',
           }}
         />
       </section>
 
-      {/* Features Grid */}
-      <section className="py-16 sm:py-20 lg:py-24 relative">
+      <section className="py-20 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 sm:mb-16 gradient-text"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            Why Choose K3HOOT?
-          </motion.h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                className="relative group"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl blur-xl"
-                  style={{
-                    backgroundImage: `linear-gradient(to right, ${feature.gradient.split(' ')[1]}, ${feature.gradient.split(' ')[3]})`
-                  }}
-                />
-                <div className="relative bg-purple-900/20 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-purple-500/20 h-full group-hover:border-purple-500/40 transition-all duration-300">
-                  <div className={`inline-flex p-2 sm:p-3 rounded-lg bg-gradient-to-r ${feature.gradient} mb-4 sm:mb-6`}>
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{feature.title}</h3>
-                  <p className="text-purple-300 leading-relaxed text-sm sm:text-base">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <BentoGrid>
+            <LiveJackpot />
+            <TopWinners />
+            <TokenomicsBento />
+            <RoadmapBento />
+            
+            <BentoCard size="medium" glowColor="rgba(59, 130, 246, 0.5)" delay={0.4}>
+              <div className="flex flex-col h-full justify-center text-center">
+                <h3 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+                  10,000+
+                </h3>
+                <p className="text-purple-300/70">Active Players Worldwide</p>
+              </div>
+            </BentoCard>
+            
+            <BentoCard size="small" glowColor="rgba(236, 72, 153, 0.5)" delay={0.5}>
+              <div className="flex flex-col h-full justify-center text-center">
+                <h3 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: 'var(--font-display)' }}>
+                  500+
+                </h3>
+                <p className="text-purple-300/70 text-sm">Quiz Topics</p>
+              </div>
+            </BentoCard>
+          </BentoGrid>
         </div>
       </section>
 
-      {/* How to Play Section */}
-      <section className="py-16 sm:py-20 lg:py-24 relative bg-gradient-to-b from-purple-900/10 to-black">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 sm:mb-16 gradient-text"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            Start Playing in 4 Simple Steps
-          </motion.h2>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="relative">
-              <div className="absolute left-4 sm:left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 to-pink-500" />
-              {[
-                { step: 'Connect Wallet', desc: 'Link your Solana wallet to get started', icon: '🔗' },
-                { step: 'Choose or Create', desc: 'Join an existing quiz or create your own', icon: '🎯' },
-                { step: 'Play & Compete', desc: 'Answer questions and race against time', icon: '⚡' },
-                { step: 'Earn Rewards', desc: 'Win SOL tokens by answering correctly', icon: '💰' }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  className="relative pl-12 sm:pl-20 pb-8 sm:pb-12 last:pb-0"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <div className="absolute left-2 sm:left-6 -translate-x-1/2 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
-                  <div className="bg-purple-900/20 backdrop-blur-lg rounded-xl p-4 sm:p-6 border border-purple-500/20">
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <span className="text-2xl sm:text-4xl">{item.icon}</span>
-                      <div>
-                        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2 text-white">
-                          Step {index + 1}: {item.step}
-                        </h3>
-                        <p className="text-purple-300 text-sm sm:text-base lg:text-lg leading-relaxed">{item.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tokenomics Section */}
-      <Tokenomics />
-
-      {/* Roadmap Section */}
-      <Roadmap />
-
-      {/* CTA Section */}
-      <section className="py-16 sm:py-20 lg:py-24 relative">
+      <section className="py-24 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="max-w-4xl mx-auto text-center bg-gradient-to-r from-purple-900/30 to-pink-900/30 backdrop-blur-lg rounded-3xl p-8 sm:p-12 border border-purple-500/20"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+            className="max-w-4xl mx-auto text-center backdrop-blur-xl rounded-[48px] p-12 md:p-16 border border-white/10"
+            style={{
+              background: 'rgba(255, 255, 255, 0.02)',
+              boxShadow: '0 0 80px rgba(168, 85, 247, 0.2), 0 30px 60px rgba(0, 0, 0, 0.4)',
+            }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 gradient-text">
-              Ready to Test Your Knowledge?
+            <h2 
+              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
+              style={{
+                fontFamily: 'var(--font-display)',
+                background: 'linear-gradient(135deg, #a855f7, #ec4899)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              READY TO PLAY?
             </h2>
-            <p className="text-lg sm:text-xl text-purple-300 mb-6 sm:mb-8 leading-relaxed">
-              Join thousands of players earning crypto while having fun!
+            <p className="text-xl md:text-2xl text-purple-300/80 mb-10">
+              Join thousands earning crypto through knowledge
             </p>
-            <Link href="/play" className="inline-block w-full sm:w-auto">
-              <GlowingButton variant="primary" className="text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 w-full sm:w-auto">
-                Start Playing Now 🎮
-              </GlowingButton>
+            <Link href="/play">
+              <button 
+                className="group relative px-12 py-6 text-2xl font-bold rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2"
+                style={{
+                  background: 'linear-gradient(135deg, #a855f7, #ec4899)',
+                  boxShadow: '0 0 60px rgba(168, 85, 247, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative">Start Playing Now 🎮</span>
+              </button>
             </Link>
           </motion.div>
         </div>

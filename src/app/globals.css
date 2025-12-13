@@ -7,6 +7,7 @@
   --primary-dark: #d946ef;
   --pixel-border: 4px;
   --pixel-shadow: 0 6px 0 #4c1d95;
+  --deep-space: #0A001F;
 }
 
 /* Base text colors */
@@ -16,28 +17,29 @@
   }
   
   body {
-    @apply bg-black text-white;
-    font-family: var(--font-pixel);
+    @apply text-white;
+    background-color: var(--deep-space);
+    font-family: var(--font-space);
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply text-white;
-    font-family: var(--font-heading);
+    font-family: var(--font-display);
   }
 
   p {
     @apply text-gray-100;
-    font-family: var(--font-pixel);
+    font-family: var(--font-space);
   }
 
   a {
     @apply text-purple-300 hover:text-purple-200;
-    font-family: var(--font-pixel);
+    font-family: var(--font-space);
   }
 
   button {
     @apply text-white;
-    font-family: var(--font-heading);
+    font-family: var(--font-space);
   }
 }
 

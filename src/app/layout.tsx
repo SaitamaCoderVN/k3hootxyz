@@ -1,25 +1,25 @@
 import './globals.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import { WalletContextProvider } from '@/contexts/WalletContextProvider';
-import { VT323, Orbitron } from 'next/font/google';
+import { Space_Grotesk, Bebas_Neue } from 'next/font/google';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { PageLoader } from '@/components/ui/LoadingStates';
 
-const vt323 = VT323({
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-space',
+});
+
+const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: '400',
   display: 'swap',
-  variable: '--font-pixel',
-});
-
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
-  variable: '--font-heading',
+  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${vt323.variable} ${orbitron.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${bebasNeue.variable}`}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
