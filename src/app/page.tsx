@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
+import { useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { SectionNav } from '@/components/layout/SectionNav';
@@ -11,23 +12,70 @@ import NeonLogo from '@/components/ui/NeonLogo';
 import { FaGamepad, FaRocket, FaCoins, FaTrophy, FaBolt } from 'react-icons/fa';
 import dynamic from 'next/dynamic';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
-import Image from 'next/image';
+import { useCountAnimation } from '@/hooks/useCountAnimation';
+import { useParallax } from '@/hooks/useParallax';
 
 const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
   ssr: false,
 });
 
-export default function Home() {
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+function AnimatedStat({ value, label, prefix = '', suffix = '' }: { value: number; label: string; prefix?: string; suffix?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { count, start } = useCountAnimation(value, 2000, true);
+
+  if (isInView && count === 0) {
+    start();
+  }
+
   return (
-    <PageWrapper minHeight="screen" className="text-white overflow-hidden" style={{ backgroundColor: '#0A001F' }}>
+    <div ref={ref}>
+      <h3 className="text-7xl font-bold mb-4 text-orange-400" style={{ fontFamily: 'var(--font-display)' }}>
+        {prefix}{count.toLocaleString()}{suffix}
+      </h3>
+      <p className="text-purple-300/70 text-lg" style={{ fontFamily: 'var(--font-space)' }}>
+        {label}
+      </p>
+    </div>
+  );
+}
+
+export default function Home() {
+  const parallaxSlow = useParallax(0.3);
+  const parallaxFast = useParallax(0.5);
+
+  return (
+    <PageWrapper minHeight="screen" className="text-white overflow-hidden scroll-smooth" style={{ backgroundColor: '#0A001F', scrollSnapType: 'y proximity' }}>
       <PixelEffect />
       <LuminousWaves />
       <Stars />
       <Header />
       <SectionNav />
 
-      {/* HERO SECTION - Full Viewport */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* HERO SECTION */}
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -65,43 +113,54 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <Link href="/play" className="w-full sm:w-auto">
-                <button 
-                  className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden w-full sm:w-auto transition-all duration-300 hover:-translate-y-2"
+                <motion.button 
+                  className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden w-full sm:w-auto transition-all duration-300"
                   style={{
                     background: 'linear-gradient(135deg, #f97316, #fb923c)',
                     boxShadow: '0 0 60px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
                   }}
+                  whileHover={{ y: -8, boxShadow: '0 0 80px rgba(249, 115, 22, 0.8), 0 25px 50px rgba(0, 0, 0, 0.5)' }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <span className="relative flex items-center justify-center gap-3">
                     <FaGamepad className="w-6 h-6" />
                     Play Now
                   </span>
-                </button>
+                </motion.button>
               </Link>
               
               <Link href="/create" className="w-full sm:w-auto">
-                <button 
-                  className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden w-full sm:w-auto backdrop-blur-xl transition-all duration-300 hover:-translate-y-2"
+                <motion.button 
+                  className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden w-full sm:w-auto backdrop-blur-xl transition-all duration-300"
                   style={{
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '2px solid rgba(168, 85, 247, 0.4)',
                     boxShadow: '0 0 60px rgba(168, 85, 247, 0.4)',
                   }}
+                  whileHover={{ 
+                    y: -8, 
+                    boxShadow: '0 0 80px rgba(168, 85, 247, 0.6), 0 25px 50px rgba(0, 0, 0, 0.5)',
+                    borderColor: 'rgba(168, 85, 247, 0.8)'
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <span className="relative flex items-center justify-center gap-3">
                     <FaRocket className="w-6 h-6" />
                     Create Quiz
                   </span>
-                </button>
+                </motion.button>
               </Link>
             </motion.div>
           </div>
         </div>
 
         <motion.div
-          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[160px]"
+          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[160px] pointer-events-none"
+          style={{ y: parallaxSlow.y }}
           animate={{
             scale: [1, 1.3, 1],
             x: [0, 60, 0],
@@ -113,7 +172,8 @@ export default function Home() {
           }}
         />
         <motion.div
-          className="absolute top-1/3 right-1/4 w-[700px] h-[700px] bg-purple-500/10 rounded-full blur-[180px]"
+          className="absolute top-1/3 right-1/4 w-[700px] h-[700px] bg-purple-500/10 rounded-full blur-[180px] pointer-events-none"
+          style={{ y: parallaxFast.y }}
           animate={{
             scale: [1.3, 0.9, 1.3],
             x: [0, -60, 0],
@@ -126,17 +186,20 @@ export default function Home() {
         />
       </section>
 
-      {/* WEB3 POWERED SECTION - Asymmetric Grid */}
-      <section id="web3-powered" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10">
+      {/* WEB3 POWERED SECTION */}
+      <section id="web3-powered" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10" style={{ scrollSnapAlign: 'start' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center">
-            {/* Left: Dominant Typography (2/3) */}
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             <div className="lg:col-span-2">
               <motion.p
                 className="text-orange-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
+                variants={itemVariants}
                 style={{ fontFamily: 'var(--font-space)' }}
               >
                 K3HOOT.XYZ EDITIONS
@@ -144,10 +207,7 @@ export default function Home() {
               
               <motion.h2
                 className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[14rem] font-bold leading-[0.85] tracking-tighter mb-8"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
+                variants={itemVariants}
                 style={{
                   fontFamily: 'var(--font-display)',
                   background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
@@ -160,17 +220,19 @@ export default function Home() {
               </motion.h2>
             </div>
 
-            {/* Right: Supporting Details (1/3) */}
             <motion.div
-              className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10"
+              className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 transition-all duration-300 hover:scale-[1.02]"
               style={{
                 background: 'rgba(255, 255, 255, 0.02)',
                 boxShadow: '0 0 60px rgba(168, 85, 247, 0.2)',
               }}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
+              variants={itemVariants}
+              whileHover={{
+                boxShadow: '0 0 100px rgba(168, 85, 247, 0.5), 0 20px 40px rgba(0, 0, 0, 0.3)',
+                y: -8,
+                borderColor: 'rgba(168, 85, 247, 0.6)',
+              }}
+              transition={{ duration: 0.3 }}
             >
               <FaBolt className="w-12 h-12 text-purple-400 mb-6" />
               <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
@@ -194,48 +256,45 @@ export default function Home() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* EARN REWARDS SECTION - Asymmetric Grid (Flipped) */}
-      <section id="earn-rewards" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10">
+      {/* EARN REWARDS SECTION */}
+      <section id="earn-rewards" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10" style={{ scrollSnapAlign: 'start' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center">
-            {/* Left: Supporting Visual (1/3) */}
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             <motion.div
-              className="backdrop-blur-xl rounded-[32px] p-12 border border-white/10 text-center"
+              className="backdrop-blur-xl rounded-[32px] p-12 border border-white/10 text-center transition-all duration-300"
               style={{
                 background: 'rgba(255, 255, 255, 0.02)',
                 boxShadow: '0 0 60px rgba(249, 115, 22, 0.3)',
               }}
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
+              variants={itemVariants}
+              whileHover={{
+                boxShadow: '0 0 120px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3)',
+                y: -8,
+                borderColor: 'rgba(249, 115, 22, 0.6)',
+              }}
+              transition={{ duration: 0.3 }}
             >
               <FaCoins className="w-16 h-16 text-orange-400 mb-6 mx-auto" />
-              <h3 className="text-7xl font-bold mb-4 text-orange-400" style={{ fontFamily: 'var(--font-display)' }}>
-                2,847
-              </h3>
-              <p className="text-purple-300/70 text-lg" style={{ fontFamily: 'var(--font-space)' }}>
-                SOL Distributed
-              </p>
+              <AnimatedStat value={2847} label="SOL Distributed" />
               <div className="mt-8 pt-8 border-t border-white/10">
-                <p className="text-4xl font-bold mb-2 text-purple-300" style={{ fontFamily: 'var(--font-display)' }}>
-                  $324K
-                </p>
-                <p className="text-purple-300/60 text-sm">Total Prize Pool</p>
+                <AnimatedStat value={324} label="Total Prize Pool" prefix="$" suffix="K" />
               </div>
             </motion.div>
 
-            {/* Right: Dominant Typography (2/3) */}
             <div className="lg:col-span-2">
               <motion.p
                 className="text-orange-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
+                variants={itemVariants}
                 style={{ fontFamily: 'var(--font-space)' }}
               >
                 PLAY-TO-EARN
@@ -243,10 +302,7 @@ export default function Home() {
               
               <motion.h2
                 className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[14rem] font-bold leading-[0.85] tracking-tighter mb-8"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
+                variants={itemVariants}
                 style={{
                   fontFamily: 'var(--font-display)',
                   background: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
@@ -260,29 +316,30 @@ export default function Home() {
 
               <motion.p
                 className="text-xl text-purple-300/70 leading-relaxed max-w-2xl"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
+                variants={itemVariants}
                 style={{ fontFamily: 'var(--font-space)' }}
               >
                 Answer correctly, climb the leaderboard, and earn $K3 tokens. Top performers receive SOL rewards directly to their wallet.
               </motion.p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* COMPETE SECTION */}
-      <section id="compete" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10">
+      <section id="compete" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10" style={{ scrollSnapAlign: 'start' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center">
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             <div className="lg:col-span-2">
               <motion.p
                 className="text-purple-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
+                variants={itemVariants}
                 style={{ fontFamily: 'var(--font-space)' }}
               >
                 GLOBAL LEADERBOARDS
@@ -290,10 +347,7 @@ export default function Home() {
               
               <motion.h2
                 className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[14rem] font-bold leading-[0.85] tracking-tighter mb-8"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1 }}
+                variants={itemVariants}
                 style={{
                   fontFamily: 'var(--font-display)',
                   background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
@@ -307,15 +361,18 @@ export default function Home() {
             </div>
 
             <motion.div
-              className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10"
+              className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 transition-all duration-300"
               style={{
                 background: 'rgba(255, 255, 255, 0.02)',
                 boxShadow: '0 0 60px rgba(236, 72, 153, 0.3)',
               }}
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
+              variants={itemVariants}
+              whileHover={{
+                boxShadow: '0 0 100px rgba(236, 72, 153, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3)',
+                y: -8,
+                borderColor: 'rgba(236, 72, 153, 0.6)',
+              }}
+              transition={{ duration: 0.3 }}
             >
               <FaTrophy className="w-12 h-12 text-pink-400 mb-6" />
               <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
@@ -339,18 +396,19 @@ export default function Home() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* TOKENOMICS SECTION - Full Width Editorial */}
-      <section id="tokenomics" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10">
+      {/* TOKENOMICS SECTION */}
+      <section id="tokenomics" className="relative min-h-screen flex items-center py-32 overflow-hidden border-t border-purple-500/10" style={{ scrollSnapAlign: 'start' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
           >
             <p
               className="text-purple-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
@@ -373,7 +431,13 @@ export default function Home() {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             {[
               { label: 'Total Supply', value: '1B', color: 'orange' },
               { label: 'Player Rewards', value: '40%', color: 'purple' },
@@ -382,7 +446,7 @@ export default function Home() {
             ].map((stat, i) => (
               <motion.div
                 key={i}
-                className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 text-center"
+                className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 text-center transition-all duration-300"
                 style={{
                   background: 'rgba(255, 255, 255, 0.02)',
                   boxShadow: `0 0 60px rgba(${
@@ -391,10 +455,17 @@ export default function Home() {
                     stat.color === 'pink' ? '236, 72, 153' : '59, 130, 246'
                   }, 0.2)`,
                 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                variants={itemVariants}
+                whileHover={{
+                  boxShadow: `0 0 100px rgba(${
+                    stat.color === 'orange' ? '249, 115, 22' :
+                    stat.color === 'purple' ? '168, 85, 247' :
+                    stat.color === 'pink' ? '236, 72, 153' : '59, 130, 246'
+                  }, 0.5), 0 20px 40px rgba(0, 0, 0, 0.3)`,
+                  y: -8,
+                  scale: 1.05,
+                }}
+                transition={{ duration: 0.3 }}
               >
                 <h3 
                   className="text-6xl font-bold mb-4"
@@ -412,7 +483,7 @@ export default function Home() {
                 </p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <motion.div
             className="max-w-4xl mx-auto text-center mt-20 backdrop-blur-xl rounded-[48px] p-12 md:p-16 border border-white/10"
@@ -422,8 +493,8 @@ export default function Home() {
             }}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.4, duration: 0.6 }}
           >
             <h2 
               className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
@@ -441,16 +512,22 @@ export default function Home() {
               Join thousands earning crypto through knowledge
             </p>
             <Link href="/play">
-              <button 
-                className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden transition-all duration-300 hover:-translate-y-2"
+              <motion.button 
+                className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden transition-all duration-300"
                 style={{
                   background: 'linear-gradient(135deg, #f97316, #a855f7)',
                   boxShadow: '0 0 60px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
                 }}
+                whileHover={{ 
+                  y: -8,
+                  boxShadow: '0 0 100px rgba(249, 115, 22, 0.8), 0 25px 50px rgba(0, 0, 0, 0.5)'
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative">Start Playing Now 🎮</span>
-              </button>
+              </motion.button>
             </Link>
           </motion.div>
         </div>
