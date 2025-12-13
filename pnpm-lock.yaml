@@ -77,6 +77,9 @@ importers:
       ws:
         specifier: ^8.18.0
         version: 8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      zustand:
+        specifier: ^5.0.9
+        version: 5.0.9(@types/react@19.1.12)(react@19.1.1)(use-sync-external-store@1.6.0(react@19.1.1))
     devDependencies:
       '@types/canvas-confetti':
         specifier: ^1.6.4

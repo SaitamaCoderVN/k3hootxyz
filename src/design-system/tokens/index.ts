@@ -1,0 +1,252 @@
+// K3HOOT Design System Tokens
+// All design values must reference these tokens for consistency
+
+export const colors = {
+  // Primary Palette
+  primary: {
+    orange: {
+      50: '#FFF7ED',
+      100: '#FFEDD5',
+      200: '#FED7AA',
+      300: '#FDBA74',
+      400: '#FB923C', // Main Orange
+      500: '#F97316', // Primary Orange
+      600: '#EA580C',
+      700: '#C2410C',
+      800: '#9A3412',
+      900: '#7C2D12',
+    },
+    purple: {
+      50: '#FAF5FF',
+      100: '#F3E8FF',
+      200: '#E9D5FF',
+      300: '#D8B4FE',
+      400: '#C084FC',
+      500: '#A855F7', // Primary Purple
+      600: '#9333EA',
+      700: '#7E22CE',
+      800: '#6B21A8',
+      900: '#581C87',
+    },
+    pink: {
+      50: '#FDF2F8',
+      100: '#FCE7F3',
+      200: '#FBCFE8',
+      300: '#F9A8D4',
+      400: '#F472B6',
+      500: '#EC4899', // Primary Pink
+      600: '#DB2777',
+      700: '#BE185D',
+      800: '#9F1239',
+      900: '#831843',
+    },
+  },
+  
+  // Background
+  background: {
+    primary: '#0A001F', // Deep Space
+    secondary: 'rgba(255, 255, 255, 0.02)',
+    tertiary: 'rgba(255, 255, 255, 0.05)',
+    glass: 'rgba(255, 255, 255, 0.03)',
+  },
+  
+  // Text
+  text: {
+    primary: '#FFFFFF',
+    secondary: 'rgba(255, 255, 255, 0.85)',
+    tertiary: 'rgba(255, 255, 255, 0.60)',
+    muted: 'rgba(255, 255, 255, 0.40)',
+  },
+  
+  // State Colors
+  state: {
+    success: '#10B981',
+    error: '#EF4444',
+    warning: '#F59E0B',
+    info: '#3B82F6',
+  },
+  
+  // Semantic
+  semantic: {
+    border: 'rgba(255, 255, 255, 0.10)',
+    borderHover: 'rgba(168, 85, 247, 0.40)',
+    borderActive: 'rgba(168, 85, 247, 0.80)',
+    shadow: 'rgba(0, 0, 0, 0.40)',
+  },
+} as const;
+
+export const typography = {
+  // Font Families
+  fontFamily: {
+    display: 'var(--font-display)', // Editorial/Impact typography
+    body: 'var(--font-space)', // Body text
+    mono: 'var(--font-mono)', // Code/monospace
+  },
+  
+  // Font Sizes (Responsive scale based on 4px)
+  fontSize: {
+    // Display (Hero sections)
+    display: {
+      xs: ['4rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 64px
+      sm: ['6rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 96px
+      md: ['8rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 128px
+      lg: ['10rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 160px
+      xl: ['12rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 192px
+      '2xl': ['16rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 256px
+    },
+    
+    // Headings
+    h1: ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }], // 56px
+    h2: ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }], // 48px
+    h3: ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }], // 36px
+    h4: ['1.875rem', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '700' }], // 30px
+    h5: ['1.5rem', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }], // 24px
+    h6: ['1.25rem', { lineHeight: '1.4', letterSpacing: '0', fontWeight: '600' }], // 20px
+    
+    // Body
+    xl: ['1.25rem', { lineHeight: '1.75', letterSpacing: '0', fontWeight: '400' }], // 20px
+    lg: ['1.125rem', { lineHeight: '1.75', letterSpacing: '0', fontWeight: '400' }], // 18px
+    base: ['1rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }], // 16px
+    sm: ['0.875rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }], // 14px
+    xs: ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.02em', fontWeight: '400' }], // 12px
+  },
+} as const;
+
+export const spacing = {
+  // Base unit: 4px
+  0: '0',
+  1: '0.25rem', // 4px
+  2: '0.5rem', // 8px
+  3: '0.75rem', // 12px
+  4: '1rem', // 16px
+  5: '1.25rem', // 20px
+  6: '1.5rem', // 24px
+  8: '2rem', // 32px
+  10: '2.5rem', // 40px
+  12: '3rem', // 48px
+  16: '4rem', // 64px
+  20: '5rem', // 80px
+  24: '6rem', // 96px
+  32: '8rem', // 128px
+  40: '10rem', // 160px
+  48: '12rem', // 192px
+  56: '14rem', // 224px
+  64: '16rem', // 256px
+} as const;
+
+export const borderRadius = {
+  none: '0',
+  sm: '0.375rem', // 6px
+  md: '0.5rem', // 8px
+  lg: '0.75rem', // 12px
+  xl: '1rem', // 16px
+  '2xl': '1.5rem', // 24px
+  '3xl': '2rem', // 32px
+  '4xl': '3rem', // 48px
+  full: '9999px',
+} as const;
+
+export const shadows = {
+  // Neon/Glow Shadows
+  neon: {
+    orange: {
+      sm: '0 0 20px rgba(249, 115, 22, 0.3)',
+      md: '0 0 40px rgba(249, 115, 22, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3)',
+      lg: '0 0 60px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
+      xl: '0 0 100px rgba(249, 115, 22, 0.8), 0 25px 50px rgba(0, 0, 0, 0.5)',
+    },
+    purple: {
+      sm: '0 0 20px rgba(168, 85, 247, 0.3)',
+      md: '0 0 40px rgba(168, 85, 247, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3)',
+      lg: '0 0 60px rgba(168, 85, 247, 0.5), 0 20px 40px rgba(0, 0, 0, 0.4)',
+      xl: '0 0 100px rgba(168, 85, 247, 0.6), 0 25px 50px rgba(0, 0, 0, 0.5)',
+    },
+    pink: {
+      sm: '0 0 20px rgba(236, 72, 153, 0.3)',
+      md: '0 0 40px rgba(236, 72, 153, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3)',
+      lg: '0 0 60px rgba(236, 72, 153, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
+      xl: '0 0 100px rgba(236, 72, 153, 0.8), 0 25px 50px rgba(0, 0, 0, 0.5)',
+    },
+  },
+  
+  // Standard shadows
+  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+  xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+} as const;
+
+export const animations = {
+  // Duration tokens
+  duration: {
+    instant: '0ms',
+    fast: '150ms',
+    normal: '300ms',
+    slow: '500ms',
+    slower: '800ms',
+    slowest: '1200ms',
+  },
+  
+  // Easing curves
+  easing: {
+    linear: 'linear',
+    easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+    easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+    easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    smooth: 'cubic-bezier(0.22, 1, 0.36, 1)', // Custom smooth curve
+  },
+  
+  // Named animations
+  variants: {
+    'fade-in': {
+      name: 'fade-in',
+      duration: '300ms',
+      easing: 'cubic-bezier(0, 0, 0.2, 1)',
+    },
+    'fade-in-slow': {
+      name: 'fade-in-slow',
+      duration: '800ms',
+      easing: 'cubic-bezier(0, 0, 0.2, 1)',
+    },
+    'slide-up': {
+      name: 'slide-up',
+      duration: '300ms',
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    },
+    'slide-up-medium': {
+      name: 'slide-up-medium',
+      duration: '500ms',
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    },
+    'neon-pulse': {
+      name: 'neon-pulse',
+      duration: '2000ms',
+      easing: 'ease-in-out',
+    },
+    'neon-pulse-quick': {
+      name: 'neon-pulse-quick',
+      duration: '1000ms',
+      easing: 'ease-in-out',
+    },
+    'scale-in': {
+      name: 'scale-in',
+      duration: '300ms',
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    },
+  },
+} as const;
+
+export const breakpoints = {
+  xs: '320px',
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px',
+  '2xl': '1536px',
+} as const;
+
+// Type exports for TypeScript
+export type ColorToken = typeof colors;
+export type TypographyToken = typeof typography;
+export type SpacingToken = typeof spacing;
+export type AnimationToken = typeof animations;

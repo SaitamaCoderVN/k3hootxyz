@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
-import Link from 'next/link';
 import { useRef, useEffect } from 'react';
+import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { SectionNav } from '@/components/layout/SectionNav';
@@ -13,10 +13,11 @@ import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import { useCountAnimation } from '@/hooks/useCountAnimation';
 import { useParallax } from '@/hooks/useParallax';
 import { CursorTrail } from '@/components/interactive/CursorTrail';
-import { InteractiveCard } from '@/components/interactive/InteractiveCard';
-import { RippleButton } from '@/components/interactive/RippleButton';
 import { FlashProvider, useFlash } from '@/components/interactive/FlashEffect';
 import { Tilt3D } from '@/components/ui/Tilt3D';
+
+// Design System Imports
+import { Typography, NeonButton, GlassCard, colors, shadows, animations, spacing } from '@/design-system';
 
 const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
   ssr: false,
@@ -42,8 +43,8 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
+      duration: parseFloat(animations.duration.slow) / 1000,
+      ease: animations.easing.smooth.split('(')[1].split(')')[0].split(',').map(Number),
     },
   },
 };
@@ -61,12 +62,12 @@ function AnimatedStat({ value, label, prefix = '', suffix = '' }: { value: numbe
 
   return (
     <div ref={ref}>
-      <h3 className="text-7xl font-bold mb-4 text-orange-400" style={{ fontFamily: 'var(--font-display)' }}>
+      <Typography variant="display-xs" gradient="orange" className="mb-4">
         {prefix}{count.toLocaleString()}{suffix}
-      </h3>
-      <p className="text-purple-300/70 text-lg" style={{ fontFamily: 'var(--font-space)' }}>
+      </Typography>
+      <Typography variant="body-lg" color={`${colors.primary.purple[300]}b3`}>
         {label}
-      </p>
+      </Typography>
     </div>
   );
 }
@@ -86,7 +87,7 @@ export default function Home() {
 
   return (
     <FlashProvider>
-      <PageWrapper minHeight="screen" className="text-white overflow-hidden scroll-smooth" style={{ backgroundColor: '#0A001F', scrollSnapType: 'y proximity' }}>
+      <PageWrapper minHeight="screen" className="text-white overflow-hidden scroll-smooth" style={{ backgroundColor: colors.background.primary, scrollSnapType: 'y proximity' }}>
         <WebGLBackground />
         <CursorTrail />
         <PixelEffect />
@@ -101,31 +102,26 @@ export default function Home() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8 }}
+                  transition={{ duration: parseFloat(animations.duration.slower) / 1000 }}
                   className="mb-12 flex justify-center lg:justify-start"
                 >
                   <NeonLogo />
                 </motion.div>
               </Tilt3D>
               
-              <motion.h1
-                className="text-[8rem] sm:text-[10rem] md:text-[12rem] lg:text-[16rem] font-bold mb-12 leading-[0.85] tracking-tighter"
+              <Typography
+                variant="display-2xl"
+                gradient="orange-purple"
+                as="h1"
+                className="mb-12 leading-[0.85] tracking-tighter"
                 style={{
-                  fontFamily: 'var(--font-display)',
-                  background: 'linear-gradient(135deg, #f97316 0%, #a855f7 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
                   textShadow: '0 0 80px rgba(249, 115, 22, 0.3)',
-                  opacity: heroOpacity,
-                  scale: heroScale,
-                  z: heroZ,
                 }}
               >
                 THE<br />
                 ULTIMATE<br />
                 WEB3 QUIZ
-              </motion.h1>
+              </Typography>
               
               <HeroButtons />
             </div>
@@ -171,64 +167,50 @@ export default function Home() {
             >
               <div className="lg:col-span-2">
                 <motion.p
-                  className="text-orange-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
+                  className="mb-6 tracking-[0.3em] uppercase"
                   variants={itemVariants}
-                  style={{ fontFamily: 'var(--font-space)' }}
                 >
-                  K3HOOT.XYZ EDITIONS
+                  <Typography variant="body-xs" color={colors.primary.orange[400]}>
+                    K3HOOT.XYZ EDITIONS
+                  </Typography>
                 </motion.p>
                 
-                <motion.h2
-                  className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[14rem] font-bold leading-[0.85] tracking-tighter mb-8"
-                  variants={itemVariants}
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  WEB3<br />POWERED
-                </motion.h2>
+                <motion.div variants={itemVariants}>
+                  <Typography variant="display-lg" gradient="purple-pink" className="mb-8">
+                    WEB3<br />POWERED
+                  </Typography>
+                </motion.div>
               </div>
 
-              <InteractiveCard
-                className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 transition-all duration-300"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  boxShadow: '0 0 60px rgba(168, 85, 247, 0.2)',
-                }}
-                variants={itemVariants}
-                whileHover={{
-                  boxShadow: '0 0 100px rgba(168, 85, 247, 0.5), 0 20px 40px rgba(0, 0, 0, 0.3)',
-                  y: -8,
-                  borderColor: 'rgba(168, 85, 247, 0.6)',
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <FaBolt className="w-12 h-12 text-purple-400 mb-6" />
-                <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+              <GlassCard variant="purple" hover={true} {...itemVariants as any}>
+                <FaBolt style={{ fontSize: '3rem', color: colors.primary.purple[400], marginBottom: spacing[6] }} />
+                <Typography variant="h4" className="mb-4">
                   Built on Solana
-                </h3>
-                <p className="text-purple-300/70 leading-relaxed mb-6" style={{ fontFamily: 'var(--font-space)' }}>
+                </Typography>
+                <Typography variant="body" color={`${colors.primary.purple[300]}b3`} className="mb-6">
                   Lightning-fast transactions with near-zero fees. Every quiz answer is recorded on-chain for complete transparency.
-                </p>
+                </Typography>
                 <div className="flex flex-col gap-3 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full" />
-                    <span className="text-purple-300/60">Instant payouts</span>
+                    <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: colors.primary.orange[400], borderRadius: '9999px' }} />
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
+                      Instant payouts
+                    </Typography>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full" />
-                    <span className="text-purple-300/60">Decentralized scoring</span>
+                    <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: colors.primary.purple[400], borderRadius: '9999px' }} />
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
+                      Decentralized scoring
+                    </Typography>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-pink-400 rounded-full" />
-                    <span className="text-purple-300/60">Non-custodial wallets</span>
+                    <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: colors.primary.pink[400], borderRadius: '9999px' }} />
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
+                      Non-custodial wallets
+                    </Typography>
                   </div>
                 </div>
-              </InteractiveCard>
+              </GlassCard>
             </motion.div>
           </div>
         </section>
@@ -243,57 +225,34 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
             >
-              <InteractiveCard
-                className="backdrop-blur-xl rounded-[32px] p-12 border border-white/10 text-center transition-all duration-300"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  boxShadow: '0 0 60px rgba(249, 115, 22, 0.3)',
-                }}
-                variants={itemVariants}
-                whileHover={{
-                  boxShadow: '0 0 120px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3)',
-                  y: -8,
-                  borderColor: 'rgba(249, 115, 22, 0.6)',
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <FaCoins className="w-16 h-16 text-orange-400 mb-6 mx-auto" />
+              <GlassCard variant="orange" hover={true} className="text-center" {...itemVariants as any}>
+                <div className="flex justify-center mb-6">
+                  <FaCoins style={{ fontSize: '4rem', color: colors.primary.orange[400] }} />
+                </div>
                 <AnimatedStat value={2847} label="SOL Distributed" />
-                <div className="mt-8 pt-8 border-t border-white/10">
+                <div className="mt-8 pt-8 border-t" style={{ borderColor: colors.semantic.border }}>
                   <AnimatedStat value={324} label="Total Prize Pool" prefix="$" suffix="K" />
                 </div>
-              </InteractiveCard>
+              </GlassCard>
 
               <div className="lg:col-span-2">
-                <motion.p
-                  className="text-orange-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
-                  variants={itemVariants}
-                  style={{ fontFamily: 'var(--font-space)' }}
-                >
-                  PLAY-TO-EARN
+                <motion.p variants={itemVariants} className="mb-6">
+                  <Typography variant="body-xs" color={colors.primary.orange[400]} className="tracking-[0.3em] uppercase">
+                    PLAY-TO-EARN
+                  </Typography>
                 </motion.p>
                 
-                <motion.h2
-                  className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[14rem] font-bold leading-[0.85] tracking-tighter mb-8"
-                  variants={itemVariants}
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    background: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  EARN<br />REWARDS
-                </motion.h2>
+                <motion.div variants={itemVariants}>
+                  <Typography variant="display-lg" gradient="orange" className="mb-8">
+                    EARN<br />REWARDS
+                  </Typography>
+                </motion.div>
 
-                <motion.p
-                  className="text-xl text-purple-300/70 leading-relaxed max-w-2xl"
-                  variants={itemVariants}
-                  style={{ fontFamily: 'var(--font-space)' }}
-                >
-                  Answer correctly, climb the leaderboard, and earn $K3 tokens. Top performers receive SOL rewards directly to their wallet.
-                </motion.p>
+                <motion.div variants={itemVariants}>
+                  <Typography variant="body-xl" color={`${colors.primary.purple[300]}b3`} className="max-w-2xl">
+                    Answer correctly, climb the leaderboard, and earn $K3 tokens. Top performers receive SOL rewards directly to their wallet.
+                  </Typography>
+                </motion.div>
               </div>
             </motion.div>
           </div>
@@ -310,65 +269,48 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
             >
               <div className="lg:col-span-2">
-                <motion.p
-                  className="text-purple-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
-                  variants={itemVariants}
-                  style={{ fontFamily: 'var(--font-space)' }}
-                >
-                  GLOBAL LEADERBOARDS
+                <motion.p variants={itemVariants} className="mb-6">
+                  <Typography variant="body-xs" color={colors.primary.purple[400]} className="tracking-[0.3em] uppercase">
+                    GLOBAL LEADERBOARDS
+                  </Typography>
                 </motion.p>
                 
-                <motion.h2
-                  className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[14rem] font-bold leading-[0.85] tracking-tighter mb-8"
-                  variants={itemVariants}
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}
-                >
-                  COMPETE<br />GLOBALLY
-                </motion.h2>
+                <motion.div variants={itemVariants}>
+                  <Typography variant="display-lg" gradient="purple-pink" className="mb-8">
+                    COMPETE<br />GLOBALLY
+                  </Typography>
+                </motion.div>
               </div>
 
-              <InteractiveCard
-                className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 transition-all duration-300"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  boxShadow: '0 0 60px rgba(236, 72, 153, 0.3)',
-                }}
-                variants={itemVariants}
-                whileHover={{
-                  boxShadow: '0 0 100px rgba(236, 72, 153, 0.6), 0 20px 40px rgba(0, 0, 0, 0.3)',
-                  y: -8,
-                  borderColor: 'rgba(236, 72, 153, 0.6)',
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <FaTrophy className="w-12 h-12 text-pink-400 mb-6" />
-                <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+              <GlassCard variant="pink" hover={true} {...itemVariants as any}>
+                <FaTrophy style={{ fontSize: '3rem', color: colors.primary.pink[400], marginBottom: spacing[6] }} />
+                <Typography variant="h4" className="mb-4">
                   Real-Time Rankings
-                </h3>
-                <p className="text-purple-300/70 leading-relaxed mb-6" style={{ fontFamily: 'var(--font-space)' }}>
+                </Typography>
+                <Typography variant="body" color={`${colors.primary.purple[300]}b3`} className="mb-6">
                   Compete against players worldwide. Track your progress, challenge friends, and dominate the leaderboard.
-                </p>
+                </Typography>
                 <div className="flex flex-col gap-3 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full" />
-                    <span className="text-purple-300/60">Live score updates</span>
+                    <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: colors.primary.orange[400], borderRadius: '9999px' }} />
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
+                      Live score updates
+                    </Typography>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full" />
-                    <span className="text-purple-300/60">Seasonal tournaments</span>
+                    <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: colors.primary.purple[400], borderRadius: '9999px' }} />
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
+                      Seasonal tournaments
+                    </Typography>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-pink-400 rounded-full" />
-                    <span className="text-purple-300/60">Achievement badges</span>
+                    <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: colors.primary.pink[400], borderRadius: '9999px' }} />
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
+                      Achievement badges
+                    </Typography>
                   </div>
                 </div>
-              </InteractiveCard>
+              </GlassCard>
             </motion.div>
           </div>
         </section>
@@ -381,27 +323,15 @@ export default function Home() {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: parseFloat(animations.duration.slower) / 1000 }}
             >
-              <p
-                className="text-purple-400 text-sm font-medium mb-6 tracking-[0.3em] uppercase"
-                style={{ fontFamily: 'var(--font-space)' }}
-              >
+              <Typography variant="body-xs" color={colors.primary.purple[400]} className="mb-6 tracking-[0.3em] uppercase">
                 $K3 TOKEN
-              </p>
+              </Typography>
               
-              <h2
-                className="text-[6rem] sm:text-[8rem] md:text-[10rem] lg:text-[12rem] font-bold leading-[0.85] tracking-tighter"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  background: 'linear-gradient(135deg, #a855f7 0%, #f97316 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
+              <Typography variant="display-xl" gradient="purple-orange">
                 TOKENOMICS
-              </h2>
+              </Typography>
             </motion.div>
 
             <motion.div
@@ -412,97 +342,48 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
             >
               {[
-                { label: 'Total Supply', value: '1B', color: 'orange' },
-                { label: 'Player Rewards', value: '40%', color: 'purple' },
-                { label: 'Liquidity Pool', value: '25%', color: 'pink' },
-                { label: 'Team & Dev', value: '15%', color: 'blue' },
+                { label: 'Total Supply', value: '1B', color: 'orange' as const },
+                { label: 'Player Rewards', value: '40%', color: 'purple' as const },
+                { label: 'Liquidity Pool', value: '25%', color: 'pink' as const },
+                { label: 'Team & Dev', value: '15%', color: 'purple' as const },
               ].map((stat, i) => (
-                <InteractiveCard
-                  key={i}
-                  className="backdrop-blur-xl rounded-[32px] p-8 border border-white/10 text-center transition-all duration-300"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    boxShadow: `0 0 60px rgba(${
-                      stat.color === 'orange' ? '249, 115, 22' :
-                      stat.color === 'purple' ? '168, 85, 247' :
-                      stat.color === 'pink' ? '236, 72, 153' : '59, 130, 246'
-                    }, 0.2)`,
-                  }}
-                  variants={itemVariants}
-                  whileHover={{
-                    boxShadow: `0 0 100px rgba(${
-                      stat.color === 'orange' ? '249, 115, 22' :
-                      stat.color === 'purple' ? '168, 85, 247' :
-                      stat.color === 'pink' ? '236, 72, 153' : '59, 130, 246'
-                    }, 0.5), 0 20px 40px rgba(0, 0, 0, 0.3)`,
-                    y: -8,
-                    scale: 1.05,
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <h3 
-                    className="text-6xl font-bold mb-4"
-                    style={{ 
-                      fontFamily: 'var(--font-display)',
-                      color: stat.color === 'orange' ? '#fb923c' :
-                             stat.color === 'purple' ? '#a855f7' :
-                             stat.color === 'pink' ? '#ec4899' : '#3b82f6'
-                    }}
-                  >
+                <GlassCard key={i} variant={stat.color} hover={true} className="text-center" {...itemVariants as any}>
+                  <Typography variant="display-sm" color={colors.primary[stat.color][400]} className="mb-4">
                     {stat.value}
-                  </h3>
-                  <p className="text-purple-300/70 text-sm uppercase tracking-wider">
+                  </Typography>
+                  <Typography variant="body-sm" color={`${colors.primary.purple[300]}b3`} className="uppercase tracking-wider">
                     {stat.label}
-                  </p>
-                </InteractiveCard>
+                  </Typography>
+                </GlassCard>
               ))}
             </motion.div>
 
-            <motion.div
-              className="max-w-4xl mx-auto text-center mt-20 backdrop-blur-xl rounded-[48px] p-12 md:p-16 border border-white/10"
-              style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                boxShadow: '0 0 80px rgba(168, 85, 247, 0.2)',
-              }}
+            <GlassCard
+              variant="purple"
+              size="xl"
+              hover={false}
+              className="max-w-4xl mx-auto text-center mt-20"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ delay: 0.4, duration: 0.6 }}
+              transition={{ delay: 0.4, duration: parseFloat(animations.duration.slow) / 1000 }}
             >
-              <h2 
-                className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  background: 'linear-gradient(135deg, #f97316, #a855f7)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
+              <Typography variant="h1" gradient="orange-purple" className="mb-6">
                 READY TO PLAY?
-              </h2>
-              <p className="text-xl md:text-2xl text-purple-300/80 mb-10">
+              </Typography>
+              <Typography variant="h5" color={`${colors.primary.purple[300]}cc`} className="mb-10">
                 Join thousands earning crypto through knowledge
-              </p>
+              </Typography>
               <Link href="/play">
-                <RippleButton 
-                  className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(135deg, #f97316, #a855f7)',
-                    boxShadow: '0 0 60px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
-                  }}
-                  whileHover={{ 
-                    y: -8,
-                    boxShadow: '0 0 100px rgba(249, 115, 22, 0.8), 0 25px 50px rgba(0, 0, 0, 0.5)'
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.2 }}
+                <NeonButton
+                  size="xl"
+                  neonColor="orange"
+                  rightIcon={<FaGamepad />}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative">Start Playing Now 🎮</span>
-                </RippleButton>
+                  Start Playing Now
+                </NeonButton>
               </Link>
-            </motion.div>
+            </GlassCard>
           </div>
         </section>
 
@@ -520,51 +401,31 @@ function HeroButtons() {
       className="flex flex-col sm:flex-row items-center gap-6 mt-16"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.6 }}
+      transition={{ duration: parseFloat(animations.duration.slower) / 1000, delay: 0.6 }}
     >
       <Link href="/play" className="w-full sm:w-auto">
-        <RippleButton 
-          className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden w-full sm:w-auto transition-all duration-300"
-          style={{
-            background: 'linear-gradient(135deg, #f97316, #fb923c)',
-            boxShadow: '0 0 60px rgba(249, 115, 22, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)',
-          }}
-          whileHover={{ y: -8, boxShadow: '0 0 80px rgba(249, 115, 22, 0.8), 0 25px 50px rgba(0, 0, 0, 0.5)' }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
+        <NeonButton
+          size="xl"
+          neonColor="orange"
+          fullWidth
+          leftIcon={<FaGamepad />}
           onClick={triggerFlash}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <span className="relative flex items-center justify-center gap-3">
-            <FaGamepad className="w-6 h-6" />
-            Play Now
-          </span>
-        </RippleButton>
+          Play Now
+        </NeonButton>
       </Link>
       
       <Link href="/create" className="w-full sm:w-auto">
-        <RippleButton 
-          className="group relative px-12 py-6 text-2xl font-bold rounded-full overflow-hidden w-full sm:w-auto backdrop-blur-xl transition-all duration-300"
-          style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '2px solid rgba(168, 85, 247, 0.4)',
-            boxShadow: '0 0 60px rgba(168, 85, 247, 0.4)',
-          }}
-          whileHover={{ 
-            y: -8, 
-            boxShadow: '0 0 80px rgba(168, 85, 247, 0.6), 0 25px 50px rgba(0, 0, 0, 0.5)',
-            borderColor: 'rgba(168, 85, 247, 0.8)'
-          }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
+        <NeonButton
+          size="xl"
+          neonColor="purple"
+          variant="secondary"
+          fullWidth
+          leftIcon={<FaRocket />}
           onClick={triggerFlash}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <span className="relative flex items-center justify-center gap-3">
-            <FaRocket className="w-6 h-6" />
-            Create Quiz
-          </span>
-        </RippleButton>
+          Create Quiz
+        </NeonButton>
       </Link>
     </motion.div>
   );
