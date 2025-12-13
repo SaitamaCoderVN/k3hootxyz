@@ -14,6 +14,7 @@
 @layer base {
   html {
     @apply text-white;
+    scroll-behavior: smooth;
   }
   
   body {
