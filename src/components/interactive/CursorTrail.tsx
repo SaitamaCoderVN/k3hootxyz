@@ -2,17 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 
-interface TrailPoint {
-  x: number;
-  y: number;
-  opacity: number;
-}
-
 export function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const trailPoints = useRef<TrailPoint[]>([]);
-  const mousePos = useRef({ x: 0, y: 0 });
-  const animationFrameId = useRef<number>();
+  const pointsRef = useRef<{ x: number; y: number; age: number }[]>([]);
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,24 +14,22 @@ export function CursorTrail() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const resizeCanvas = () => {
+    const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    resize();
+    window.addEventListener('resize', resize);
 
     const handleMouseMove = (e: MouseEvent) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
-      
-      trailPoints.current.push({
+      pointsRef.current.push({
         x: e.clientX,
         y: e.clientY,
-        opacity: 1.0,
+        age: 0,
       });
 
-      if (trailPoints.current.length > 20) {
-        trailPoints.current.shift();
+      if (pointsRef.current.length > 20) {
+        pointsRef.current.shift();
       }
     };
 
@@ -47,40 +38,38 @@ export function CursorTrail() {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      trailPoints.current = trailPoints.current
-        .map(point => ({
-          ...point,
-          opacity: point.opacity - 0.05,
-        }))
-        .filter(point => point.opacity > 0);
+      pointsRef.current = pointsRef.current.filter(point => point.age < 30);
 
-      trailPoints.current.forEach((point, index) => {
-        const radius = 8 - (index * 0.3);
-        const gradient = ctx.createRadialGradient(
-          point.x, point.y, 0,
-          point.x, point.y, radius
-        );
+      for (let i = 0; i < pointsRef.current.length - 1; i++) {
+        const point = pointsRef.current[i];
+        const nextPoint = pointsRef.current[i + 1];
         
-        gradient.addColorStop(0, `rgba(168, 85, 247, ${point.opacity * 0.8})`);
-        gradient.addColorStop(0.5, `rgba(249, 115, 22, ${point.opacity * 0.5})`);
-        gradient.addColorStop(1, `rgba(168, 85, 247, 0)`);
+        const opacity = 1 - point.age / 30;
+        const gradient = ctx.createLinearGradient(point.x, point.y, nextPoint.x, nextPoint.y);
+        gradient.addColorStop(0, `rgba(249, 115, 22, ${opacity * 0.6})`);
+        gradient.addColorStop(1, `rgba(168, 85, 247, ${opacity * 0.6})`);
 
-        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-        ctx.fill();
-      });
+        ctx.moveTo(point.x, point.y);
+        ctx.lineTo(nextPoint.x, nextPoint.y);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        
+        point.age++;
+      }
 
-      animationFrameId.current = requestAnimationFrame(animate);
+      rafRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
+      window.removeEventListener('resize', resize);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
       }
     };
   }, []);
@@ -88,8 +77,8 @@ export function CursorTrail() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 9999, mixBlendMode: 'screen' }}
+      className="pointer-events-none fixed inset-0 z-50"
+      style={{ mixBlendMode: 'screen' }}
     />
   );
 }

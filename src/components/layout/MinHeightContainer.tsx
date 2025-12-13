@@ -83,12 +83,14 @@ export function PageWrapper({
   children, 
   className = '',
   loading = false,
-  minHeight = 'content'
+  minHeight = 'content',
+  style
 }: { 
   children: ReactNode; 
   className?: string;
   loading?: boolean;
   minHeight?: 'screen' | 'content' | 'auto';
+  style?: React.CSSProperties;
 }) {
   if (loading) {
     return (
@@ -104,7 +106,7 @@ export function PageWrapper({
       minHeight={minHeight}
       pushFooter={true}
     >
-      {children}
+      <div style={style}>{children}</div>
     </MinHeightContainer>
   );
 }

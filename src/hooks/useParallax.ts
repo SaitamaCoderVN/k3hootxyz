@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 
 export function useParallax(speed: number = 0.5) {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const handleScroll = () => {

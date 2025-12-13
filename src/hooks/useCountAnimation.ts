@@ -10,7 +10,7 @@ export function useCountAnimation(
   const [count, setCount] = useState(0);
   const [hasStarted, setHasStarted] = useState(!startOnView);
   const countRef = useRef<number>(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     if (!hasStarted) return;
