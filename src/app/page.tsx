@@ -166,14 +166,14 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
             >
               <div className="lg:col-span-2">
-                <motion.p
+                <motion.div
                   className="mb-6 tracking-[0.3em] uppercase"
                   variants={itemVariants}
                 >
                   <Typography variant="body-xs" color={colors.primary.orange[400]}>
                     K3HOOT.XYZ EDITIONS
                   </Typography>
-                </motion.p>
+                </motion.div>
                 
                 <motion.div variants={itemVariants}>
                   <Typography variant="display-lg" gradient="purple-pink" className="mb-8">
@@ -236,11 +236,11 @@ export default function Home() {
               </GlassCard>
 
               <div className="lg:col-span-2">
-                <motion.p variants={itemVariants} className="mb-6">
+                <motion.div variants={itemVariants} className="mb-6">
                   <Typography variant="body-xs" color={colors.primary.orange[400]} className="tracking-[0.3em] uppercase">
                     PLAY-TO-EARN
                   </Typography>
-                </motion.p>
+                </motion.div>
                 
                 <motion.div variants={itemVariants}>
                   <Typography variant="display-lg" gradient="orange" className="mb-8">
@@ -269,11 +269,11 @@ export default function Home() {
               viewport={{ once: true, margin: "-100px" }}
             >
               <div className="lg:col-span-2">
-                <motion.p variants={itemVariants} className="mb-6">
+                <motion.div variants={itemVariants} className="mb-6">
                   <Typography variant="body-xs" color={colors.primary.purple[400]} className="tracking-[0.3em] uppercase">
                     GLOBAL LEADERBOARDS
                   </Typography>
-                </motion.p>
+                </motion.div>
                 
                 <motion.div variants={itemVariants}>
                   <Typography variant="display-lg" gradient="purple-pink" className="mb-8">
