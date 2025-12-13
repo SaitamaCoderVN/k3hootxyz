@@ -12,6 +12,7 @@ import { SimpleQuizCard } from '@/components/SimpleQuizCard';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import { FaRocket, FaGamepad, FaTrophy, FaSync } from 'react-icons/fa';
+import { Typography, NeonButton, GlassCard, StatCard, colors } from '@/design-system';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
@@ -48,39 +49,40 @@ export default function PlayPage() {
       <Header />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl sm:text-6xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <Typography variant="display-lg" gradient="purple-pink" className="mb-4">
             Play Quizzes
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          </Typography>
+          <Typography variant="body-xl" color={colors.text.secondary} className="max-w-2xl mx-auto">
             Answer questions correctly to win SOL rewards!
-          </p>
+          </Typography>
         </motion.div>
 
-        {/* Wallet Connection */}
         {!connected && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="max-w-md mx-auto bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border-2 border-cyan-500/30 mb-12 text-center"
+            className="max-w-md mx-auto mb-12 text-center"
           >
-            <FaRocket className="text-6xl text-cyan-400 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Connect Your Wallet</h3>
-            <p className="text-gray-300 mb-6">
-              Connect your Solana wallet to play quizzes and claim rewards
-            </p>
-            <div className="flex justify-center">
-              <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !text-white !font-bold !px-8 !py-4 !rounded-xl hover:!from-cyan-600 hover:!to-purple-600 !transition-all" />
-            </div>
+            <GlassCard variant="purple" size="md" hover={false}>
+              <FaRocket className="text-6xl mx-auto mb-4" style={{ color: colors.primary.purple[400] }} />
+              <Typography variant="h3" className="mb-4">
+                Connect Your Wallet
+              </Typography>
+              <Typography variant="body" color={colors.text.secondary} className="mb-6">
+                Connect your Solana wallet to play quizzes and claim rewards
+              </Typography>
+              <div className="flex justify-center">
+                <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !text-white !font-bold !px-8 !py-4 !rounded-xl hover:!from-cyan-600 hover:!to-purple-600 !transition-all" />
+              </div>
+            </GlassCard>
           </motion.div>
         )}
 
-        {/* Stats Dashboard */}
         {connected && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -88,94 +90,82 @@ export default function PlayPage() {
             className="max-w-4xl mx-auto mb-12"
           >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Total Quizzes */}
-              <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-500/5 backdrop-blur-lg rounded-xl p-6 border border-cyan-500/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-cyan-500/20 rounded-lg">
-                    <FaGamepad className="text-3xl text-cyan-400" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-white">{totalQuizzes}</p>
-                    <p className="text-cyan-300">Total Quizzes</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Available */}
-              <div className="bg-gradient-to-br from-green-500/20 to-green-500/5 backdrop-blur-lg rounded-xl p-6 border border-green-500/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-green-500/20 rounded-lg">
-                    <FaGamepad className="text-3xl text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-white">{availableCount}</p>
-                    <p className="text-green-300">Available</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Completed */}
-              <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/5 backdrop-blur-lg rounded-xl p-6 border border-purple-500/30">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-purple-500/20 rounded-lg">
-                    <FaTrophy className="text-3xl text-purple-400" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-white">{completedCount}</p>
-                    <p className="text-purple-300">Completed</p>
-                  </div>
-                </div>
-              </div>
+              <StatCard
+                icon={<FaGamepad />}
+                value={totalQuizzes.toString()}
+                label="Total Quizzes"
+                variant="orange"
+              />
+              <StatCard
+                icon={<FaGamepad />}
+                value={availableCount.toString()}
+                label="Available"
+                variant="purple"
+              />
+              <StatCard
+                icon={<FaTrophy />}
+                value={completedCount.toString()}
+                label="Completed"
+                variant="pink"
+              />
             </div>
           </motion.div>
         )}
 
-        {/* Error State */}
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="max-w-2xl mx-auto mb-8 bg-red-500/10 border border-red-500/30 rounded-xl p-6 text-center"
+            className="max-w-2xl mx-auto mb-8"
           >
-            <p className="text-red-300">{error}</p>
-            <button
-              onClick={fetchQuizzes}
-              className="mt-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
-            >
-              <FaSync className="inline mr-2" />
-              Retry
-            </button>
+            <GlassCard variant="default" hover={false} className="text-center">
+              <Typography variant="body" color={colors.state.error} className="mb-4">
+                {error}
+              </Typography>
+              <NeonButton
+                variant="secondary"
+                neonColor="orange"
+                size="md"
+                leftIcon={<FaSync />}
+                onClick={fetchQuizzes}
+              >
+                Retry
+              </NeonButton>
+            </GlassCard>
           </motion.div>
         )}
 
-        {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mb-4"></div>
-            <p className="text-gray-300">Loading quizzes...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style={{ borderColor: colors.primary.purple[400] }}></div>
+            <Typography variant="body" color={colors.text.secondary}>
+              Loading quizzes...
+            </Typography>
           </div>
         )}
 
-        {/* Quiz Lists */}
         {connected && !loading && (
           <div className="max-w-6xl mx-auto">
-            {/* Available Quizzes */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="mb-12"
             >
-              <h2 className="text-3xl font-bold mb-6 text-cyan-400">
+              <Typography variant="h2" gradient="purple" className="mb-6">
                 Available Quizzes ({availableCount})
-              </h2>
+              </Typography>
               
               {availableQuizzes.length === 0 ? (
-                <div className="text-center py-12 bg-gray-800/30 rounded-xl border border-gray-700">
-                  <FaGamepad className="text-5xl text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg">No available quizzes yet</p>
-                  <p className="text-gray-500 mt-2">Check back later or create your own!</p>
-                </div>
+                <GlassCard variant="default" hover={false} className="text-center py-12">
+                  <FaGamepad className="text-5xl mx-auto mb-4" style={{ color: colors.text.muted }} />
+                  <Typography variant="body-lg" color={colors.text.secondary} className="mb-2">
+                    No available quizzes yet
+                  </Typography>
+                  <Typography variant="body-sm" color={colors.text.muted}>
+                    Check back later or create your own!
+                  </Typography>
+                </GlassCard>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {availableQuizzes.map((quiz) => (
@@ -192,21 +182,22 @@ export default function PlayPage() {
               )}
             </motion.div>
 
-            {/* Completed Quizzes */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <h2 className="text-3xl font-bold mb-6 text-purple-400">
+              <Typography variant="h2" gradient="pink" className="mb-6">
                 Completed Quizzes ({completedCount})
-              </h2>
+              </Typography>
               
               {completedQuizzes.length === 0 ? (
-                <div className="text-center py-12 bg-gray-800/30 rounded-xl border border-gray-700">
-                  <FaTrophy className="text-5xl text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400 text-lg">No completed quizzes yet</p>
-                </div>
+                <GlassCard variant="default" hover={false} className="text-center py-12">
+                  <FaTrophy className="text-5xl mx-auto mb-4" style={{ color: colors.text.muted }} />
+                  <Typography variant="body-lg" color={colors.text.secondary}>
+                    No completed quizzes yet
+                  </Typography>
+                </GlassCard>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {completedQuizzes.map((quiz) => (

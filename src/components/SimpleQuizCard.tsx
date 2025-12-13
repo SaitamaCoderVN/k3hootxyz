@@ -3,6 +3,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { Typography, GlassCard, NeonButton, colors } from '@/design-system';
 
 interface SimpleQuizCardProps {
   quizId: number;
@@ -13,10 +14,6 @@ interface SimpleQuizCardProps {
   onPlay?: () => void;
 }
 
-/**
- * Simple Quiz Card Component
- * Displays quiz summary for listing page
- */
 export function SimpleQuizCard({
   quizId,
   question,
@@ -38,51 +35,64 @@ export function SimpleQuizCard({
 
   return (
     <motion.div
-      className="group relative overflow-hidden rounded-xl border-2 border-gray-700 bg-gray-800/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-500/20"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
+      className="relative"
     >
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
-      {/* Content */}
-      <div className="relative p-6">
-        {/* Header */}
+      <GlassCard 
+        variant={hasWinner ? "default" : "purple"} 
+        size="md" 
+        hover={!hasWinner}
+      >
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-gray-400">Quiz #{quizId}</span>
+              <Typography variant="body-sm" color={colors.text.muted}>
+                Quiz #{quizId}
+              </Typography>
               {hasWinner && (
-                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  isClaimed 
-                    ? 'bg-green-500/20 text-green-400' 
-                    : 'bg-yellow-500/20 text-yellow-400'
-                }`}>
+                <span 
+                  className="px-2 py-1 rounded-full text-xs font-semibold"
+                  style={{
+                    background: isClaimed ? `${colors.state.success}33` : `${colors.primary.orange[500]}33`,
+                    color: isClaimed ? colors.state.success : colors.primary.orange[400]
+                  }}
+                >
                   {isClaimed ? 'Claimed' : 'Won'}
                 </span>
               )}
               {!hasWinner && (
-                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-400 animate-pulse">
+                <span 
+                  className="px-2 py-1 rounded-full text-xs font-semibold animate-pulse"
+                  style={{
+                    background: `${colors.primary.purple[500]}33`,
+                    color: colors.primary.purple[400]
+                  }}
+                >
                   Available
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-cyan-400 transition-colors">
+            <Typography 
+              variant="body-lg" 
+              className="line-clamp-2 font-bold transition-colors group-hover:text-cyan-400"
+            >
               {question}
-            </h3>
+            </Typography>
           </div>
         </div>
 
-        {/* Stats */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">💰</span>
             <div>
-              <div className="text-sm text-gray-400">Reward</div>
-              <div className="text-lg font-bold text-cyan-400">
+              <Typography variant="body-xs" color={colors.text.muted}>
+                Reward
+              </Typography>
+              <Typography variant="h5" gradient="purple">
                 {rewardAmount} SOL
-              </div>
+              </Typography>
             </div>
           </div>
 
@@ -90,27 +100,28 @@ export function SimpleQuizCard({
             <div className="flex items-center gap-2">
               <span className="text-2xl">🏆</span>
               <div className="text-right">
-                <div className="text-sm text-gray-400">Winner</div>
-                <div className="text-xs font-mono text-purple-400">
+                <Typography variant="body-xs" color={colors.text.muted}>
+                  Winner
+                </Typography>
+                <Typography 
+                  variant="body-xs" 
+                  color={colors.primary.pink[400]}
+                  className="font-mono"
+                >
                   {winner.toString().slice(0, 4)}...{winner.toString().slice(-4)}
-                </div>
+                </Typography>
               </div>
             </div>
           )}
         </div>
 
-        {/* Action Button */}
-        <button
+        <NeonButton
           onClick={handleClick}
           disabled={hasWinner}
-          className={`
-            w-full py-3 px-4 rounded-lg font-semibold
-            transition-all duration-300
-            ${hasWinner
-              ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white hover:from-cyan-600 hover:to-purple-600 hover:shadow-lg hover:shadow-cyan-500/50'
-            }
-          `}
+          variant={hasWinner ? "ghost" : "primary"}
+          neonColor="purple"
+          size="md"
+          fullWidth
         >
           {hasWinner ? (
             <span className="flex items-center justify-center gap-2">
@@ -127,12 +138,8 @@ export function SimpleQuizCard({
               </svg>
             </span>
           )}
-        </button>
-      </div>
-
-      {/* Shimmer Effect on Hover */}
-      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+        </NeonButton>
+      </GlassCard>
     </motion.div>
   );
 }
-
