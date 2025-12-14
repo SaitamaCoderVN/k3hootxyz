@@ -78,7 +78,16 @@ export default function PlayPage() {
                 Connect your Solana wallet to play quizzes and claim rewards
               </Typography>
               <div className="flex justify-center">
-                <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !text-white !font-bold !px-8 !py-4 !rounded-xl hover:!from-cyan-600 hover:!to-purple-600 !transition-all" />
+                <WalletMultiButton 
+                  style={{
+                    background: `linear-gradient(to right, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`,
+                    color: colors.text.primary,
+                    fontWeight: 700,
+                    padding: '1rem 2rem',
+                    borderRadius: '0.75rem',
+                    transition: 'all 200ms',
+                  }}
+                />
               </div>
             </GlassCard>
           </motion.div>

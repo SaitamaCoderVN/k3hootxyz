@@ -1,8 +1,6 @@
-'use client';
-
-import { ReactNode } from 'react';
-import { GlassCard } from '../atoms/GlassCard';
+import React, { ReactNode } from 'react';
 import { Typography } from '../atoms/Typography';
+import { GlassCard } from './GlassCard';
 import { colors } from '../tokens';
 
 type StatCardVariant = 'orange' | 'purple' | 'pink' | 'default';

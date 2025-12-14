@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo, useEffect, useState } from 'react';
+import { useRef, useMemo, useEffect, useState, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -8,7 +8,7 @@ interface ParticleFieldProps {
   count?: number;
 }
 
-export function ParticleField({ count = 3000 }: ParticleFieldProps) {
+export const ParticleField = memo(function ParticleField({ count = 3000 }: ParticleFieldProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const [scrollY, setScrollY] = useState(0);
   const lastScrollY = useRef(0);
@@ -107,4 +107,4 @@ export function ParticleField({ count = 3000 }: ParticleFieldProps) {
       />
     </points>
   );
-}
+});
