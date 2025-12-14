@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { colors, typography, spacing, animations, shadows } from '@/design-system';
 
 const sections = [
   { id: 'hero', label: 'K3HOOT' },
@@ -46,37 +47,40 @@ export function SectionNav() {
       className="fixed right-8 top-1/2 -translate-y-1/2 z-50 hidden lg:block"
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 1 }}
+      transition={{ delay: 1, duration: parseFloat(animations.duration.slow) / 1000 }}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col" style={{ gap: spacing[4] }}>
         {sections.map((section) => (
           <button
             key={section.id}
             onClick={() => scrollToSection(section.id)}
-            className="group flex items-center gap-3"
+            className="group flex items-center" style={{ gap: spacing[3] }}
           >
             <span
-              className={`text-xs font-medium transition-all duration-300 ${
-                activeSection === section.id
-                  ? 'text-orange-400 opacity-100'
-                  : 'text-purple-300/40 opacity-0 group-hover:opacity-100'
-              }`}
-              style={{ fontFamily: 'var(--font-space)' }}
+              style={{
+                fontSize: typography.fontSize.xs[0],
+                fontFamily: typography.fontFamily.body,
+                fontWeight: 500,
+                color: activeSection === section.id ? colors.primary.orange[400] : `${colors.primary.purple[300]}66`,
+                opacity: activeSection === section.id ? 1 : 0,
+                transition: `all ${animations.duration.normal}`,
+              }}
+              className="group-hover:opacity-100"
             >
               {section.label}
             </span>
             <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                activeSection === section.id
-                  ? 'w-12 bg-gradient-to-r from-orange-500 to-purple-500'
-                  : 'w-8 bg-purple-300/20 group-hover:bg-purple-300/40'
-              }`}
               style={{
-                boxShadow:
-                  activeSection === section.id
-                    ? '0 0 20px rgba(249, 115, 22, 0.5)'
-                    : 'none',
+                height: spacing[2],
+                borderRadius: '9999px',
+                width: activeSection === section.id ? spacing[12] : spacing[8],
+                background: activeSection === section.id 
+                  ? `linear-gradient(to right, ${colors.primary.orange[500]}, ${colors.primary.purple[500]})`
+                  : `${colors.primary.purple[300]}33`,
+                boxShadow: activeSection === section.id ? shadows.neon.orange.sm : 'none',
+                transition: `all ${animations.duration.normal}`,
               }}
+              className="group-hover:bg-purple-300/40"
             />
           </button>
         ))}

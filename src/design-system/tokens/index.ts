@@ -76,23 +76,22 @@ export const colors = {
 } as const;
 
 export const typography = {
-  // Font Families
   fontFamily: {
-    display: 'var(--font-display)', // Editorial/Impact typography
-    body: 'var(--font-space)', // Body text
-    mono: 'var(--font-mono)', // Code/monospace
+    display: "'Space Grotesk', 'Inter', system-ui, sans-serif",
+    body: "'Inter', system-ui, sans-serif",
+    mono: "'Fira Code', 'Courier New', monospace",
   },
   
-  // Font Sizes (Responsive scale based on 4px)
   fontSize: {
     // Display (Hero sections)
     display: {
-      xs: ['4rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 64px
-      sm: ['6rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 96px
-      md: ['8rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 128px
-      lg: ['10rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 160px
-      xl: ['12rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 192px
-      '2xl': ['16rem', { lineHeight: '0.85', letterSpacing: '-0.04em', fontWeight: '700' }], // 256px
+      // Responsive scaling: clamp(min_mobile, preferred, max_desktop)
+      '2xl': 'clamp(4rem, 8vw + 2rem, 12rem)',      // 64px → 192px (was 256px)
+      'xl': 'clamp(3rem, 6vw + 1.5rem, 8rem)',      // 48px → 128px
+      'lg': 'clamp(2.5rem, 5vw + 1rem, 6rem)',      // 40px → 96px
+      'md': 'clamp(2rem, 4vw + 0.5rem, 4.5rem)',    // 32px → 72px
+      'sm': 'clamp(1.75rem, 3vw + 0.5rem, 3.5rem)', // 28px → 56px
+      'xs': 'clamp(1.5rem, 2.5vw + 0.5rem, 2.5rem)',// 24px → 40px
     },
     
     // Headings
@@ -250,3 +249,6 @@ export type ColorToken = typeof colors;
 export type TypographyToken = typeof typography;
 export type SpacingToken = typeof spacing;
 export type AnimationToken = typeof animations;
+
+export * from './animations';
+export * from './shadows';

@@ -34,6 +34,81 @@ interface TypographyProps {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
 }
 
+const variantStyles: Record<TypographyVariant, { font: any; element: string; style?: any }> = {
+  // Display variants (responsive with clamp)
+  'display-2xl': { 
+    font: typography.fontSize.display['2xl'], 
+    element: 'h1',
+    style: { 
+      lineHeight: 0.85, 
+      letterSpacing: '-0.04em', 
+      fontWeight: 700,
+      fontFamily: typography.fontFamily.display,
+    },
+  },
+  'display-xl': { 
+    font: typography.fontSize.display.xl, 
+    element: 'h1',
+    style: { 
+      lineHeight: 0.85, 
+      letterSpacing: '-0.04em', 
+      fontWeight: 700,
+      fontFamily: typography.fontFamily.display,
+    },
+  },
+  'display-lg': { 
+    font: typography.fontSize.display.lg, 
+    element: 'h1',
+    style: { 
+      lineHeight: 0.85, 
+      letterSpacing: '-0.04em', 
+      fontWeight: 700,
+      fontFamily: typography.fontFamily.display,
+    },
+  },
+  'display-md': { 
+    font: typography.fontSize.display.md, 
+    element: 'h2',
+    style: { 
+      lineHeight: 0.9, 
+      letterSpacing: '-0.03em', 
+      fontWeight: 700,
+      fontFamily: typography.fontFamily.display,
+    },
+  },
+  'display-sm': { 
+    font: typography.fontSize.display.sm, 
+    element: 'h2',
+    style: { 
+      lineHeight: 0.9, 
+      letterSpacing: '-0.03em', 
+      fontWeight: 700,
+      fontFamily: typography.fontFamily.display,
+    },
+  },
+  'display-xs': { 
+    font: typography.fontSize.display.xs, 
+    element: 'h3',
+    style: { 
+      lineHeight: 0.95, 
+      letterSpacing: '-0.02em', 
+      fontWeight: 700,
+      fontFamily: typography.fontFamily.display,
+    },
+  },
+  h1: { font: typography.fontSize.h1, element: 'h1' },
+  h2: { font: typography.fontSize.h2, element: 'h2' },
+  h3: { font: typography.fontSize.h3, element: 'h3' },
+  h4: { font: typography.fontSize.h4, element: 'h4' },
+  h5: { font: typography.fontSize.h5, element: 'h5' },
+  h6: { font: typography.fontSize.h6, element: 'h6' },
+  'body-xl': { font: typography.fontSize.xl, element: 'p' },
+  'body-lg': { font: typography.fontSize.lg, element: 'p' },
+  body: { font: typography.fontSize.base, element: 'p' },
+  'body-sm': { font: typography.fontSize.sm, element: 'p' },
+  'body-xs': { font: typography.fontSize.xs, element: 'p' },
+};
+
 const gradientMap: Record<GradientDirection, string> = {
   orange: `linear-gradient(135deg, ${colors.primary.orange[500]}, ${colors.primary.orange[400]})`,
   purple: `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.purple[400]})`,
@@ -53,28 +128,13 @@ export function Typography({
   style = {},
   as,
 }: TypographyProps) {
-  const variantMap: Record<TypographyVariant, { font: any; element: string }> = {
-    'display-2xl': { font: typography.fontSize.display['2xl'], element: 'h1' },
-    'display-xl': { font: typography.fontSize.display.xl, element: 'h1' },
-    'display-lg': { font: typography.fontSize.display.lg, element: 'h1' },
-    'display-md': { font: typography.fontSize.display.md, element: 'h1' },
-    'display-sm': { font: typography.fontSize.display.sm, element: 'h2' },
-    'display-xs': { font: typography.fontSize.display.xs, element: 'h2' },
-    h1: { font: typography.fontSize.h1, element: 'h1' },
-    h2: { font: typography.fontSize.h2, element: 'h2' },
-    h3: { font: typography.fontSize.h3, element: 'h3' },
-    h4: { font: typography.fontSize.h4, element: 'h4' },
-    h5: { font: typography.fontSize.h5, element: 'h5' },
-    h6: { font: typography.fontSize.h6, element: 'h6' },
-    'body-xl': { font: typography.fontSize.xl, element: 'p' },
-    'body-lg': { font: typography.fontSize.lg, element: 'p' },
-    body: { font: typography.fontSize.base, element: 'p' },
-    'body-sm': { font: typography.fontSize.sm, element: 'p' },
-    'body-xs': { font: typography.fontSize.xs, element: 'p' },
-  };
-
-  const config = variantMap[variant];
-  const [fontSize, fontConfig] = config.font;
+  const config = variantStyles[variant];
+  
+  // Handle new clamp-based display variants (string format)
+  const isClampVariant = typeof config.font === 'string';
+  const fontSize = isClampVariant ? config.font : config.font[0];
+  const fontConfig = isClampVariant ? config.style : config.font[1];
+  
   const Element = (as || config.element) as any;
 
   const isDisplay = variant.startsWith('display');

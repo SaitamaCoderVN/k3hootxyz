@@ -1,171 +1,137 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaTwitter, FaDiscord, FaGithub, FaTelegram } from 'react-icons/fa';
-
-const socialLinks = [
-  {
-    icon: <FaTwitter className="w-5 h-5 sm:w-6 sm:h-6" />,
-    href: 'https://twitter.com/k3hootxyz',
-    label: 'Twitter',
-    color: 'hover:text-blue-400'
-  },
-  {
-    icon: <FaDiscord className="w-5 h-5 sm:w-6 sm:h-6" />,
-    href: 'https://discord.gg/k3hootxyz',
-    label: 'Discord',
-    color: 'hover:text-indigo-400'
-  },
-  {
-    icon: <FaTelegram className="w-5 h-5 sm:w-6 sm:h-6" />,
-    href: 'https://t.me/k3hootxyz',
-    label: 'Telegram',
-    color: 'hover:text-sky-400'
-  },
-  {
-    icon: <FaGithub className="w-5 h-5 sm:w-6 sm:h-6" />,
-    href: 'https://github.com/k3hootxyz',
-    label: 'GitHub',
-    color: 'hover:text-gray-400'
-  }
-];
-
-const footerLinks = [
-  {
-    title: 'Product',
-    links: [
-      { label: 'Features', href: '/#features' },
-      { label: 'How to Play', href: '/#how-to-play' },
-      { label: 'Rewards', href: '/rewards' },
-      { label: 'Tokenomics', href: '/tokenomics' }
-    ]
-  },
-  {
-    title: 'Community',
-    links: [
-      { label: 'Discord', href: 'https://discord.gg/k3hootxyz' },
-      { label: 'Twitter', href: 'https://twitter.com/k3hootxyz' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Forum', href: '/forum' }
-    ]
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Documentation', href: '/docs' },
-      { label: 'FAQ', href: '/faq' },
-      { label: 'Support', href: '/support' },
-      { label: 'Bug Bounty', href: '/bug-bounty' }
-    ]
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Terms of Service', href: '/terms' },
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Cookie Policy', href: '/cookies' },
-      { label: 'Disclaimer', href: '/disclaimer' }
-    ]
-  }
-];
+import { FaDiscord, FaTwitter, FaGithub } from 'react-icons/fa';
+import { colors, spacing, typography, Typography } from '@/design-system';
 
 export default function Footer() {
+  const footerLinks = {
+    product: [
+      { label: 'Play Quiz', href: '/play' },
+      { label: 'Create Quiz', href: '/create' },
+      { label: 'Leaderboard', href: '/leaderboard' },
+    ],
+    community: [
+      { label: 'Discord', href: '#', icon: <FaDiscord /> },
+      { label: 'Twitter', href: '#', icon: <FaTwitter /> },
+      { label: 'GitHub', href: '#', icon: <FaGithub /> },
+    ],
+    resources: [
+      { label: 'Documentation', href: '#' },
+      { label: 'Tokenomics', href: '#' },
+      { label: 'Whitepaper', href: '#' },
+    ],
+  };
+
   return (
-    <footer className="relative z-10 border-t border-purple-500/20 bg-black/50 backdrop-blur-lg">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12">
+    <footer 
+      style={{ 
+        backgroundColor: colors.background.secondary,
+        borderTop: `1px solid ${colors.semantic.border}`,
+        paddingTop: spacing[16],
+        paddingBottom: spacing[8],
+      }}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8" style={{ paddingTop: spacing[12], paddingBottom: spacing[16] }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: spacing[8] }}>
           {/* Brand */}
-          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-3 sm:space-y-4"
-            >
-              <h3 className="text-2xl sm:text-3xl font-bold gradient-text">K3HOOT.XYZ</h3>
-              <p className="text-purple-300 leading-relaxed text-sm sm:text-base">
-                The ultimate Web3 quiz platform on Solana. Play, Learn, and Earn in the most exciting way possible.
-              </p>
-              <div className="flex space-x-3 sm:space-x-4">
-                {socialLinks.map((link) => (
-                  <motion.a
-                    key={link.label}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-purple-400 transition-all ${link.color}`}
-                    whileHover={{ scale: 1.2, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
-                    aria-label={link.label}
-                  >
-                    {link.icon}
-                  </motion.a>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Links */}
-          {footerLinks.map((section, index) => (
-            <motion.div 
-              key={section.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <h3 className="font-semibold text-white mb-4 sm:mb-6 text-base sm:text-lg">{section.title}</h3>
-              <ul className="space-y-2 sm:space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-purple-300 hover:text-white transition-colors inline-flex items-center gap-2 group text-sm sm:text-base"
-                    >
-                      <span className="w-1 h-1 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Bottom */}
-        <motion.div 
-          className="mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-purple-500/20"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-purple-300 text-xs sm:text-sm text-center md:text-left">
-              © 2024 K3HOOT.XYZ. All rights reserved. Built with ❤️ on Solana.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
-              <Link
-                href="/privacy"
-                className="text-purple-300 hover:text-white text-xs sm:text-sm transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <span className="hidden sm:inline text-purple-500">•</span>
-              <Link
-                href="/terms"
-                className="text-purple-300 hover:text-white text-xs sm:text-sm transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <span className="hidden sm:inline text-purple-500">•</span>
-              <Link
-                href="/sitemap"
-                className="text-purple-300 hover:text-white text-xs sm:text-sm transition-colors"
-              >
-                Sitemap
-              </Link>
+          <div className="lg:col-span-1" style={{ display: 'flex', flexDirection: 'column', gap: spacing[4] }}>
+            <Typography variant="h3" gradient="orange-purple">
+              K3HOOT
+            </Typography>
+            <Typography variant="body-sm" color={`${colors.primary.purple[300]}cc`}>
+              The ultimate Web3 quiz platform on Solana. Play, Learn, and Earn.
+            </Typography>
+            <div className="flex" style={{ gap: spacing[4] }}>
+              {footerLinks.community.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  style={{
+                    color: colors.primary.purple[400],
+                    fontSize: '1.5rem',
+                    transition: 'all 200ms',
+                  }}
+                  className="hover:text-purple-200"
+                  aria-label={link.label}
+                >
+                  {link.icon}
+                </Link>
+              ))}
             </div>
           </div>
-        </motion.div>
+
+          {/* Product Links */}
+          <div>
+            <Typography variant="body" style={{ fontWeight: 600, marginBottom: spacing[4], color: colors.primary.purple[200] }}>
+              Product
+            </Typography>
+            <div className="flex flex-col" style={{ gap: spacing[3] }}>
+              {footerLinks.product.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  style={{
+                    color: `${colors.primary.purple[300]}99`,
+                    fontSize: typography.fontSize.sm[0],
+                    transition: 'color 200ms',
+                  }}
+                  className="hover:text-purple-200"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Resources Links */}
+          <div>
+            <Typography variant="body" style={{ fontWeight: 600, marginBottom: spacing[4], color: colors.primary.purple[200] }}>
+              Resources
+            </Typography>
+            <div className="flex flex-col" style={{ gap: spacing[3] }}>
+              {footerLinks.resources.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  style={{
+                    color: `${colors.primary.purple[300]}99`,
+                    fontSize: typography.fontSize.sm[0],
+                    transition: 'color 200ms',
+                  }}
+                  className="hover:text-purple-200"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <Typography variant="body" style={{ fontWeight: 600, marginBottom: spacing[4], color: colors.primary.purple[200] }}>
+              Legal
+            </Typography>
+            <div className="flex flex-col" style={{ gap: spacing[3] }}>
+              <Link href="#" style={{ color: `${colors.primary.purple[300]}99`, fontSize: typography.fontSize.sm[0] }} className="hover:text-purple-200">Terms</Link>
+              <Link href="#" style={{ color: `${colors.primary.purple[300]}99`, fontSize: typography.fontSize.sm[0] }} className="hover:text-purple-200">Privacy</Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div 
+          style={{ 
+            marginTop: spacing[12],
+            paddingTop: spacing[8],
+            borderTop: `1px solid ${colors.semantic.border}`,
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="body-sm" color={`${colors.primary.purple[300]}66`}>
+            © {new Date().getFullYear()} K3HOOT.XYZ. Built on Solana.
+          </Typography>
+        </div>
       </div>
 
       {/* Background decoration */}
@@ -175,4 +141,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-} 
+}
