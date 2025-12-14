@@ -41,7 +41,15 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
         .eq('id', resolvedParams.sessionId)
         .single();
 
-      if (sessionError) throw sessionError;
+      if (sessionError) {
+        console.error('Session error:', {
+          message: sessionError.message,
+          details: sessionError.details,
+          hint: sessionError.hint,
+          code: sessionError.code
+        });
+        throw sessionError;
+      }
       setSession(sessionData as any);
 
       // Load participants
@@ -51,10 +59,17 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
         .eq('session_id', resolvedParams.sessionId)
         .order('joined_at', { ascending: true });
 
-      if (participantsError) throw participantsError;
+      if (participantsError) {
+        console.error('Participants error:', participantsError);
+        throw participantsError;
+      }
       setParticipants(participantsData as any);
-    } catch (error) {
-      console.error('Failed to load session:', error);
+    } catch (error: any) {
+      console.error('Failed to load session:', {
+        error,
+        message: error?.message,
+        stack: error?.stack
+      });
     } finally {
       setLoading(false);
     }
