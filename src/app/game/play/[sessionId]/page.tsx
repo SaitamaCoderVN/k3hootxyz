@@ -77,7 +77,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
     try {
       const { data: sessionData, error: sessionError } = await supabase
         .from('game_sessions')
-        .select('*, quiz_sets(questions)')
+        .select('*')
         .eq('id', resolvedParams.sessionId)
         .single();
 
@@ -85,8 +85,24 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
       
       setSession(sessionData as any);
       
-      const quizQuestions = sessionData?.quiz_sets?.questions || [];
-      setQuestions(quizQuestions);
+      // Fetch questions separately
+      const { data: questionsData, error: questionsError } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('quiz_set_id', sessionData.quiz_set_id)
+        .order('created_at', { ascending: true });
+      
+      if (questionsError) throw questionsError;
+      
+      // Map database columns to Question type
+      const mappedQuestions = (questionsData || []).map((q: any) => ({
+        id: q.id,
+        text: q.question_text,
+        options: q.choices || [],
+        correctAnswer: q.correct_answer,
+      }));
+      
+      setQuestions(mappedQuestions);
     } catch (error) {
       console.error('Failed to load game:', error);
     } finally {
