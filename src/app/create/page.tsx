@@ -8,8 +8,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import SpaceBackground from '@/components/animations/SpaceBackground';
-import Stars from '@/components/animations/Stars';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 import { QuizSetCreationData, QuestionCreationData } from '@/types/quiz';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
@@ -20,6 +18,10 @@ const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
   { ssr: false }
 );
+
+const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground').then(mod => mod.WebGLBackground), {
+  ssr: false,
+});
 
 const defaultQuestion: QuestionCreationData = {
   questionText: '',
@@ -140,8 +142,7 @@ export default function CreatePage() {
 
   return (
     <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-      <SpaceBackground />
-      <Stars />
+      <WebGLBackground />
       <Header />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">

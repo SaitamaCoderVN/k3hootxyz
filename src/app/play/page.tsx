@@ -6,8 +6,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import SpaceBackground from '@/components/animations/SpaceBackground';
-import Stars from '@/components/animations/Stars';
 import { SimpleQuizCard } from '@/components/SimpleQuizCard';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
@@ -18,6 +16,10 @@ const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
   { ssr: false }
 );
+
+const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground').then(mod => mod.WebGLBackground), {
+  ssr: false,
+});
 
 export default function PlayPage() {
   const { connected } = useWallet();
@@ -44,8 +46,7 @@ export default function PlayPage() {
 
   return (
     <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-      <SpaceBackground />
-      <Stars />
+      <WebGLBackground />
       <Header />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
