@@ -38,21 +38,26 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
   }, [resolvedParams.sessionId]);
 
   useEffect(() => {
-    if (!session) return;
+    if (!session || questions.length === 0) return;
 
-    const question = questions[session.currentQuestionIndex];
-    setCurrentQuestion(question || null);
+    const questionIndex = session.currentQuestionIndex ?? 0;
+    console.log('[GAME] Current question index:', questionIndex, 'Total questions:', questions.length);
+    
+    // Check if game should end
+    if (questionIndex >= questions.length) {
+      console.log('[GAME] No more questions, ending game');
+      router.push(`/game/results/${resolvedParams.sessionId}?role=${role}`);
+      return;
+    }
+
+    // Load current question
+    const question = questions[questionIndex];
+    console.log('[GAME] Loading question:', question);
+    setCurrentQuestion(question);
     setTimeLeft(QUESTION_TIME_SECONDS);
     setHasAnswered(false);
     setSelectedAnswer(null);
-
-    if (!question) {
-      // No more questions - game ended
-      setTimeout(() => {
-        router.push(`/game/results/${resolvedParams.sessionId}?role=${role}`);
-      }, 2000);
-    }
-  }, [session?.currentQuestionIndex, questions]);
+  }, [session?.currentQuestionIndex, questions.length]);
 
   useEffect(() => {
     if (!currentQuestion || hasAnswered || timeLeft === 0) return;
