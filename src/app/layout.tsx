@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${bebasNeue.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${bebasNeue.variable}`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -54,7 +54,7 @@ export default function RootLayout({
         <meta httpEquiv="Content-Language" content="en" />
         <meta name="theme-color" content="#000000" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ErrorBoundary>
           <ToastProvider>
             <WalletContextProvider>
