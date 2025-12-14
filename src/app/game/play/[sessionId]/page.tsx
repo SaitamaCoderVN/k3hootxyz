@@ -41,10 +41,10 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
     if (!session || questions.length === 0) return;
 
     const questionIndex = session.currentQuestionIndex ?? 0;
-    console.log('[GAME] Current question index:', questionIndex, 'Total questions:', questions.length);
+    console.log('[GAME] useEffect triggered - index:', questionIndex, 'total:', questions.length, 'session:', session);
     
-    // Check if game should end
-    if (questionIndex >= questions.length) {
+    // Check if game should end - should only end when index is BEYOND the last question
+    if (questionIndex > questions.length - 1) {
       console.log('[GAME] No more questions, ending game');
       router.push(`/game/results/${resolvedParams.sessionId}?role=${role}`);
       return;
@@ -57,7 +57,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
     setTimeLeft(QUESTION_TIME_SECONDS);
     setHasAnswered(false);
     setSelectedAnswer(null);
-  }, [session?.currentQuestionIndex, questions.length]);
+  }, [session?.currentQuestionIndex, questions, router, resolvedParams.sessionId, role]);
 
   useEffect(() => {
     if (!currentQuestion || hasAnswered || timeLeft === 0) return;
@@ -90,14 +90,13 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
         ...sessionData,
         currentQuestionIndex: sessionData.current_question_index ?? 0,
       };
-      setSession(mappedSession as any);
       
       // Fetch questions separately
       const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select('*')
         .eq('quiz_set_id', sessionData.quiz_set_id)
-        .order('created_at', { ascending: true });
+        .order('question_index', { ascending: true });
       
       if (questionsError) throw questionsError;
       
@@ -109,8 +108,11 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
         correctAnswer: q.correct_answer,
       }));
       
-      console.log('[GAME] Loaded questions:', mappedQuestions.length);
+      console.log('[GAME] Loaded:', mappedQuestions.length, 'questions, current index:', mappedSession.currentQuestionIndex);
+      
+      // Set state in one batch to avoid multiple re-renders
       setQuestions(mappedQuestions);
+      setSession(mappedSession as any);
     } catch (error) {
       console.error('Failed to load game:', error);
     } finally {
@@ -182,8 +184,9 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
 
     const nextIndex = session.currentQuestionIndex + 1;
     
-    if (nextIndex >= questions.length) {
+    if (nextIndex > questions.length - 1) {
       // Game finished
+      console.log('[GAME] Finishing game, next index:', nextIndex, 'total questions:', questions.length);
       await fetch('/api/game/update-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -197,6 +200,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
     }
 
     // Move to next question
+    console.log('[GAME] Moving to next question:', nextIndex);
     await fetch('/api/game/update-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -261,11 +265,21 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
           </div>
 
           {/* Question */}
-          <GlassCard variant="purple" size="xl" className="mb-8">
-            <Typography variant="display-xs" className="text-center">
-              {currentQuestion.text}
-            </Typography>
-          </GlassCard>
+          {isHost && (
+            <GlassCard variant="purple" size="xl" className="mb-8">
+              <Typography variant="display-xs" className="text-center">
+                {currentQuestion.text}
+              </Typography>
+            </GlassCard>
+          )}
+
+          {!isHost && (
+            <GlassCard variant="purple" size="xl" className="mb-8">
+              <Typography variant="h4" className="text-center text-purple-300">
+                Select your answer below
+              </Typography>
+            </GlassCard>
+          )}
 
           {/* Answers */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
