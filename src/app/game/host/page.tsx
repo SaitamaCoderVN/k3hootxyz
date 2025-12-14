@@ -8,12 +8,7 @@ import { FaRocket, FaGamepad } from 'react-icons/fa';
 import { Typography, NeonButton, GlassCard, colors } from '@/design-system';
 import Header from '@/components/layout/Header';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from '@/lib/supabase-client';
 
 interface QuizSet {
   id: string;

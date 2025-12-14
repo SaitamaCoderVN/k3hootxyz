@@ -7,7 +7,7 @@ import { Typography, NeonButton, GlassCard } from '@/design-system';
 import { FaTrophy, FaMedal, FaHome, FaRedo } from 'react-icons/fa';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import Header from '@/components/layout/Header';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase-client';
 import type { GameParticipant, GameSession } from '@/types/quiz';
 
 const PODIUM_COLORS = {
@@ -26,7 +26,6 @@ export default function ResultsPage({ params }: { params: Promise<{ sessionId: s
   const [session, setSession] = useState<GameSession | null>(null);
   const [participants, setParticipants] = useState<GameParticipant[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     loadResults();

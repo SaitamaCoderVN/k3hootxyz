@@ -23,6 +23,11 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!resolvedParams.sessionId) {
+      console.error('Session ID is undefined');
+      setLoading(false);
+      return;
+    }
     loadSessionData();
     subscribeToUpdates();
   }, [resolvedParams.sessionId]);

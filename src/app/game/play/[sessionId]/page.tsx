@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Typography, NeonButton, GlassCard } from '@/design-system';
 import { FaClock, FaTrophy } from 'react-icons/fa';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
-import { createClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase-client';
 import type { GameSession, Question } from '@/types/quiz';
 
 const QUESTION_TIME_SECONDS = 20;
@@ -31,7 +31,6 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     loadGameData();
