@@ -32,7 +32,7 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
       // Load session
       const { data: sessionData, error: sessionError } = await supabase
         .from('game_sessions')
-        .select('*, quiz_sets(id,name,difficulty,questions_count)')
+        .select('*, quiz_sets(id,name,question_count)')
         .eq('id', resolvedParams.sessionId)
         .single();
 
