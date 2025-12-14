@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -10,7 +10,17 @@ interface ParticleFieldProps {
 
 export function ParticleField({ count = 3000 }: ParticleFieldProps) {
   const pointsRef = useRef<THREE.Points>(null);
-  const scrollSpeed = useRef(0);
+  const [scrollY, setScrollY] = useState(0);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const [positions, colors, speeds] = useMemo(() => {
     const positions = new Float32Array(count * 3);
@@ -45,25 +55,27 @@ export function ParticleField({ count = 3000 }: ParticleFieldProps) {
     return [positions, colors, speeds];
   }, [count]);
 
-  useFrame((state) => {
+  useFrame(() => {
     if (!pointsRef.current) return;
 
-    const scroll = state.clock.elapsedTime * 0.1;
-    scrollSpeed.current = scroll;
+    const scrollDelta = (scrollY - lastScrollY.current) * 0.01;
+    lastScrollY.current = scrollY;
 
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
     
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      positions[i3 + 2] += speeds[i] * (1 + scrollSpeed.current * 0.5);
+      positions[i3 + 2] += speeds[i] * scrollDelta;
 
       if (positions[i3 + 2] > 25) {
         positions[i3 + 2] = -25;
+      } else if (positions[i3 + 2] < -25) {
+        positions[i3 + 2] = 25;
       }
     }
 
     pointsRef.current.geometry.attributes.position.needsUpdate = true;
-    pointsRef.current.rotation.y = scroll * 0.05;
+    pointsRef.current.rotation.y = scrollY * 0.0001;
   });
 
   return (

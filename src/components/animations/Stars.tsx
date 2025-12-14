@@ -1,10 +1,11 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export default function Stars() {
   const [stars, setStars] = useState<{ x: number; y: number; delay: number }[]>([]);
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     const newStars = Array.from({ length: 50 }, () => ({
@@ -17,26 +18,25 @@ export default function Stars() {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {stars.map((star, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-white rounded-full"
-          style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`
-          }}
-          animate={{
-            opacity: [0.2, 1, 0.2],
-            scale: [1, 1.5, 1]
-          }}
-          transition={{
-            duration: 2,
-            delay: star.delay,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      ))}
+      {stars.map((star, i) => {
+        const opacity = useTransform(
+          scrollYProgress,
+          [0, 0.5, 1],
+          [0.2 + (i % 5) * 0.1, 1, 0.2 + (i % 5) * 0.1]
+        );
+
+        return (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full"
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              opacity
+            }}
+          />
+        );
+      })}
     </div>
   );
-} 
+}
