@@ -80,7 +80,12 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
 
       if (sessionError) throw sessionError;
       
-      setSession(sessionData as any);
+      // Map snake_case to camelCase
+      const mappedSession = {
+        ...sessionData,
+        currentQuestionIndex: sessionData.current_question_index ?? 0,
+      };
+      setSession(mappedSession as any);
       
       // Fetch questions separately
       const { data: questionsData, error: questionsError } = await supabase
@@ -99,6 +104,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
         correctAnswer: q.correct_answer,
       }));
       
+      console.log('[GAME] Loaded questions:', mappedQuestions.length);
       setQuestions(mappedQuestions);
     } catch (error) {
       console.error('Failed to load game:', error);
@@ -120,7 +126,12 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
         },
         (payload: any) => {
           if (payload.new) {
-            setSession(payload.new as any);
+            // Map snake_case to camelCase
+            const mappedSession = {
+              ...payload.new,
+              currentQuestionIndex: payload.new.current_question_index ?? 0,
+            };
+            setSession(mappedSession as any);
             
             if (payload.new.status === 'finished') {
               router.push(`/game/results/${resolvedParams.sessionId}?role=${role}`);
