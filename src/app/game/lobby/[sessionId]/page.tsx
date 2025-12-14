@@ -76,9 +76,15 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
   };
 
   const subscribeToUpdates = () => {
+    console.log('[LOBBY] Setting up subscriptions for session:', resolvedParams.sessionId);
+    
     // Subscribe to session updates
     const sessionChannel = supabase
-      .channel(`game_session_${resolvedParams.sessionId}`)
+      .channel(`session_updates_${resolvedParams.sessionId}`, {
+        config: {
+          broadcast: { self: true },
+        },
+      })
       .on(
         'postgres_changes',
         {
@@ -88,22 +94,29 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
           filter: `id=eq.${resolvedParams.sessionId}`,
         },
         (payload: any) => {
-          console.log('Session update:', payload);
+          console.log('[LOBBY] Session update received:', payload);
           if (payload.eventType === 'UPDATE' && payload.new) {
             setSession(payload.new as any);
             
             // If game started, navigate to play page
             if (payload.new.status === 'playing') {
+              console.log('[LOBBY] Game started, navigating to play page');
               router.push(`/game/play/${resolvedParams.sessionId}?role=${role}`);
             }
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[LOBBY] Session channel status:', status);
+      });
 
     // Subscribe to participants updates
     const participantsChannel = supabase
-      .channel(`game_participants_${resolvedParams.sessionId}`)
+      .channel(`participants_updates_${resolvedParams.sessionId}`, {
+        config: {
+          broadcast: { self: true },
+        },
+      })
       .on(
         'postgres_changes',
         {
@@ -113,13 +126,16 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
           filter: `session_id=eq.${resolvedParams.sessionId}`,
         },
         (payload: any) => {
-          console.log('Participant update:', payload);
+          console.log('[LOBBY] Participant event received:', payload);
           loadSessionData();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[LOBBY] Participants channel status:', status);
+      });
 
     return () => {
+      console.log('[LOBBY] Cleaning up subscriptions');
       supabase.removeChannel(sessionChannel);
       supabase.removeChannel(participantsChannel);
     };

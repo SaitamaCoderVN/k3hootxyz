@@ -55,15 +55,12 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
   }, [session?.currentQuestionIndex, questions]);
 
   useEffect(() => {
-    if (!currentQuestion || hasAnswered) return;
+    if (!currentQuestion || hasAnswered || timeLeft === 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          if (isHost) {
-            handleNextQuestion();
-          }
           return 0;
         }
         return prev - 1;
@@ -71,7 +68,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentQuestion, hasAnswered]);
+  }, [currentQuestion, hasAnswered, timeLeft]);
 
   const loadGameData = async () => {
     try {
@@ -334,7 +331,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
           </div>
 
           {/* Host Controls */}
-          {isHost && hasAnswered && (
+          {isHost && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -344,6 +341,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
                 size="xl"
                 neonColor="orange"
                 onClick={handleNextQuestion}
+                disabled={timeLeft > 0}
               >
                 Next Question
               </NeonButton>
