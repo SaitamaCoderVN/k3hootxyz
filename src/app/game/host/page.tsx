@@ -76,7 +76,7 @@ export default function HostGamePage() {
       if (!response.ok) throw new Error('Failed to create session');
 
       const { session } = await response.json();
-      router.push(`/game/lobby?sessionId=${session.id}`);
+      router.push(`/game/lobby/${session.id}`);
     } catch (error) {
       console.error('Error creating session:', error);
       alert('Không thể tạo game session!');
