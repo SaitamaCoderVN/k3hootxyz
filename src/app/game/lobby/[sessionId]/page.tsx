@@ -7,7 +7,7 @@ import { Typography, NeonButton, GlassCard } from '@/design-system';
 import { FaPlay, FaCopy, FaCheck, FaUsers } from 'react-icons/fa';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import Header from '@/components/layout/Header';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase-client';
 import type { GameParticipant, GameSession } from '@/types/quiz';
 
 export default function LobbyPage({ params }: { params: Promise<{ sessionId: string }> }) {
