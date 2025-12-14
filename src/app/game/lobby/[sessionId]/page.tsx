@@ -7,7 +7,7 @@ import { Typography, NeonButton, GlassCard } from '@/design-system';
 import { FaPlay, FaCopy, FaCheck, FaUsers } from 'react-icons/fa';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import Header from '@/components/layout/Header';
-import { createClient } from '@/lib/supabase-client';
+import { supabase } from '@/lib/supabase-client';
 import type { GameParticipant, GameSession } from '@/types/quiz';
 
 export default function LobbyPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -21,7 +21,6 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
   const [participants, setParticipants] = useState<GameParticipant[]>([]);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     loadSessionData();
