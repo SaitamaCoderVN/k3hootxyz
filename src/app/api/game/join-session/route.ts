@@ -51,7 +51,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ participant, session });
+    return NextResponse.json({ 
+      sessionId: session.id,
+      participantId: participant.id,
+      session,
+      participant 
+    });
   } catch (error) {
     console.error('Error in join-session:', error);
     return NextResponse.json(
