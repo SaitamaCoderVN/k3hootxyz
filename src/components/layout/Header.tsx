@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaBell, FaSearch, FaBars, FaTimes, FaHome, FaPlus, FaGamepad, FaTrophy } from 'react-icons/fa';
+import { FaBell, FaSearch, FaBars, FaTimes, FaHome, FaPlus, FaGamepad, FaTrophy, FaUserFriends, FaDoorOpen } from 'react-icons/fa';
 import { useWallet } from '@solana/wallet-adapter-react';
 import WalletButton from '@/components/WalletButton';
 import { BrandLogo } from '@/components/ui/Logo';
@@ -17,6 +17,8 @@ export default function Header() {
     { name: 'Home', href: '/', icon: <FaHome className="w-4 h-4" /> },
     { name: 'Play', href: '/play', icon: <FaGamepad className="w-4 h-4" /> },
     { name: 'Create', href: '/create', icon: <FaPlus className="w-4 h-4" /> },
+    { name: 'Host Game', href: '/game/host', icon: <FaUserFriends className="w-4 h-4" /> },
+    { name: 'Join Game', href: '/game/join', icon: <FaDoorOpen className="w-4 h-4" /> },
   ];
 
   return (
@@ -81,4 +83,4 @@ export default function Header() {
       </div>
     </header>
   );
-} 
+}
