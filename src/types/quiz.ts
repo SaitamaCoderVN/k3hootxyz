@@ -92,6 +92,43 @@ export interface LeaderboardEntry {
 }
 
 // ============================================================================
+// Realtime Game Sessions (Kahoot-like)
+// ============================================================================
+
+export interface GameSession {
+  id: string;
+  pin: string;
+  quizSetId: string;
+  hostWallet: string;
+  status: 'lobby' | 'playing' | 'finished';
+  currentQuestionIndex: number;
+  startedAt?: Date;
+  endedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  quizSet?: QuizSet;
+}
+
+export interface GameParticipant {
+  id: string;
+  sessionId: string;
+  playerName: string;
+  walletAddress?: string;
+  score: number;
+  answers: ParticipantAnswer[];
+  joinedAt: Date;
+  lastSeenAt: Date;
+}
+
+export interface ParticipantAnswer {
+  questionIndex: number;
+  answer: "A" | "B" | "C" | "D";
+  isCorrect: boolean;
+  answeredAt: number;
+  pointsEarned: number;
+}
+
+// ============================================================================
 // Backward Compatibility (OLD interfaces - will be deprecated)
 // ============================================================================
 
