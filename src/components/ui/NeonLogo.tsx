@@ -1,20 +1,25 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { colors, shadows, animations, typography } from '@/design-system';
 
 export default function NeonLogo({ className = '' }: { className?: string }) {
   return (
     <motion.div
       className={`relative inline-block ${className}`}
+      style={{
+        willChange: 'filter',
+        transform: 'translate3d(0, 0, 0)',
+      }}
       animate={{
         filter: [
-          'drop-shadow(0 0 20px rgba(249, 115, 22, 0.6)) drop-shadow(0 0 40px rgba(168, 85, 247, 0.4))',
-          'drop-shadow(0 0 30px rgba(249, 115, 22, 0.8)) drop-shadow(0 0 60px rgba(168, 85, 247, 0.6))',
-          'drop-shadow(0 0 20px rgba(249, 115, 22, 0.6)) drop-shadow(0 0 40px rgba(168, 85, 247, 0.4))',
+          `drop-shadow(${shadows.neon.orange.sm}) drop-shadow(${shadows.neon.purple.sm})`,
+          `drop-shadow(${shadows.neon.orange.md}) drop-shadow(${shadows.neon.purple.md})`,
+          `drop-shadow(${shadows.neon.orange.sm}) drop-shadow(${shadows.neon.purple.sm})`,
         ],
       }}
       transition={{
-        duration: 3,
+        duration: parseFloat(animations.duration.slower) / 1000,
         repeat: Infinity,
         ease: 'easeInOut',
       }}
@@ -22,8 +27,8 @@ export default function NeonLogo({ className = '' }: { className?: string }) {
       <span
         className="text-6xl md:text-7xl lg:text-8xl font-bold"
         style={{
-          fontFamily: 'var(--font-display)',
-          background: 'linear-gradient(135deg, #f97316, #a855f7)',
+          fontFamily: typography.fontFamily.display,
+          background: `linear-gradient(135deg, ${colors.primary.orange[500]}, ${colors.primary.purple[500]})`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',

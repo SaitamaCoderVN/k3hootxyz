@@ -15,9 +15,10 @@ import { useParallax } from '@/hooks/useParallax';
 import { CursorTrail } from '@/components/interactive/CursorTrail';
 import { FlashProvider, useFlash } from '@/components/interactive/FlashEffect';
 import { Tilt3D } from '@/components/ui/Tilt3D';
+import { memo } from 'react';
 
 // Design System Imports
-import { Typography, NeonButton, GlassCard, colors, shadows, animations, spacing } from '@/design-system';
+import { Typography, NeonButton, GlassCard, colors, shadows, animations, spacing, motionVariants } from '@/design-system';
 
 const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
   ssr: false,
@@ -27,29 +28,8 @@ const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackg
   ssr: false,
 });
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: parseFloat(animations.duration.slow) / 1000,
-      ease: animations.easing.smooth.split('(')[1].split(')')[0].split(',').map(Number),
-    },
-  },
-};
-
-function AnimatedStat({ value, label, prefix = '', suffix = '' }: { value: number; label: string; prefix?: string; suffix?: string }) {
+const AnimatedStat = memo(function AnimatedStat({ value, label, prefix = '', suffix = '' }: { value: number; label: string; prefix?: string; suffix?: string }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { count, start } = useCountAnimation(value, 2000, true);
@@ -70,7 +50,7 @@ function AnimatedStat({ value, label, prefix = '', suffix = '' }: { value: numbe
       </Typography>
     </div>
   );
-}
+});
 
 export default function Home() {
   const parallaxSlow = useParallax(0.3);
@@ -129,7 +109,11 @@ export default function Home() {
 
           <motion.div
             className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[160px] pointer-events-none"
-            style={{ y: parallaxSlow.y }}
+            style={{ 
+              y: parallaxSlow.y,
+              willChange: 'transform',
+              transform: 'translate3d(0, 0, 0)',
+            }}
             animate={{
               scale: [1, 1.3, 1],
               x: [0, 60, 0],
@@ -142,7 +126,11 @@ export default function Home() {
           />
           <motion.div
             className="absolute top-1/3 right-1/4 w-[700px] h-[700px] bg-purple-500/10 rounded-full blur-[180px] pointer-events-none"
-            style={{ y: parallaxFast.y }}
+            style={{ 
+              y: parallaxFast.y,
+              willChange: 'transform',
+              transform: 'translate3d(0, 0, 0)',
+            }}
             animate={{
               scale: [1.3, 0.9, 1.3],
               x: [0, -60, 0],
@@ -160,7 +148,7 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center"
-              variants={containerVariants}
+              variants={motionVariants.container}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
@@ -168,21 +156,21 @@ export default function Home() {
               <div className="lg:col-span-2">
                 <motion.div
                   className="mb-6 tracking-[0.3em] uppercase"
-                  variants={itemVariants}
+                  variants={motionVariants.item}
                 >
                   <Typography variant="body-xs" color={colors.primary.orange[400]}>
                     K3HOOT.XYZ EDITIONS
                   </Typography>
                 </motion.div>
                 
-                <motion.div variants={itemVariants}>
+                <motion.div variants={motionVariants.item}>
                   <Typography variant="display-lg" gradient="purple-pink" className="mb-8">
                     WEB3<br />POWERED
                   </Typography>
                 </motion.div>
               </div>
 
-              <GlassCard variant="purple" hover={true} {...itemVariants as any}>
+              <GlassCard variant="purple" hover={true} {...motionVariants.item as any}>
                 <FaBolt style={{ fontSize: '3rem', color: colors.primary.purple[400], marginBottom: spacing[6] }} />
                 <Typography variant="h4" className="mb-4">
                   Built on Solana
@@ -220,12 +208,12 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center"
-              variants={containerVariants}
+              variants={motionVariants.container}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
             >
-              <GlassCard variant="orange" hover={true} className="text-center" {...itemVariants as any}>
+              <GlassCard variant="orange" hover={true} className="text-center" {...motionVariants.item as any}>
                 <div className="flex justify-center mb-6">
                   <FaCoins style={{ fontSize: '4rem', color: colors.primary.orange[400] }} />
                 </div>
@@ -236,19 +224,19 @@ export default function Home() {
               </GlassCard>
 
               <div className="lg:col-span-2">
-                <motion.div variants={itemVariants} className="mb-6">
+                <motion.div variants={motionVariants.item} className="mb-6">
                   <Typography variant="body-xs" color={colors.primary.orange[400]} className="tracking-[0.3em] uppercase">
                     PLAY-TO-EARN
                   </Typography>
                 </motion.div>
                 
-                <motion.div variants={itemVariants}>
+                <motion.div variants={motionVariants.item}>
                   <Typography variant="display-lg" gradient="orange" className="mb-8">
                     EARN<br />REWARDS
                   </Typography>
                 </motion.div>
 
-                <motion.div variants={itemVariants}>
+                <motion.div variants={motionVariants.item}>
                   <Typography variant="body-xl" color={`${colors.primary.purple[300]}b3`} className="max-w-2xl">
                     Answer correctly, climb the leaderboard, and earn $K3 tokens. Top performers receive SOL rewards directly to their wallet.
                   </Typography>
@@ -263,26 +251,26 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-center"
-              variants={containerVariants}
+              variants={motionVariants.container}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
             >
               <div className="lg:col-span-2">
-                <motion.div variants={itemVariants} className="mb-6">
+                <motion.div variants={motionVariants.item} className="mb-6">
                   <Typography variant="body-xs" color={colors.primary.purple[400]} className="tracking-[0.3em] uppercase">
                     GLOBAL LEADERBOARDS
                   </Typography>
                 </motion.div>
                 
-                <motion.div variants={itemVariants}>
+                <motion.div variants={motionVariants.item}>
                   <Typography variant="display-lg" gradient="purple-pink" className="mb-8">
                     COMPETE<br />GLOBALLY
                   </Typography>
                 </motion.div>
               </div>
 
-              <GlassCard variant="pink" hover={true} {...itemVariants as any}>
+              <GlassCard variant="pink" hover={true} {...motionVariants.item as any}>
                 <FaTrophy style={{ fontSize: '3rem', color: colors.primary.pink[400], marginBottom: spacing[6] }} />
                 <Typography variant="h4" className="mb-4">
                   Real-Time Rankings
@@ -336,7 +324,7 @@ export default function Home() {
 
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"
-              variants={containerVariants}
+              variants={motionVariants.container}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
@@ -347,7 +335,7 @@ export default function Home() {
                 { label: 'Liquidity Pool', value: '25%', color: 'pink' as const },
                 { label: 'Team & Dev', value: '15%', color: 'purple' as const },
               ].map((stat, i) => (
-                <GlassCard key={i} variant={stat.color} hover={true} className="text-center" {...itemVariants as any}>
+                <GlassCard key={i} variant={stat.color} hover={true} className="text-center" {...motionVariants.item as any}>
                   <Typography variant="display-sm" color={colors.primary[stat.color][400]} className="mb-4">
                     {stat.value}
                   </Typography>
