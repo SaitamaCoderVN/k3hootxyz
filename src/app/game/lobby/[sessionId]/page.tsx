@@ -88,6 +88,7 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
           filter: `id=eq.${resolvedParams.sessionId}`,
         },
         (payload: any) => {
+          console.log('Session update:', payload);
           if (payload.eventType === 'UPDATE' && payload.new) {
             setSession(payload.new as any);
             
@@ -111,7 +112,8 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
           table: 'game_participants',
           filter: `session_id=eq.${resolvedParams.sessionId}`,
         },
-        () => {
+        (payload: any) => {
+          console.log('Participant update:', payload);
           loadSessionData();
         }
       )
