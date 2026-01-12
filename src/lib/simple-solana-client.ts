@@ -1,5 +1,5 @@
 import { Program, AnchorProvider, Idl } from "@coral-xyz/anchor";
-import { K3HootProgramArcium } from "../types/k_3_hoot_program_arcium";
+import { K3HootProgramArcium } from "@/types/k_3_hoot_program_arcium";
 import {
   PublicKey,
   SystemProgram,
@@ -9,7 +9,7 @@ import {
 } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import { AnchorWallet } from '@solana/wallet-adapter-react';
-import IDL from '../idl/k_3_hoot_program_arcium.json';
+import IDL from '@/idl/k_3_hoot_program_arcium.json';
 import { SimpleQuiz, QuizCreationData, QuizSetCreationData, QuestionCreationData, QuizResult, LeaderboardEntry } from '../types/quiz';
 import { supabase } from './supabase-client';
 import { ResilientConnection, createResilientConnection } from './solana-connection';

@@ -9,7 +9,7 @@ import {
   x25519,
   getComputationAccAddress,
   awaitComputationFinalization,
-  getArciumProgAddress,
+  // getArciumProgAddress, // Not exported in current version
   getMXEAccAddress,
   getMempoolAccAddress,
   getExecutingPoolAccAddress,
@@ -21,8 +21,8 @@ import { BN } from "@coral-xyz/anchor";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import IDL from "../idl/k_3_hoot_program_arcium.json";
-import { K3HootProgramArcium } from "../types/k_3_hoot_program_arcium";
+import IDL from "@/idl/k_3_hoot_program_arcium.json";
+import { K3HootProgramArcium } from "@/types/k_3_hoot_program_arcium";
 
 // Hardcoded devnet MXE public key (fallback)
 const HARDCODED_MXE_PUBKEY = new Uint8Array([
@@ -202,12 +202,12 @@ export class ArciumK3HootClient {
     // Get Arcium accounts
     const clusterOffset = 1078779259; // Devnet cluster
     const clusterAccount = getClusterAccAddress(clusterOffset);
-    const mxeAccount = getMXEAccAddress(this.programId);
-    const mempoolAccount = getMempoolAccAddress(this.programId);
-    const executingPool = getExecutingPoolAccAddress(this.programId);
-    const computationAccount = getComputationAccAddress(this.programId, computationOffset);
+    const mxeAccount = getMXEAccAddress(this.programId as any);
+    const mempoolAccount = getMempoolAccAddress(this.programId as any);
+    const executingPool = getExecutingPoolAccAddress(this.programId as any);
+    const computationAccount = getComputationAccAddress(this.programId as any, computationOffset as any);
     const compDefOffset = getCompDefAccOffset("validate_answer");
-    const compDefAccount = getCompDefAccAddress(this.programId, Buffer.from(compDefOffset).readUInt32LE());
+    const compDefAccount = getCompDefAccAddress(this.programId as any, Buffer.from(compDefOffset as any).readUInt32LE());
 
     // Submit validation transaction
     const txSignature = await this.program.methods

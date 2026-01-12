@@ -11,7 +11,7 @@
 
 import { Connection, PublicKey, Keypair, Transaction } from '@solana/web3.js';
 import { Program, AnchorProvider, Wallet, BN, Idl } from '@coral-xyz/anchor';
-import IDL from '../idl/k_3_hoot_program_arcium.json';
+import IDL from '@/idl/k_3_hoot_program_arcium.json';
 
 // Program ID from your deployment
 const PROGRAM_ID = new PublicKey('24MqGK5Ei8aKG6fCK8Ym36cHy1UvYD3zicRHWaEpekz4');

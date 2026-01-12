@@ -12,9 +12,10 @@ function createWalletFromPrivateKey(privateKey: string): anchor.Wallet {
   const keypair = Keypair.fromSecretKey(
     new Uint8Array(JSON.parse(privateKey))
   );
-  
+
   return {
     publicKey: keypair.publicKey,
+    payer: keypair, // Required by NodeWallet type
     signTransaction: async (tx: any) => {
       tx.sign(keypair);
       return tx;
@@ -195,7 +196,7 @@ export async function POST(req: NextRequest) {
             tx_signature: validationResult.txSignature,
             encrypted_user_answer: Buffer.from(encryptedAnswer.ciphertext),
             arcium_pubkey: Buffer.from(encryptedAnswer.publicKey),
-            nonce: validationResult.nonce.toString(),
+            nonce: encryptedAnswer.nonce.toString(), // Use encryptedAnswer.nonce
             is_correct: null, // Will be updated by callback handler
             callback_tx_signature: validationResult.callbackTxSignature,
           })

@@ -3,8 +3,8 @@ import { getServerSupabaseClient } from '@/lib/supabase/server-client';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Program } from '@coral-xyz/anchor';
 import * as anchor from '@coral-xyz/anchor';
-import IDL from '../../../idl/k_3_hoot_program_arcium.json';
-import { K3HootProgramArcium } from '../../../types/k_3_hoot_program_arcium';
+import IDL from '@/idl/k_3_hoot_program_arcium.json';
+import { K3HootProgramArcium } from '@/types/k_3_hoot_program_arcium';
 
 export const dynamic = 'force-dynamic';
 

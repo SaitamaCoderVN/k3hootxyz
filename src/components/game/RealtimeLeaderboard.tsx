@@ -154,7 +154,7 @@ export default function RealtimeLeaderboard({ sessionId, className = '' }: Realt
                       {entry.player_name}
                     </Typography>
                     {entry.wallet_address && (
-                      <Typography variant="caption" className="text-purple-400/60 truncate">
+                      <Typography variant="body" className="text-purple-400/60 truncate text-sm">
                         {entry.wallet_address.slice(0, 8)}...{entry.wallet_address.slice(-6)}
                       </Typography>
                     )}
@@ -168,7 +168,7 @@ export default function RealtimeLeaderboard({ sessionId, className = '' }: Realt
                     >
                       {entry.score}
                     </Typography>
-                    <Typography variant="caption" className="text-purple-400/60">
+                    <Typography variant="body" style={{fontSize: "0.875rem"}} className="text-purple-400/60">
                       {entry.correct_answers}/{entry.total_correct_onchain || entry.correct_answers} ✓
                     </Typography>
                   </div>

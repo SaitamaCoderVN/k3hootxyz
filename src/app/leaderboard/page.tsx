@@ -134,7 +134,7 @@ export default function LeaderboardPage() {
             animate={{ opacity: 1 }}
           >
             <GlassCard variant="purple" size="lg" className="text-center">
-              <Typography variant="h4" className="mb-4" style={{ color: colors.semantic.error }}>
+              <Typography variant="h4" className="mb-4" style={{ color: '#ef4444' }}>
                 ❌ Error Loading Leaderboard
               </Typography>
               <Typography variant="body" color={`${colors.primary.purple[300]}99`}>

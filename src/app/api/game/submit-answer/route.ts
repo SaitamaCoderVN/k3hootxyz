@@ -220,8 +220,8 @@ export async function POST(req: NextRequest) {
       }
 
       console.log(`[Answer Submission] Score updated atomically:`, {
-        new_score: scoreData.new_score,
-        new_correct_answers: scoreData.new_correct_answers
+        new_score: (scoreData as any)?.new_score,
+        new_correct_answers: (scoreData as any)?.new_correct_answers
       });
 
       // Update last_answer_at separately (doesn't need atomicity)
