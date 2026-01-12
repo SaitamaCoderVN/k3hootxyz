@@ -3,10 +3,10 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Typography, NeonButton, GlassCard } from '@/design-system';
+import { Typography, NeonButton, GlassCard, colors } from '@/design-system';
 import { FaPlay, FaCopy, FaCheck, FaUsers } from 'react-icons/fa';
-import { PageWrapper } from '@/components/layout/MinHeightContainer';
-import Header from '@/components/layout/Header';
+import { PageTemplate } from '@/components/layout/PageTemplate';
+import { ScrollReveal, StaggerContainer, StaggerItem } from '@/components/animations';
 import { supabase } from '@/lib/supabase-client';
 import type { GameParticipant, GameSession } from '@/types/quiz';
 
@@ -176,152 +176,193 @@ export default function LobbyPage({ params }: { params: Promise<{ sessionId: str
 
   if (loading) {
     return (
-      <PageWrapper minHeight="screen">
-        <Header />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <Typography variant="h3">Loading...</Typography>
+      <PageTemplate title="Loading..." showBackground={true}>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style={{ borderColor: colors.primary.purple[400] }}></div>
+            <Typography variant="body-lg" color={`${colors.primary.purple[300]}cc`}>
+              Loading game session...
+            </Typography>
+          </div>
         </div>
-      </PageWrapper>
+      </PageTemplate>
     );
   }
 
   if (!session) {
     return (
-      <PageWrapper minHeight="screen">
-        <Header />
-        <div className="flex items-center justify-center min-h-[80vh]">
-          <Typography variant="h3">Session not found</Typography>
+      <PageTemplate title="Session Not Found" showBackground={true}>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <GlassCard variant="default" size="lg" hover={false} className="text-center">
+            <Typography variant="h4" color={colors.state.error} className="mb-4">
+              Session not found
+            </Typography>
+            <Typography variant="body-lg" color={`${colors.primary.purple[300]}cc`}>
+              The game session you're looking for doesn't exist or has expired.
+            </Typography>
+          </GlassCard>
         </div>
-      </PageWrapper>
+      </PageTemplate>
     );
   }
 
   return (
-    <PageWrapper minHeight="screen">
-      <Header />
-      
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-6xl mx-auto">
-          {/* Header Section */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <Typography variant="display-sm" gradient="purple-pink" className="mb-4">
-              GAME LOBBY
-            </Typography>
-            <Typography variant="h5" color="#a78bfab3">
-              {session.quiz_sets?.name || 'Quiz Game'}
-            </Typography>
-          </motion.div>
+    <PageTemplate
+      title="Game Lobby"
+      subtitle={(session as any).quiz_sets?.name || 'Quiz Game'}
+      containerClassName="pb-16"
+    >
+      <div className="pt-8">
+        <div className="max-w-7xl mx-auto">
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* PIN Display */}
-            <GlassCard variant="purple" className="lg:col-span-1">
-              <div className="text-center">
-                <Typography variant="body-sm" color="#a78bfa" className="mb-4">
-                  Game PIN
-                </Typography>
-                <Typography variant="display-sm" gradient="orange" className="mb-6 tracking-[0.3em]">
-                  {session.pin}
-                </Typography>
-                <NeonButton
-                  size="lg"
-                  neonColor="purple"
-                  variant="secondary"
-                  fullWidth
-                  leftIcon={copied ? <FaCheck /> : <FaCopy />}
-                  onClick={handleCopyPin}
-                >
-                  {copied ? 'Copied!' : 'Copy PIN'}
-                </NeonButton>
+            <ScrollReveal type="scaleIn" delay={0.2} amount={40}>
+              <GlassCard variant="purple" size="lg" hover={true} className="lg:col-span-1">
+                <div className="text-center">
+                  <Typography variant="body-xs" color={colors.primary.purple[400]} className="mb-4 tracking-[0.2em] uppercase" style={{ textShadow: `0 0 20px ${colors.primary.purple[400]}40` }}>
+                    Game PIN
+                  </Typography>
+                  <Typography variant="display-lg" gradient="orange" className="mb-8 tracking-[0.3em]" style={{ textShadow: '0 0 40px rgba(249, 115, 22, 0.4)' }}>
+                    {session.pin}
+                  </Typography>
+                  <NeonButton
+                    size="lg"
+                    neonColor="purple"
+                    variant="secondary"
+                    fullWidth
+                    leftIcon={copied ? <FaCheck /> : <FaCopy />}
+                    onClick={handleCopyPin}
+                  >
+                    {copied ? 'Copied!' : 'Copy PIN'}
+                  </NeonButton>
 
-                {isHost && (
-                  <div className="mt-8 pt-8 border-t border-purple-500/20">
-                    <Typography variant="body-sm" color="#a78bfa99" className="mb-4">
-                      {participants.length} {participants.length === 1 ? 'player' : 'players'} joined
-                    </Typography>
-                    <NeonButton
-                      size="xl"
-                      neonColor="orange"
-                      fullWidth
-                      leftIcon={<FaPlay />}
-                      onClick={handleStartGame}
-                      disabled={participants.length === 0}
-                    >
-                      Start Game
-                    </NeonButton>
-                  </div>
-                )}
-              </div>
-            </GlassCard>
+                  {isHost && (
+                    <div className="mt-10 pt-8" style={{ borderTop: `1px solid ${colors.semantic.border}60` }}>
+                      <Typography variant="body-lg" color={`${colors.primary.purple[300]}cc`} className="mb-6">
+                        {participants.length} {participants.length === 1 ? 'player' : 'players'} joined
+                      </Typography>
+                      <NeonButton
+                        size="xl"
+                        neonColor="orange"
+                        fullWidth
+                        leftIcon={<FaPlay />}
+                        onClick={handleStartGame}
+                        disabled={participants.length === 0}
+                      >
+                        Start Game
+                      </NeonButton>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
+            </ScrollReveal>
 
             {/* Players List */}
-            <GlassCard variant="purple" className="lg:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <FaUsers className="text-purple-400 text-2xl" />
-                <Typography variant="h4">
-                  Players ({participants.length})
-                </Typography>
-              </div>
-
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                <AnimatePresence>
-                  {participants.map((participant, index) => (
-                    <motion.div
-                      key={participant.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="flex items-center justify-between p-4 bg-black/30 rounded-lg border border-purple-500/20"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <Typography variant="body-lg">
-                            {participant.player_name}
-                          </Typography>
-                          {participant.wallet_address && (
-                            <Typography variant="body-sm" color="#a78bfa66">
-                              {participant.wallet_address.slice(0, 6)}...{participant.wallet_address.slice(-4)}
-                            </Typography>
-                          )}
-                        </div>
-                      </div>
-                      <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-
-                {participants.length === 0 && (
-                  <div className="text-center py-12">
-                    <Typography variant="body" color="#a78bfa66">
-                      Waiting for players to join...
-                    </Typography>
+            <ScrollReveal type="fadeInRight" delay={0.3} amount={60}>
+              <GlassCard variant="purple" size="lg" hover={false} className="lg:col-span-2">
+                <div className="flex items-center gap-4 mb-8">
+                  <div 
+                    className="p-3 rounded-xl"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${colors.primary.purple[500]}20, ${colors.primary.pink[500]}10)`,
+                      border: `1px solid ${colors.primary.purple[400]}30`,
+                    }}
+                  >
+                    <FaUsers style={{ fontSize: '1.5rem', color: colors.primary.purple[400] }} />
                   </div>
-                )}
-              </div>
-            </GlassCard>
+                  <Typography variant="h3" gradient="purple-pink">
+                    Players ({participants.length})
+                  </Typography>
+                </div>
+
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                  <AnimatePresence>
+                    {participants.map((participant, index) => (
+                      <motion.div
+                        key={participant.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:scale-[1.02]"
+                        style={{
+                          background: `linear-gradient(135deg, ${colors.primary.purple[500]}10, ${colors.primary.pink[500]}05)`,
+                          borderColor: `${colors.primary.purple[400]}40`,
+                        }}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div 
+                            className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg"
+                            style={{
+                              background: `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`,
+                              boxShadow: `0 4px 15px ${colors.primary.purple[400]}40`,
+                            }}
+                          >
+                            {index + 1}
+                          </div>
+                          <div>
+                            <Typography variant="body-lg" className="font-semibold" style={{ color: colors.primary.purple[200] }}>
+                              {(participant as any).player_name}
+                            </Typography>
+                            {(participant as any).wallet_address && (
+                              <Typography variant="body-sm" color={`${colors.primary.purple[400]}99`}>
+                                {(participant as any).wallet_address.slice(0, 6)}...{(participant as any).wallet_address.slice(-4)}
+                              </Typography>
+                            )}
+                          </div>
+                        </div>
+                        <div 
+                          className="w-3 h-3 rounded-full animate-pulse"
+                          style={{ 
+                            backgroundColor: colors.state.success,
+                            boxShadow: `0 0 10px ${colors.state.success}80`,
+                          }}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+
+                  {participants.length === 0 && (
+                    <div className="text-center py-16">
+                      <div 
+                        className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
+                        style={{
+                          background: `linear-gradient(135deg, ${colors.primary.purple[500]}20, ${colors.primary.pink[500]}10)`,
+                          border: `1px solid ${colors.primary.purple[400]}30`,
+                        }}
+                      >
+                        <FaUsers style={{ fontSize: '3rem', color: colors.primary.purple[400] }} />
+                      </div>
+                      <Typography variant="h4" gradient="purple" className="mb-2">
+                        Waiting for players
+                      </Typography>
+                      <Typography variant="body-lg" color={`${colors.primary.purple[300]}cc`}>
+                        Share the PIN to invite players to join
+                      </Typography>
+                    </div>
+                  )}
+                </div>
+              </GlassCard>
+            </ScrollReveal>
           </div>
 
           {!isHost && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-center mt-12"
-            >
-              <Typography variant="body" color="#a78bfa99">
-                Waiting for host to start the game...
-              </Typography>
-            </motion.div>
+            <ScrollReveal type="fadeInUp" delay={0.5} amount={40}>
+              <div className="text-center mt-12">
+                <GlassCard variant="default" size="md" hover={false} className="max-w-md mx-auto">
+                  <Typography variant="body-lg" color={`${colors.primary.purple[300]}dd`} className="mb-2">
+                    ⏳ Waiting for host to start the game...
+                  </Typography>
+                  <Typography variant="body-sm" color={`${colors.primary.purple[400]}99`}>
+                    Get ready! The game will begin soon.
+                  </Typography>
+                </GlassCard>
+              </div>
+            </ScrollReveal>
           )}
         </div>
       </div>
-    </PageWrapper>
+    </PageTemplate>
   );
 }

@@ -1,5 +1,5 @@
 {
-  "address": "6noZrDWRwRnMx2cszs5P2wdpYpVwYCdQL5Ps6gFhD5T5",
+  "address": "24MqGK5Ei8aKG6fCK8Ym36cHy1UvYD3zicRHWaEpekz4",
   "metadata": {
     "name": "k_3_hoot_program_arcium",
     "version": "0.1.0",
@@ -7,6 +7,66 @@
     "description": "Created with Arcium & Anchor"
   },
   "instructions": [
+    {
+      "name": "add_encrypted_question_block",
+      "discriminator": [
+        123,
+        21,
+        48,
+        208,
+        167,
+        176,
+        240,
+        215
+      ],
+      "accounts": [
+        {
+          "name": "question_block",
+          "writable": true
+        },
+        {
+          "name": "quiz_set",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "question_index",
+          "type": "u8"
+        },
+        {
+          "name": "encrypted_correct_answer",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "arcium_pubkey",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "nonce",
+          "type": "u128"
+        }
+      ]
+    },
     {
       "name": "claim_reward",
       "discriminator": [
@@ -21,30 +81,27 @@
       ],
       "accounts": [
         {
-          "name": "reward_pool",
+          "name": "quiz_set",
+          "writable": true
+        },
+        {
+          "name": "vault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  114,
-                  101,
-                  119,
+                  118,
                   97,
-                  114,
-                  100,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
+                  117,
+                  108,
+                  116
                 ]
               },
               {
                 "kind": "account",
-                "path": "reward_pool.quiz_id",
-                "account": "RewardPool"
+                "path": "quiz_set"
               }
             ]
           }
@@ -62,239 +119,46 @@
       "args": []
     },
     {
-      "name": "close_answer_account",
+      "name": "create_quiz_set",
       "discriminator": [
-        65,
-        13,
-        74,
-        113,
-        196,
-        173,
-        56,
-        247
-      ],
-      "accounts": [
-        {
-          "name": "answer_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  97,
-                  110,
-                  115,
-                  119,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "quiz_id"
-              },
-              {
-                "kind": "arg",
-                "path": "question_id"
-              },
-              {
-                "kind": "arg",
-                "path": "topic_id"
-              }
-            ]
-          }
-        },
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "close_reward_pool",
-      "discriminator": [
-        132,
-        11,
-        178,
-        150,
-        41,
-        107,
-        204,
-        187
-      ],
-      "accounts": [
-        {
-          "name": "reward_pool",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  119,
-                  97,
-                  114,
-                  100,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "quiz_id"
-              }
-            ]
-          }
-        },
-        {
-          "name": "funder",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "create_answer_account",
-      "discriminator": [
-        252,
-        81,
-        231,
-        192,
-        64,
-        60,
-        128,
-        85
-      ],
-      "accounts": [
-        {
-          "name": "answer_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  97,
-                  110,
-                  115,
-                  119,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "quiz_id"
-              },
-              {
-                "kind": "arg",
-                "path": "question_id"
-              },
-              {
-                "kind": "arg",
-                "path": "topic_id"
-              }
-            ]
-          }
-        },
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "quiz_id",
-          "type": "u64"
-        },
-        {
-          "name": "question_id",
-          "type": "u64"
-        },
-        {
-          "name": "topic_id",
-          "type": "u64"
-        },
-        {
-          "name": "encrypted_correct_answer",
-          "type": {
-            "array": [
-              "u8",
-              64
-            ]
-          }
-        },
-        {
-          "name": "nonce",
-          "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "create_reward_pool",
-      "discriminator": [
-        199,
-        136,
-        155,
+        236,
+        139,
+        63,
+        87,
         69,
-        28,
-        136,
-        237,
-        214
+        122,
+        7,
+        218
       ],
       "accounts": [
         {
-          "name": "reward_pool",
+          "name": "quiz_set",
+          "writable": true
+        },
+        {
+          "name": "vault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  114,
-                  101,
-                  119,
+                  118,
                   97,
-                  114,
-                  100,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
+                  117,
+                  108,
+                  116
                 ]
               },
               {
-                "kind": "arg",
-                "path": "quiz_id"
+                "kind": "account",
+                "path": "quiz_set"
               }
             ]
           }
         },
         {
-          "name": "funder",
+          "name": "authority",
           "writable": true,
           "signer": true
         },
@@ -305,14 +169,112 @@
       ],
       "args": [
         {
-          "name": "quiz_id",
-          "type": "u64"
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "question_count",
+          "type": "u8"
+        },
+        {
+          "name": "unique_id",
+          "type": "u8"
         },
         {
           "name": "reward_amount",
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "finalize_game",
+      "docs": [
+        "Finalize game and determine winner based on highest score"
+      ],
+      "discriminator": [
+        203,
+        227,
+        3,
+        167,
+        186,
+        102,
+        76,
+        10
+      ],
+      "accounts": [
+        {
+          "name": "quiz_set",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "init_player_answer",
+      "discriminator": [
+        8,
+        206,
+        227,
+        95,
+        58,
+        147,
+        114,
+        4
+      ],
+      "accounts": [
+        {
+          "name": "player_answer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  97,
+                  110,
+                  115,
+                  119,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "quiz_set"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quiz_set"
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "init_validate_answer_comp_def",
@@ -352,101 +314,76 @@
       "args": []
     },
     {
-      "name": "submit_answer_mock",
+      "name": "update_player_score",
       "docs": [
-        "Submit and validate answer (mock version for testing)",
-        "In production, use validate_answer_onchain with Arcium"
+        "Update player's on-chain score (called by frontend after Arcium validation)"
       ],
       "discriminator": [
+        61,
+        168,
         107,
-        12,
-        201,
-        5,
-        240,
-        131,
-        194,
-        84
+        150,
+        46,
+        189,
+        206,
+        173
       ],
       "accounts": [
         {
-          "name": "answer_account"
-        },
-        {
-          "name": "reward_pool",
+          "name": "quiz_set",
           "writable": true
         },
         {
-          "name": "user",
+          "name": "player_answer",
           "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "user_answer",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "validate_answer_callback",
-      "discriminator": [
-        242,
-        143,
-        241,
-        66,
-        101,
-        128,
-        174,
-        58
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "arcium_program",
-          "address": "BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6"
-        },
-        {
-          "name": "comp_def_account"
-        },
-        {
-          "name": "instructions_sysvar",
-          "address": "Sysvar1nstructions1111111111111111111111111"
-        },
-        {
-          "name": "answer_account"
-        },
-        {
-          "name": "reward_pool",
-          "writable": true
-        }
-      ],
-      "args": [
-        {
-          "name": "output",
-          "type": {
-            "defined": {
-              "name": "ComputationOutputs",
-              "generics": [
-                {
-                  "kind": "type",
-                  "type": {
-                    "defined": {
-                      "name": "ValidateAnswerOutput"
-                    }
-                  }
-                }
-              ]
-            }
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  97,
+                  110,
+                  115,
+                  119,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "quiz_set"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
           }
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "updater",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "question_index",
+          "type": "u8"
+        },
+        {
+          "name": "is_correct",
+          "type": "bool"
         }
       ]
     },
@@ -495,11 +432,10 @@
           }
         },
         {
-          "name": "answer_account"
+          "name": "question_block"
         },
         {
-          "name": "reward_pool",
-          "writable": true
+          "name": "quiz_set"
         },
         {
           "name": "mxe_account"
@@ -547,38 +483,35 @@
           "type": "u64"
         },
         {
-          "name": "user_answer",
-          "type": "string"
+          "name": "encrypted_user_answer",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
-          "name": "quiz_id",
-          "type": "u64"
+          "name": "pub_key",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
-          "name": "question_id",
-          "type": "u64"
+          "name": "nonce",
+          "type": "u128"
         },
         {
-          "name": "topic_id",
-          "type": "u64"
+          "name": "question_index",
+          "type": "u8"
         }
       ]
     }
   ],
   "accounts": [
-    {
-      "name": "AnswerAccount",
-      "discriminator": [
-        75,
-        175,
-        139,
-        96,
-        119,
-        135,
-        123,
-        71
-      ]
-    },
     {
       "name": "ClockAccount",
       "discriminator": [
@@ -645,16 +578,42 @@
       ]
     },
     {
-      "name": "RewardPool",
+      "name": "PlayerAnswer",
       "discriminator": [
-        134,
-        121,
-        197,
-        211,
-        133,
-        154,
-        82,
-        32
+        61,
+        96,
+        92,
+        185,
+        176,
+        189,
+        137,
+        111
+      ]
+    },
+    {
+      "name": "QuestionBlock",
+      "discriminator": [
+        51,
+        105,
+        8,
+        110,
+        131,
+        74,
+        146,
+        153
+      ]
+    },
+    {
+      "name": "QuizSet",
+      "discriminator": [
+        49,
+        245,
+        250,
+        47,
+        47,
+        117,
+        148,
+        6
       ]
     },
     {
@@ -671,72 +630,56 @@
       ]
     }
   ],
-  "events": [
-    {
-      "name": "AnswerValidatedEvent",
-      "discriminator": [
-        196,
-        165,
-        217,
-        124,
-        203,
-        179,
-        131,
-        229
-      ]
-    },
-    {
-      "name": "RewardClaimedEvent",
-      "discriminator": [
-        246,
-        43,
-        215,
-        228,
-        82,
-        49,
-        230,
-        56
-      ]
-    },
-    {
-      "name": "RewardPoolCreatedEvent",
-      "discriminator": [
-        251,
-        98,
-        202,
-        109,
-        133,
-        154,
-        58,
-        206
-      ]
-    }
-  ],
   "errors": [
     {
       "code": 6000,
+      "name": "InvalidName",
+      "msg": "Invalid quiz name"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidQuestionCount",
+      "msg": "Invalid question count (must be 1-50)"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidQuestionIndex",
+      "msg": "Invalid question index"
+    },
+    {
+      "code": 6003,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6004,
+      "name": "QuizSetAlreadyInitialized",
+      "msg": "Quiz set already initialized"
+    },
+    {
+      "code": 6005,
       "name": "InvalidRewardAmount",
       "msg": "Invalid reward amount"
     },
     {
-      "code": 6001,
+      "code": 6006,
+      "name": "QuizNotInitialized",
+      "msg": "Quiz not initialized"
+    },
+    {
+      "code": 6007,
+      "name": "NoWinner",
+      "msg": "No winner yet"
+    },
+    {
+      "code": 6008,
       "name": "RewardAlreadyClaimed",
       "msg": "Reward already claimed"
     },
     {
-      "code": 6002,
+      "code": 6009,
       "name": "NotWinner",
       "msg": "Not the winner"
-    },
-    {
-      "code": 6003,
-      "name": "NoWinner",
-      "msg": "No winner set yet"
-    },
-    {
-      "code": 6004,
-      "name": "CannotCloseActivePool",
-      "msg": "Cannot close active reward pool with unclaimed rewards"
     }
   ],
   "types": [
@@ -760,75 +703,6 @@
                 "name": "Epoch"
               }
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "AnswerAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "quiz_id",
-            "type": "u64"
-          },
-          {
-            "name": "question_id",
-            "type": "u64"
-          },
-          {
-            "name": "topic_id",
-            "type": "u64"
-          },
-          {
-            "name": "encrypted_correct_answer",
-            "type": {
-              "array": [
-                "u8",
-                64
-              ]
-            }
-          },
-          {
-            "name": "nonce",
-            "type": "u128"
-          },
-          {
-            "name": "created_at",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AnswerValidatedEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "user",
-            "type": "pubkey"
-          },
-          {
-            "name": "quiz_id",
-            "type": "u64"
-          },
-          {
-            "name": "question_id",
-            "type": "u64"
-          },
-          {
-            "name": "topic_id",
-            "type": "u64"
-          },
-          {
-            "name": "is_correct",
-            "type": "bool"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           }
         ]
       }
@@ -1055,31 +929,6 @@
                 "name": "ComputationSignature"
               }
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "ComputationOutputs",
-      "generics": [
-        {
-          "kind": "type",
-          "name": "O"
-        }
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Success",
-            "fields": [
-              {
-                "generic": "O"
-              }
-            ]
-          },
-          {
-            "name": "Failure"
           }
         ]
       }
@@ -1358,101 +1207,57 @@
       }
     },
     {
-      "name": "RewardClaimedEvent",
+      "name": "PlayerAnswer",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "winner",
+            "name": "quiz_set",
             "type": "pubkey"
           },
           {
-            "name": "quiz_id",
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_score",
             "type": "u64"
           },
           {
-            "name": "reward_amount",
-            "type": "u64"
+            "name": "correct_count",
+            "type": "u8"
           },
           {
-            "name": "timestamp",
+            "name": "last_updated",
             "type": "i64"
           }
         ]
       }
     },
     {
-      "name": "RewardPool",
+      "name": "QuestionBlock",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "quiz_id",
-            "type": "u64"
+            "name": "quiz_set",
+            "type": "pubkey"
           },
           {
-            "name": "reward_amount",
-            "type": "u64"
+            "name": "question_index",
+            "type": "u32"
           },
           {
-            "name": "winner",
+            "name": "encrypted_correct_answer",
             "type": {
-              "option": "pubkey"
+              "array": [
+                "u8",
+                32
+              ]
             }
           },
           {
-            "name": "is_claimed",
-            "type": "bool"
-          },
-          {
-            "name": "question_id",
-            "type": "u64"
-          },
-          {
-            "name": "topic_id",
-            "type": "u64"
-          },
-          {
-            "name": "created_at",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "RewardPoolCreatedEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "quiz_id",
-            "type": "u64"
-          },
-          {
-            "name": "reward_amount",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "SharedEncryptedStruct",
-      "generics": [
-        {
-          "kind": "const",
-          "name": "LEN",
-          "type": "usize"
-        }
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "encryption_key",
+            "name": "arcium_pubkey",
             "type": {
               "array": [
                 "u8",
@@ -1465,20 +1270,58 @@
             "type": "u128"
           },
           {
-            "name": "ciphertexts",
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "QuizSet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "question_count",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "is_initialized",
+            "type": "bool"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          },
+          {
+            "name": "is_reward_claimed",
+            "type": "bool"
+          },
+          {
+            "name": "winner",
             "type": {
-              "array": [
-                {
-                  "array": [
-                    "u8",
-                    32
-                  ]
-                },
-                {
-                  "generic": "LEN"
-                }
-              ]
+              "option": "pubkey"
             }
+          },
+          {
+            "name": "correct_answers_count",
+            "type": "u8"
+          },
+          {
+            "name": "unique_id",
+            "type": "u8"
           }
         ]
       }
@@ -1503,32 +1346,6 @@
           {
             "name": "timestamp",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ValidateAnswerOutput",
-      "docs": [
-        "The output of the callback instruction. Provided as a struct with ordered fields",
-        "as anchor does not support tuples and tuple structs yet."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "field_0",
-            "type": {
-              "defined": {
-                "name": "SharedEncryptedStruct",
-                "generics": [
-                  {
-                    "kind": "const",
-                    "value": "1"
-                  }
-                ]
-              }
-            }
           }
         ]
       }

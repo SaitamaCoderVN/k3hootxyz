@@ -134,7 +134,7 @@ export interface ParticipantAnswer {
 
 /** @deprecated Use QuizSet instead */
 export interface SimpleQuiz {
-  quizId: number;
+  quizId: string; // Changed from number to string (Solana PDA)
   questionId: number;
   topicId: number;
   question: string;

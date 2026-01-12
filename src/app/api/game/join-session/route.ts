@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getServerSupabaseClient } from '@/lib/supabase/server-client';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = getServerSupabaseClient();
+
     const { pin, playerName, walletAddress } = await req.json();
 
     if (!pin || !playerName) {
@@ -51,11 +51,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({ 
+    // Increment total_players count
+    await supabase
+      .from('game_sessions')
+      .update({ total_players: (session.total_players || 0) + 1 })
+      .eq('id', session.id);
+
+    return NextResponse.json({
       sessionId: session.id,
       participantId: participant.id,
+      participantToken: participant.participant_token, // For reconnection
       session,
-      participant 
+      participant
     });
   } catch (error) {
     console.error('Error in join-session:', error);

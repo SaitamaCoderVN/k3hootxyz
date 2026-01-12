@@ -7,7 +7,9 @@ import { Typography, NeonButton, GlassCard } from '@/design-system';
 import { FaClock, FaTrophy } from 'react-icons/fa';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import { supabase } from '@/lib/supabase-client';
-import type { GameSession, Question } from '@/types/quiz';
+import { useWallet } from '@solana/wallet-adapter-react';
+import RealtimeLeaderboard from '@/components/game/RealtimeLeaderboard';
+import type { GameSession, QuizQuestion } from '@/types/quiz';
 
 const QUESTION_TIME_SECONDS = 20;
 const ANSWER_COLORS = {
@@ -25,12 +27,13 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
   const isHost = role === 'host';
 
   const [session, setSession] = useState<GameSession | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_SECONDS);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { publicKey, connected } = useWallet();
 
   useEffect(() => {
     loadGameData();
@@ -111,7 +114,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
       console.log('[GAME] Loaded:', mappedQuestions.length, 'questions, current index:', mappedSession.currentQuestionIndex);
       
       // Set state in one batch to avoid multiple re-renders
-      setQuestions(mappedQuestions);
+      setQuestions(mappedQuestions as any);
       setSession(mappedSession as any);
     } catch (error) {
       console.error('Failed to load game:', error);
@@ -163,7 +166,15 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
     if (!participantId) return;
 
     try {
-      await fetch('/api/game/submit-answer', {
+      // Get wallet private key from localStorage (temporary - should use secure session)
+      const walletPrivateKey = localStorage.getItem('walletPrivateKey');
+      
+      // Use Arcium-enabled endpoint if wallet is connected
+      const endpoint = connected && publicKey && walletPrivateKey
+        ? '/api/game/submit-answer-arcium'
+        : '/api/game/submit-answer';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -172,8 +183,15 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
           questionIndex: session?.currentQuestionIndex,
           answer,
           timeToAnswer: QUESTION_TIME_SECONDS - timeLeft,
+          walletPrivateKey: walletPrivateKey || undefined,
         }),
       });
+
+      const result = await response.json();
+      
+      if (result.arciumValidation) {
+        console.log('✅ Answer validated with Arcium MPC:', result.arciumValidation);
+      }
     } catch (error) {
       console.error('Failed to submit answer:', error);
     }
@@ -236,7 +254,9 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
   return (
     <PageWrapper minHeight="screen" className="bg-gradient-to-b from-black via-purple-950/20 to-black">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Game Area */}
+          <div className="lg:col-span-2">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
@@ -268,7 +288,7 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
           {isHost && (
             <GlassCard variant="purple" size="xl" className="mb-8">
               <Typography variant="display-xs" className="text-center">
-                {currentQuestion.text}
+                {(currentQuestion as any).text}
               </Typography>
             </GlassCard>
           )}
@@ -285,12 +305,12 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AnimatePresence>
               {['A', 'B', 'C', 'D'].map((letter, index) => {
-                const option = currentQuestion.options[index];
+                const option = (currentQuestion as any).options[index];
                 if (!option) return null;
 
                 const isSelected = selectedAnswer === letter;
-                const isCorrect = hasAnswered && letter === currentQuestion.correctAnswer;
-                const isWrong = hasAnswered && isSelected && letter !== currentQuestion.correctAnswer;
+                const isCorrect = hasAnswered && letter === (currentQuestion as any).correctAnswer;
+                const isWrong = hasAnswered && isSelected && letter !== (currentQuestion as any).correctAnswer;
 
                 return (
                   <motion.div
@@ -389,6 +409,12 @@ export default function GamePlayPage({ params }: { params: Promise<{ sessionId: 
               </Typography>
             </motion.div>
           )}
+          </div>
+
+          {/* Leaderboard Sidebar */}
+          <div className="lg:col-span-1">
+            <RealtimeLeaderboard sessionId={resolvedParams.sessionId} />
+          </div>
         </div>
       </div>
     </PageWrapper>

@@ -90,7 +90,7 @@ export default function ResultsPage({ params }: { params: Promise<{ sessionId: s
               GAME RESULTS
             </Typography>
             <Typography variant="h5" color="#a78bfab3">
-              {session?.quiz_sets?.title || 'Quiz Game'}
+              {(session as any)?.quiz_sets?.title || 'Quiz Game'}
             </Typography>
           </motion.div>
 
@@ -107,7 +107,7 @@ export default function ResultsPage({ params }: { params: Promise<{ sessionId: s
                 >
                   <FaMedal className="text-6xl mb-4" style={{ color: PODIUM_COLORS[2].text }} />
                   <Typography variant="h4" className="mb-2">
-                    {topThree[1].player_name}
+                    {(topThree[1] as any).player_name}
                   </Typography>
                   <Typography variant="h3" gradient="purple" className="mb-4">
                     {topThree[1].score}
@@ -132,7 +132,7 @@ export default function ResultsPage({ params }: { params: Promise<{ sessionId: s
                 >
                   <FaTrophy className="text-7xl mb-4" style={{ color: PODIUM_COLORS[1].text }} />
                   <Typography variant="h3" className="mb-2">
-                    {topThree[0].player_name}
+                    {(topThree[0] as any).player_name}
                   </Typography>
                   <Typography variant="display-xs" gradient="orange" className="mb-4">
                     {topThree[0].score}
@@ -157,7 +157,7 @@ export default function ResultsPage({ params }: { params: Promise<{ sessionId: s
                 >
                   <FaMedal className="text-5xl mb-4" style={{ color: PODIUM_COLORS[3].text }} />
                   <Typography variant="h5" className="mb-2">
-                    {topThree[2].player_name}
+                    {(topThree[2] as any).player_name}
                   </Typography>
                   <Typography variant="h4" gradient="pink" className="mb-4">
                     {topThree[2].score}
@@ -230,7 +230,7 @@ export default function ResultsPage({ params }: { params: Promise<{ sessionId: s
                           {index + 4}
                         </div>
                         <Typography variant="body-lg">
-                          {participant.player_name}
+                          {(participant as any).player_name}
                         </Typography>
                       </div>
                       <Typography variant="h5" gradient="purple">

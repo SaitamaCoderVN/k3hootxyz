@@ -6,11 +6,10 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import { PageTemplate } from '@/components/layout/PageTemplate';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 import { QuizSetCreationData, QuestionCreationData } from '@/types/quiz';
-import { PageWrapper } from '@/components/layout/MinHeightContainer';
+import { ScrollReveal, StaggerContainer, StaggerItem } from '@/components/animations';
 import { FaRocket, FaPlus, FaCheckCircle, FaTrash } from 'react-icons/fa';
 import { Typography, NeonButton, GlassCard, colors, Input, spacing } from '@/design-system';
 
@@ -18,10 +17,6 @@ const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
   { ssr: false }
 );
-
-const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground').then(mod => mod.WebGLBackground), {
-  ssr: false,
-});
 
 const defaultQuestion: QuestionCreationData = {
   questionText: '',
@@ -141,87 +136,96 @@ export default function CreatePage() {
   if (!mounted) return null;
 
   return (
-    <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-      <WebGLBackground />
-      <Header />
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl mx-auto"
-        >
-          <div className="text-center mb-12">
-            <Typography variant="display-lg" gradient="purple-pink" className="mb-4">
-              Create Quiz Set
-            </Typography>
-            <Typography variant="body-xl" color={colors.text.secondary} className="max-w-2xl mx-auto">
-              Design your quiz with multiple questions and custom rewards!
-            </Typography>
-          </div>
-
-          {!connected && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mb-8 text-center"
-            >
-              <GlassCard variant="purple" size="md" hover={false}>
-                <FaRocket className="text-6xl mx-auto mb-4" style={{ color: colors.primary.purple[400] }} />
-                <Typography variant="h3" className="mb-4">Connect Your Wallet</Typography>
-                <Typography variant="body" color={colors.text.secondary} className="mb-6">
+    <PageTemplate
+      title="Create Quiz Set"
+      subtitle="Design your quiz with multiple questions and custom rewards!"
+      containerClassName="pb-16"
+    >
+      <div className="max-w-4xl mx-auto pt-8">
+        {!connected && (
+          <ScrollReveal type="scaleIn" delay={0.2} amount={40}>
+            <div className="mb-12 text-center">
+              <GlassCard variant="purple" size="lg" hover={true} className="text-center">
+                <div 
+                  className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.primary.purple[500]}20, ${colors.primary.pink[500]}10)`,
+                    border: `1px solid ${colors.primary.purple[400]}30`,
+                    boxShadow: `0 0 40px ${colors.primary.purple[400]}20`,
+                  }}
+                >
+                  <FaRocket style={{ fontSize: '4rem', color: colors.primary.purple[400], filter: 'drop-shadow(0 0 20px rgba(168, 85, 247, 0.5))' }} />
+                </div>
+                <Typography variant="h3" gradient="purple-pink" className="mb-4">Connect Your Wallet</Typography>
+                <Typography variant="body-lg" color={`${colors.primary.purple[300]}dd`} className="mb-8 leading-relaxed">
                   Connect your Solana wallet to create quizzes
                 </Typography>
                 <div className="flex justify-center">
-                  <WalletMultiButton className="!bg-gradient-to-r !from-cyan-500 !to-purple-500 !text-white !font-bold !px-8 !py-4 !rounded-xl" />
+                  <WalletMultiButton 
+                    style={{
+                      background: `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`,
+                      color: colors.text.primary,
+                      fontWeight: 700,
+                      padding: '1rem 2rem',
+                      borderRadius: '0.75rem',
+                      transition: 'all 200ms',
+                      boxShadow: `0 4px 20px ${colors.primary.purple[400]}40`,
+                    }}
+                  />
                 </div>
               </GlassCard>
-            </motion.div>
-          )}
+            </div>
+          </ScrollReveal>
+        )}
 
-          {successMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8 text-center"
-            >
-              <GlassCard variant="default" hover={false}>
-                <FaCheckCircle className="text-5xl mx-auto mb-4" style={{ color: colors.state.success }} />
-                <Typography variant="h3" color={colors.state.success} className="mb-2">Quiz Created Successfully!</Typography>
-                <Typography variant="body" color={colors.state.success}>Redirecting to quiz list...</Typography>
+        {successMessage && (
+          <ScrollReveal type="scaleIn" delay={0.1} amount={40}>
+            <div className="mb-8 text-center">
+              <GlassCard variant="orange" size="lg" hover={false} className="text-center">
+                <div 
+                  className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.state.success}20, ${colors.state.success}10)`,
+                    border: `1px solid ${colors.state.success}30`,
+                  }}
+                >
+                  <FaCheckCircle style={{ fontSize: '4rem', color: colors.state.success, filter: 'drop-shadow(0 0 20px rgba(34, 197, 94, 0.5))' }} />
+                </div>
+                <Typography variant="h3" gradient="orange" className="mb-2">Quiz Created Successfully!</Typography>
+                <Typography variant="body-lg" color={`${colors.primary.purple[300]}dd`}>Redirecting to quiz list...</Typography>
               </GlassCard>
-            </motion.div>
-          )}
+            </div>
+          </ScrollReveal>
+        )}
 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8 text-center"
-            >
-              <GlassCard variant="default" hover={false}>
-                <Typography variant="body" color={colors.state.error} className="mb-4">{error}</Typography>
+        {error && (
+          <ScrollReveal type="scaleIn" delay={0.1} amount={40}>
+            <div className="mb-8 text-center">
+              <GlassCard variant="default" size="lg" hover={false}>
+                <Typography variant="h4" color={colors.state.error} className="mb-4">{error}</Typography>
                 <NeonButton
-                  variant="ghost"
+                  variant="secondary"
                   neonColor="orange"
-                  size="sm"
+                  size="md"
                   onClick={clearError}
                 >
                   Dismiss
                 </NeonButton>
               </GlassCard>
-            </motion.div>
-          )}
+            </div>
+          </ScrollReveal>
+        )}
 
-          {connected && (
+        {connected && (
+          <ScrollReveal type="fadeInUp" delay={0.3} amount={50}>
             <motion.form
               onSubmit={handleSubmit}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <GlassCard variant="purple" size="lg" hover={false}>
-                <div className="mb-8 pb-6" style={{ borderBottom: `1px solid ${colors.semantic.border}` }}>
-                  <Typography variant="h4" gradient="purple" className="mb-3">
+              <GlassCard variant="purple" size="xl" hover={false}>
+                <div className="mb-8 pb-8" style={{ borderBottom: `1px solid ${colors.semantic.border}60` }}>
+                  <Typography variant="h4" gradient="purple-pink" className="mb-4">
                     Quiz Name
                   </Typography>
                   <input
@@ -229,9 +233,22 @@ export default function CreatePage() {
                     value={quizName}
                     onChange={(e) => setQuizName(e.target.value)}
                     placeholder="e.g., Solana Basics Quiz"
-                    className="w-full px-4 py-3 bg-gray-900/50 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none"
+                    className="w-full px-6 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
                     disabled={creating}
-                    style={{ fontFamily: 'var(--font-space)' }}
+                    style={{ 
+                      fontFamily: 'var(--font-space)',
+                      background: `${colors.background.glass}dd`,
+                      border: `2px solid ${colors.primary.purple[400]}40`,
+                      color: colors.text.primary,
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = `${colors.primary.purple[400]}80`;
+                      e.target.style.boxShadow = `0 0 20px ${colors.primary.purple[400]}30`;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = `${colors.primary.purple[400]}40`;
+                      e.target.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
 
@@ -261,9 +278,9 @@ export default function CreatePage() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                       >
-                        <GlassCard variant="default" size="md" hover={false}>
-                          <div className="flex items-center justify-between mb-4">
-                            <Typography variant="h5" gradient="pink">
+                        <GlassCard variant="default" size="lg" hover={true} className="mb-6">
+                          <div className="flex items-center justify-between mb-6">
+                            <Typography variant="h4" gradient="pink" className="mb-0">
                               Question {qIndex + 1}
                             </Typography>
                             {questions.length > 1 && (
@@ -281,57 +298,113 @@ export default function CreatePage() {
                             )}
                           </div>
 
-                          <div className="mb-4">
-                            <Typography variant="body-sm" color={colors.text.secondary} className="mb-2">
+                          <div className="mb-6">
+                            <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-3 font-medium">
                               Question Text
                             </Typography>
                             <textarea
                               value={question.questionText}
                               onChange={(e) => updateQuestionText(qIndex, e.target.value)}
                               placeholder="Enter your question here..."
-                              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none resize-none"
-                              rows={2}
+                              className="w-full px-6 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none resize-none transition-all duration-300"
+                              rows={3}
                               disabled={creating}
-                              style={{ fontFamily: 'var(--font-space)' }}
+                              style={{ 
+                                fontFamily: 'var(--font-space)',
+                                background: `${colors.background.glass}dd`,
+                                border: `2px solid ${colors.primary.purple[400]}40`,
+                                color: colors.text.primary,
+                              }}
+                              onFocus={(e) => {
+                                e.target.style.borderColor = `${colors.primary.purple[400]}80`;
+                                e.target.style.boxShadow = `0 0 20px ${colors.primary.purple[400]}30`;
+                              }}
+                              onBlur={(e) => {
+                                e.target.style.borderColor = `${colors.primary.purple[400]}40`;
+                                e.target.style.boxShadow = 'none';
+                              }}
                             />
                           </div>
 
-                          <div className="mb-4">
-                            <Typography variant="body-sm" color={colors.text.secondary} className="mb-2">
+                          <div className="mb-6">
+                            <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-4 font-medium">
                               Answer Options
                             </Typography>
-                            <div className="space-y-2">
-                              {['A', 'B', 'C', 'D'].map((letter, cIndex) => (
-                                <div key={letter} className="flex items-center gap-2">
-                                  <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded font-bold text-sm"
-                                       style={{ background: `${colors.primary.purple[500]}33`, color: colors.primary.purple[400] }}>
-                                    {letter}
+                            <div className="space-y-3">
+                              {['A', 'B', 'C', 'D'].map((letter, cIndex) => {
+                                const optionColors = {
+                                  A: colors.primary.orange,
+                                  B: colors.primary.purple,
+                                  C: colors.primary.pink,
+                                  D: colors.primary.purple,
+                                };
+                                const color = optionColors[letter as keyof typeof optionColors];
+                                return (
+                                  <div key={letter} className="flex items-center gap-3">
+                                    <div 
+                                      className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl font-bold text-base transition-all duration-300"
+                                      style={{ 
+                                        background: `linear-gradient(135deg, ${color[500]}40, ${color[400]}20)`,
+                                        border: `1px solid ${color[400]}60`,
+                                        color: color[300],
+                                        boxShadow: `0 2px 10px ${color[400]}20`,
+                                      }}
+                                    >
+                                      {letter}
+                                    </div>
+                                    <input
+                                      type="text"
+                                      value={question.choices[cIndex]}
+                                      onChange={(e) => updateChoice(qIndex, cIndex, e.target.value)}
+                                      placeholder={`Option ${letter}`}
+                                      className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
+                                      disabled={creating}
+                                      style={{ 
+                                        fontFamily: 'var(--font-space)',
+                                        background: `${colors.background.glass}dd`,
+                                        border: `2px solid ${color[400]}40`,
+                                        color: colors.text.primary,
+                                      }}
+                                      onFocus={(e) => {
+                                        e.target.style.borderColor = `${color[400]}80`;
+                                        e.target.style.boxShadow = `0 0 15px ${color[400]}30`;
+                                      }}
+                                      onBlur={(e) => {
+                                        e.target.style.borderColor = `${color[400]}40`;
+                                        e.target.style.boxShadow = 'none';
+                                      }}
+                                    />
                                   </div>
-                                  <input
-                                    type="text"
-                                    value={question.choices[cIndex]}
-                                    onChange={(e) => updateChoice(qIndex, cIndex, e.target.value)}
-                                    placeholder={`Option ${letter}`}
-                                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none text-sm"
-                                    disabled={creating}
-                                    style={{ fontFamily: 'var(--font-space)' }}
-                                  />
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                              <Typography variant="body-sm" color={colors.text.secondary} className="mb-2">
+                              <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-3 font-medium">
                                 Correct Answer
                               </Typography>
                               <select
                                 value={question.correctAnswer}
                                 onChange={(e) => updateCorrectAnswer(qIndex, e.target.value as "A" | "B" | "C" | "D")}
-                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none text-sm"
+                                className="w-full px-6 py-4 rounded-xl text-white focus:outline-none transition-all duration-300"
                                 disabled={creating}
-                                style={{ fontFamily: 'var(--font-space)' }}
+                                style={{ 
+                                  fontFamily: 'var(--font-space)',
+                                  background: `${colors.background.glass}dd`,
+                                  border: `2px solid ${colors.primary.purple[400]}40`,
+                                  color: colors.text.primary,
+                                  fontSize: '1rem',
+                                }}
+                                onFocus={(e) => {
+                                  e.target.style.borderColor = `${colors.primary.purple[400]}80`;
+                                  e.target.style.boxShadow = `0 0 20px ${colors.primary.purple[400]}30`;
+                                }}
+                                onBlur={(e) => {
+                                  e.target.style.borderColor = `${colors.primary.purple[400]}40`;
+                                  e.target.style.boxShadow = 'none';
+                                }}
                               >
                                 <option value="A">A</option>
                                 <option value="B">B</option>
@@ -340,7 +413,7 @@ export default function CreatePage() {
                               </select>
                             </div>
                             <div>
-                              <Typography variant="body-sm" color={colors.text.secondary} className="mb-2">
+                              <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-3 font-medium">
                                 Reward (SOL)
                               </Typography>
                               <input
@@ -349,9 +422,24 @@ export default function CreatePage() {
                                 min="0.01"
                                 value={question.rewardAmount}
                                 onChange={(e) => updateRewardAmount(qIndex, parseFloat(e.target.value) || 0.01)}
-                                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none text-sm"
+                                className="w-full px-6 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
                                 disabled={creating}
-                                style={{ fontFamily: 'var(--font-space)' }}
+                                placeholder="0.1"
+                                style={{ 
+                                  fontFamily: 'var(--font-space)',
+                                  background: `${colors.background.glass}dd`,
+                                  border: `2px solid ${colors.primary.orange[400]}40`,
+                                  color: colors.text.primary,
+                                  fontSize: '1rem',
+                                }}
+                                onFocus={(e) => {
+                                  e.target.style.borderColor = `${colors.primary.orange[400]}80`;
+                                  e.target.style.boxShadow = `0 0 20px ${colors.primary.orange[400]}30`;
+                                }}
+                                onBlur={(e) => {
+                                  e.target.style.borderColor = `${colors.primary.orange[400]}40`;
+                                  e.target.style.boxShadow = 'none';
+                                }}
                               />
                             </div>
                           </div>
@@ -361,18 +449,25 @@ export default function CreatePage() {
                   </AnimatePresence>
                 </div>
 
-                <div className="rounded-xl p-4 mb-6" style={{ background: `${colors.primary.purple[500]}20`, border: `1px solid ${colors.primary.purple[500]}30` }}>
-                  <div className="flex items-center justify-between">
-                    <Typography variant="body" color={colors.text.secondary}>Total Reward Pool:</Typography>
-                    <Typography variant="h3" gradient="purple">
+                <GlassCard variant="orange" size="md" hover={false} className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <Typography variant="h4" gradient="orange" className="mb-0">
+                      Total Reward Pool
+                    </Typography>
+                    <Typography variant="display-sm" gradient="orange">
                       {getTotalReward().toFixed(2)} SOL
                     </Typography>
                   </div>
-                  <Typography variant="body-xs" color={colors.text.muted} className="mt-2">
-                    {questions.length} question{questions.length > 1 ? 's' : ''} • 
-                    Average {(getTotalReward() / questions.length).toFixed(2)} SOL per question
-                  </Typography>
-                </div>
+                  <div className="flex items-center gap-4 text-sm">
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}cc`}>
+                      {questions.length} question{questions.length > 1 ? 's' : ''}
+                    </Typography>
+                    <span style={{ color: `${colors.semantic.border}60` }}>•</span>
+                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}cc`}>
+                      Avg {(getTotalReward() / questions.length).toFixed(2)} SOL/question
+                    </Typography>
+                  </div>
+                </GlassCard>
 
                 <NeonButton
                   type="submit"
@@ -388,11 +483,9 @@ export default function CreatePage() {
                 </NeonButton>
               </GlassCard>
             </motion.form>
-          )}
-        </motion.div>
+          </ScrollReveal>
+        )}
       </div>
-
-      <Footer />
-    </PageWrapper>
+    </PageTemplate>
   );
 }

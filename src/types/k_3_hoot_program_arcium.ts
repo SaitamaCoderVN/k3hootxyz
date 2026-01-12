@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/k_3_hoot_program_arcium.json`.
  */
 export type K3HootProgramArcium = {
-  "address": "6noZrDWRwRnMx2cszs5P2wdpYpVwYCdQL5Ps6gFhD5T5",
+  "address": "24MqGK5Ei8aKG6fCK8Ym36cHy1UvYD3zicRHWaEpekz4",
   "metadata": {
     "name": "k3HootProgramArcium",
     "version": "0.1.0",
@@ -13,6 +13,66 @@ export type K3HootProgramArcium = {
     "description": "Created with Arcium & Anchor"
   },
   "instructions": [
+    {
+      "name": "addEncryptedQuestionBlock",
+      "discriminator": [
+        123,
+        21,
+        48,
+        208,
+        167,
+        176,
+        240,
+        215
+      ],
+      "accounts": [
+        {
+          "name": "questionBlock",
+          "writable": true
+        },
+        {
+          "name": "quizSet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "questionIndex",
+          "type": "u8"
+        },
+        {
+          "name": "encryptedCorrectAnswer",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "arciumPubkey",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "nonce",
+          "type": "u128"
+        }
+      ]
+    },
     {
       "name": "claimReward",
       "discriminator": [
@@ -27,30 +87,27 @@ export type K3HootProgramArcium = {
       ],
       "accounts": [
         {
-          "name": "rewardPool",
+          "name": "quizSet",
+          "writable": true
+        },
+        {
+          "name": "vault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  114,
-                  101,
-                  119,
+                  118,
                   97,
-                  114,
-                  100,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
+                  117,
+                  108,
+                  116
                 ]
               },
               {
                 "kind": "account",
-                "path": "reward_pool.quiz_id",
-                "account": "rewardPool"
+                "path": "quizSet"
               }
             ]
           }
@@ -68,239 +125,46 @@ export type K3HootProgramArcium = {
       "args": []
     },
     {
-      "name": "closeAnswerAccount",
+      "name": "createQuizSet",
       "discriminator": [
-        65,
-        13,
-        74,
-        113,
-        196,
-        173,
-        56,
-        247
-      ],
-      "accounts": [
-        {
-          "name": "answerAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  97,
-                  110,
-                  115,
-                  119,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "quizId"
-              },
-              {
-                "kind": "arg",
-                "path": "questionId"
-              },
-              {
-                "kind": "arg",
-                "path": "topicId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "closeRewardPool",
-      "discriminator": [
-        132,
-        11,
-        178,
-        150,
-        41,
-        107,
-        204,
-        187
-      ],
-      "accounts": [
-        {
-          "name": "rewardPool",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  119,
-                  97,
-                  114,
-                  100,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "quizId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "funder",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "createAnswerAccount",
-      "discriminator": [
-        252,
-        81,
-        231,
-        192,
-        64,
-        60,
-        128,
-        85
-      ],
-      "accounts": [
-        {
-          "name": "answerAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  97,
-                  110,
-                  115,
-                  119,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "quizId"
-              },
-              {
-                "kind": "arg",
-                "path": "questionId"
-              },
-              {
-                "kind": "arg",
-                "path": "topicId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "quizId",
-          "type": "u64"
-        },
-        {
-          "name": "questionId",
-          "type": "u64"
-        },
-        {
-          "name": "topicId",
-          "type": "u64"
-        },
-        {
-          "name": "encryptedCorrectAnswer",
-          "type": {
-            "array": [
-              "u8",
-              64
-            ]
-          }
-        },
-        {
-          "name": "nonce",
-          "type": "u128"
-        }
-      ]
-    },
-    {
-      "name": "createRewardPool",
-      "discriminator": [
-        199,
-        136,
-        155,
+        236,
+        139,
+        63,
+        87,
         69,
-        28,
-        136,
-        237,
-        214
+        122,
+        7,
+        218
       ],
       "accounts": [
         {
-          "name": "rewardPool",
+          "name": "quizSet",
+          "writable": true
+        },
+        {
+          "name": "vault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  114,
-                  101,
-                  119,
+                  118,
                   97,
-                  114,
-                  100,
-                  95,
-                  112,
-                  111,
-                  111,
-                  108
+                  117,
+                  108,
+                  116
                 ]
               },
               {
-                "kind": "arg",
-                "path": "quizId"
+                "kind": "account",
+                "path": "quizSet"
               }
             ]
           }
         },
         {
-          "name": "funder",
+          "name": "authority",
           "writable": true,
           "signer": true
         },
@@ -311,14 +175,112 @@ export type K3HootProgramArcium = {
       ],
       "args": [
         {
-          "name": "quizId",
-          "type": "u64"
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "questionCount",
+          "type": "u8"
+        },
+        {
+          "name": "uniqueId",
+          "type": "u8"
         },
         {
           "name": "rewardAmount",
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "finalizeGame",
+      "docs": [
+        "Finalize game and determine winner based on highest score"
+      ],
+      "discriminator": [
+        203,
+        227,
+        3,
+        167,
+        186,
+        102,
+        76,
+        10
+      ],
+      "accounts": [
+        {
+          "name": "quizSet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initPlayerAnswer",
+      "discriminator": [
+        8,
+        206,
+        227,
+        95,
+        58,
+        147,
+        114,
+        4
+      ],
+      "accounts": [
+        {
+          "name": "playerAnswer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  97,
+                  110,
+                  115,
+                  119,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "quizSet"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quizSet"
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initValidateAnswerCompDef",
@@ -358,101 +320,76 @@ export type K3HootProgramArcium = {
       "args": []
     },
     {
-      "name": "submitAnswerMock",
+      "name": "updatePlayerScore",
       "docs": [
-        "Submit and validate answer (mock version for testing)",
-        "In production, use validate_answer_onchain with Arcium"
+        "Update player's on-chain score (called by frontend after Arcium validation)"
       ],
       "discriminator": [
+        61,
+        168,
         107,
-        12,
-        201,
-        5,
-        240,
-        131,
-        194,
-        84
+        150,
+        46,
+        189,
+        206,
+        173
       ],
       "accounts": [
         {
-          "name": "answerAccount"
-        },
-        {
-          "name": "rewardPool",
+          "name": "quizSet",
           "writable": true
         },
         {
-          "name": "user",
+          "name": "playerAnswer",
           "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "userAnswer",
-          "type": "string"
-        }
-      ]
-    },
-    {
-      "name": "validateAnswerCallback",
-      "discriminator": [
-        242,
-        143,
-        241,
-        66,
-        101,
-        128,
-        174,
-        58
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "arciumProgram",
-          "address": "BKck65TgoKRokMjQM3datB9oRwJ8rAj2jxPXvHXUvcL6"
-        },
-        {
-          "name": "compDefAccount"
-        },
-        {
-          "name": "instructionsSysvar",
-          "address": "Sysvar1nstructions1111111111111111111111111"
-        },
-        {
-          "name": "answerAccount"
-        },
-        {
-          "name": "rewardPool",
-          "writable": true
-        }
-      ],
-      "args": [
-        {
-          "name": "output",
-          "type": {
-            "defined": {
-              "name": "computationOutputs",
-              "generics": [
-                {
-                  "kind": "type",
-                  "type": {
-                    "defined": {
-                      "name": "validateAnswerOutput"
-                    }
-                  }
-                }
-              ]
-            }
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  97,
+                  110,
+                  115,
+                  119,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "quizSet"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
           }
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "updater",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "questionIndex",
+          "type": "u8"
+        },
+        {
+          "name": "isCorrect",
+          "type": "bool"
         }
       ]
     },
@@ -501,11 +438,10 @@ export type K3HootProgramArcium = {
           }
         },
         {
-          "name": "answerAccount"
+          "name": "questionBlock"
         },
         {
-          "name": "rewardPool",
-          "writable": true
+          "name": "quizSet"
         },
         {
           "name": "mxeAccount"
@@ -553,38 +489,35 @@ export type K3HootProgramArcium = {
           "type": "u64"
         },
         {
-          "name": "userAnswer",
-          "type": "string"
+          "name": "encryptedUserAnswer",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
-          "name": "quizId",
-          "type": "u64"
+          "name": "pubKey",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
-          "name": "questionId",
-          "type": "u64"
+          "name": "nonce",
+          "type": "u128"
         },
         {
-          "name": "topicId",
-          "type": "u64"
+          "name": "questionIndex",
+          "type": "u8"
         }
       ]
     }
   ],
   "accounts": [
-    {
-      "name": "answerAccount",
-      "discriminator": [
-        75,
-        175,
-        139,
-        96,
-        119,
-        135,
-        123,
-        71
-      ]
-    },
     {
       "name": "clockAccount",
       "discriminator": [
@@ -651,16 +584,42 @@ export type K3HootProgramArcium = {
       ]
     },
     {
-      "name": "rewardPool",
+      "name": "playerAnswer",
       "discriminator": [
-        134,
-        121,
-        197,
-        211,
-        133,
-        154,
-        82,
-        32
+        61,
+        96,
+        92,
+        185,
+        176,
+        189,
+        137,
+        111
+      ]
+    },
+    {
+      "name": "questionBlock",
+      "discriminator": [
+        51,
+        105,
+        8,
+        110,
+        131,
+        74,
+        146,
+        153
+      ]
+    },
+    {
+      "name": "quizSet",
+      "discriminator": [
+        49,
+        245,
+        250,
+        47,
+        47,
+        117,
+        148,
+        6
       ]
     },
     {
@@ -677,72 +636,56 @@ export type K3HootProgramArcium = {
       ]
     }
   ],
-  "events": [
-    {
-      "name": "answerValidatedEvent",
-      "discriminator": [
-        196,
-        165,
-        217,
-        124,
-        203,
-        179,
-        131,
-        229
-      ]
-    },
-    {
-      "name": "rewardClaimedEvent",
-      "discriminator": [
-        246,
-        43,
-        215,
-        228,
-        82,
-        49,
-        230,
-        56
-      ]
-    },
-    {
-      "name": "rewardPoolCreatedEvent",
-      "discriminator": [
-        251,
-        98,
-        202,
-        109,
-        133,
-        154,
-        58,
-        206
-      ]
-    }
-  ],
   "errors": [
     {
       "code": 6000,
+      "name": "invalidName",
+      "msg": "Invalid quiz name"
+    },
+    {
+      "code": 6001,
+      "name": "invalidQuestionCount",
+      "msg": "Invalid question count (must be 1-50)"
+    },
+    {
+      "code": 6002,
+      "name": "invalidQuestionIndex",
+      "msg": "Invalid question index"
+    },
+    {
+      "code": 6003,
+      "name": "unauthorized",
+      "msg": "unauthorized"
+    },
+    {
+      "code": 6004,
+      "name": "quizSetAlreadyInitialized",
+      "msg": "Quiz set already initialized"
+    },
+    {
+      "code": 6005,
       "name": "invalidRewardAmount",
       "msg": "Invalid reward amount"
     },
     {
-      "code": 6001,
+      "code": 6006,
+      "name": "quizNotInitialized",
+      "msg": "Quiz not initialized"
+    },
+    {
+      "code": 6007,
+      "name": "noWinner",
+      "msg": "No winner yet"
+    },
+    {
+      "code": 6008,
       "name": "rewardAlreadyClaimed",
       "msg": "Reward already claimed"
     },
     {
-      "code": 6002,
+      "code": 6009,
       "name": "notWinner",
       "msg": "Not the winner"
-    },
-    {
-      "code": 6003,
-      "name": "noWinner",
-      "msg": "No winner set yet"
-    },
-    {
-      "code": 6004,
-      "name": "cannotCloseActivePool",
-      "msg": "Cannot close active reward pool with unclaimed rewards"
     }
   ],
   "types": [
@@ -766,75 +709,6 @@ export type K3HootProgramArcium = {
                 "name": "epoch"
               }
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "answerAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "quizId",
-            "type": "u64"
-          },
-          {
-            "name": "questionId",
-            "type": "u64"
-          },
-          {
-            "name": "topicId",
-            "type": "u64"
-          },
-          {
-            "name": "encryptedCorrectAnswer",
-            "type": {
-              "array": [
-                "u8",
-                64
-              ]
-            }
-          },
-          {
-            "name": "nonce",
-            "type": "u128"
-          },
-          {
-            "name": "createdAt",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "answerValidatedEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "user",
-            "type": "pubkey"
-          },
-          {
-            "name": "quizId",
-            "type": "u64"
-          },
-          {
-            "name": "questionId",
-            "type": "u64"
-          },
-          {
-            "name": "topicId",
-            "type": "u64"
-          },
-          {
-            "name": "isCorrect",
-            "type": "bool"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           }
         ]
       }
@@ -1061,31 +935,6 @@ export type K3HootProgramArcium = {
                 "name": "computationSignature"
               }
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "computationOutputs",
-      "generics": [
-        {
-          "kind": "type",
-          "name": "o"
-        }
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "success",
-            "fields": [
-              {
-                "generic": "o"
-              }
-            ]
-          },
-          {
-            "name": "failure"
           }
         ]
       }
@@ -1364,101 +1213,57 @@ export type K3HootProgramArcium = {
       }
     },
     {
-      "name": "rewardClaimedEvent",
+      "name": "playerAnswer",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "winner",
+            "name": "quizSet",
             "type": "pubkey"
           },
           {
-            "name": "quizId",
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "totalScore",
             "type": "u64"
           },
           {
-            "name": "rewardAmount",
-            "type": "u64"
+            "name": "correctCount",
+            "type": "u8"
           },
           {
-            "name": "timestamp",
+            "name": "lastUpdated",
             "type": "i64"
           }
         ]
       }
     },
     {
-      "name": "rewardPool",
+      "name": "questionBlock",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "quizId",
-            "type": "u64"
+            "name": "quizSet",
+            "type": "pubkey"
           },
           {
-            "name": "rewardAmount",
-            "type": "u64"
+            "name": "questionIndex",
+            "type": "u32"
           },
           {
-            "name": "winner",
+            "name": "encryptedCorrectAnswer",
             "type": {
-              "option": "pubkey"
+              "array": [
+                "u8",
+                32
+              ]
             }
           },
           {
-            "name": "isClaimed",
-            "type": "bool"
-          },
-          {
-            "name": "questionId",
-            "type": "u64"
-          },
-          {
-            "name": "topicId",
-            "type": "u64"
-          },
-          {
-            "name": "createdAt",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "rewardPoolCreatedEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "quizId",
-            "type": "u64"
-          },
-          {
-            "name": "rewardAmount",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "sharedEncryptedStruct",
-      "generics": [
-        {
-          "kind": "const",
-          "name": "len",
-          "type": "usize"
-        }
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "encryptionKey",
+            "name": "arciumPubkey",
             "type": {
               "array": [
                 "u8",
@@ -1471,20 +1276,58 @@ export type K3HootProgramArcium = {
             "type": "u128"
           },
           {
-            "name": "ciphertexts",
+            "name": "createdAt",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "quizSet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "questionCount",
+            "type": "u8"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "rewardAmount",
+            "type": "u64"
+          },
+          {
+            "name": "isRewardClaimed",
+            "type": "bool"
+          },
+          {
+            "name": "winner",
             "type": {
-              "array": [
-                {
-                  "array": [
-                    "u8",
-                    32
-                  ]
-                },
-                {
-                  "generic": "len"
-                }
-              ]
+              "option": "pubkey"
             }
+          },
+          {
+            "name": "correctAnswersCount",
+            "type": "u8"
+          },
+          {
+            "name": "uniqueId",
+            "type": "u8"
           }
         ]
       }
@@ -1509,32 +1352,6 @@ export type K3HootProgramArcium = {
           {
             "name": "timestamp",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "validateAnswerOutput",
-      "docs": [
-        "The output of the callback instruction. Provided as a struct with ordered fields",
-        "as anchor does not support tuples and tuple structs yet."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "field0",
-            "type": {
-              "defined": {
-                "name": "sharedEncryptedStruct",
-                "generics": [
-                  {
-                    "kind": "const",
-                    "value": "1"
-                  }
-                ]
-              }
-            }
           }
         ]
       }

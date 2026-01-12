@@ -69,7 +69,7 @@ export default function Footer() {
             <div className="flex flex-col" style={{ gap: spacing[3] }}>
               {footerLinks.product.map((link) => (
                 <Link
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
                   style={{
                     color: `${colors.primary.purple[300]}99`,
@@ -92,7 +92,7 @@ export default function Footer() {
             <div className="flex flex-col" style={{ gap: spacing[3] }}>
               {footerLinks.resources.map((link) => (
                 <Link
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
                   style={{
                     color: `${colors.primary.purple[300]}99`,
@@ -113,8 +113,8 @@ export default function Footer() {
               Legal
             </Typography>
             <div className="flex flex-col" style={{ gap: spacing[3] }}>
-              <Link href="#" style={{ color: `${colors.primary.purple[300]}99`, fontSize: typography.fontSize.sm[0] }} className="hover:text-purple-200">Terms</Link>
-              <Link href="#" style={{ color: `${colors.primary.purple[300]}99`, fontSize: typography.fontSize.sm[0] }} className="hover:text-purple-200">Privacy</Link>
+              <Link key="terms" href="#" style={{ color: `${colors.primary.purple[300]}99`, fontSize: typography.fontSize.sm[0] }} className="hover:text-purple-200">Terms</Link>
+              <Link key="privacy" href="#" style={{ color: `${colors.primary.purple[300]}99`, fontSize: typography.fontSize.sm[0] }} className="hover:text-purple-200">Privacy</Link>
             </div>
           </div>
         </div>

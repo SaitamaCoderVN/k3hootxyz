@@ -7,18 +7,32 @@ import { motion } from 'framer-motion';
 import { FaArrowLeft, FaTrophy, FaRocket } from 'react-icons/fa';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import SpaceBackground from '@/components/animations/SpaceBackground';
-import Stars from '@/components/animations/Stars';
 import { AnswerButton } from '@/components/AnswerButton';
 import { ClaimButton } from '@/components/ClaimButton';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 import { PageWrapper } from '@/components/layout/MinHeightContainer';
+import { colors } from '@/design-system';
 import dynamic from 'next/dynamic';
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
   { ssr: false }
 );
+
+const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'), {
+  ssr: false,
+  loading: () => null,
+});
+
+const CursorTrail = dynamic(() => import('@/components/interactive/CursorTrail').then(mod => ({ default: mod.CursorTrail })), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function QuizPlayPage() {
   const { id } = useParams();
@@ -49,9 +63,9 @@ export default function QuizPlayPage() {
   // Fetch quiz ONCE when page loads
   useEffect(() => {
     if (connected && id) {
-      const quizId = parseInt(id as string);
-      console.log('📥 Loading quiz:', quizId);
-      fetchQuizById(quizId);
+      const quizSetId = id as string; // Now a string PDA, not a number
+      console.log('📥 Loading quiz set:', quizSetId);
+      fetchQuizById(quizSetId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, connected]); // Only trigger when id or connected changes, NOT fetchQuizById
@@ -86,9 +100,10 @@ export default function QuizPlayPage() {
 
   if (!connected) {
     return (
-      <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-        <SpaceBackground />
-        <Stars />
+      <PageWrapper minHeight="screen" className="text-white overflow-hidden" style={{ backgroundColor: colors.background.primary }}>
+        <WebGLBackground />
+        <CursorTrail />
+        <PixelEffect />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <motion.div
@@ -111,9 +126,10 @@ export default function QuizPlayPage() {
 
   if (loading) {
     return (
-      <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-        <SpaceBackground />
-        <Stars />
+      <PageWrapper minHeight="screen" className="text-white overflow-hidden" style={{ backgroundColor: colors.background.primary }}>
+        <WebGLBackground />
+        <CursorTrail />
+        <PixelEffect />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16 text-center">
           <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-cyan-400 mb-4"></div>
@@ -126,9 +142,10 @@ export default function QuizPlayPage() {
 
   if (error || !currentQuiz) {
     return (
-      <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-        <SpaceBackground />
-        <Stars />
+      <PageWrapper minHeight="screen" className="text-white overflow-hidden" style={{ backgroundColor: colors.background.primary }}>
+        <WebGLBackground />
+        <CursorTrail />
+        <PixelEffect />
         <Header />
         <div className="container mx-auto px-4 pt-32 pb-16">
           <motion.div
@@ -156,9 +173,10 @@ export default function QuizPlayPage() {
   const hasAnswered = quizResult !== null;
 
   return (
-    <PageWrapper minHeight="screen" className="bg-black text-white overflow-hidden">
-      <SpaceBackground />
-      <Stars />
+    <PageWrapper minHeight="screen" className="text-white overflow-hidden" style={{ backgroundColor: colors.background.primary }}>
+      <WebGLBackground />
+      <CursorTrail />
+      <PixelEffect />
       <Header />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
@@ -180,8 +198,10 @@ export default function QuizPlayPage() {
             <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-lg rounded-xl p-6 border border-cyan-500/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">Quiz #{currentQuiz.quizId}</h1>
-                  <p className="text-gray-400">Answer correctly to win SOL!</p>
+                  <h1 className="text-3xl font-bold mb-2">{currentQuiz.question.slice(0, 50)}{currentQuiz.question.length > 50 ? '...' : ''}</h1>
+                  <p className="text-gray-400 font-mono text-xs">
+                    {currentQuiz.quizId.slice(0, 4)}...{currentQuiz.quizId.slice(-4)}
+                  </p>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-cyan-400">{currentQuiz.rewardAmount} SOL</div>

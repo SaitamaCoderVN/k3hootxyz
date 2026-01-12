@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { FaTimes, FaBars } from 'react-icons/fa';
-import { colors, spacing, shadows, animations, Typography, NeonButton } from '@/design-system';
+import { colors, spacing, shadows, animations, typography, Typography } from '@/design-system';
+import WalletButton from '@/components/WalletButton';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/play', label: 'Play' },
   { href: '/create', label: 'Create' },
+  { href: '/multiplayer/join', label: 'Join Game' },
   { href: '/leaderboard', label: 'Leaderboard' },
 ];
 
@@ -69,9 +71,7 @@ export default function Header() {
 
           {/* Right section */}
           <div className="flex items-center" style={{ gap: spacing[4] }}>
-            <NeonButton size="sm" neonColor="purple">
-              Connect Wallet
-            </NeonButton>
+            <WalletButton />
 
             {/* Mobile menu button */}
             <button

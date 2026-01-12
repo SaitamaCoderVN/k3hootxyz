@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import { ParticleField } from './ParticleField';
 import { useEffect, useState, memo } from 'react';
 
-export const WebGLBackground = memo(function WebGLBackground() {
+const WebGLBackgroundComponent = memo(function WebGLBackground() {
   const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
@@ -40,3 +40,6 @@ export const WebGLBackground = memo(function WebGLBackground() {
     </div>
   );
 });
+
+export const WebGLBackground = WebGLBackgroundComponent;
+export default WebGLBackgroundComponent;

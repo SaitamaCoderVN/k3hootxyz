@@ -22,8 +22,9 @@ const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'),
   ssr: false,
 });
 
-const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground').then(mod => mod.WebGLBackground), {
+const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground'), {
   ssr: false,
+  loading: () => null,
 });
 
 const containerVariants = {

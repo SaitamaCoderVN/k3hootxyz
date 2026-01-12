@@ -44,12 +44,11 @@ export function useSimpleQuiz() {
   }, [client]);
 
   /**
-   * Fetch single quiz by ID
+   * Fetch single quiz by ID (NEW: uses string PDA)
    */
   const fetchQuizById = useCallback(async (
-    quizId: number,
-    questionId: number = 1,
-    topicId: number = 100
+    quizSetId: string,
+    questionIndex: number = 0
   ) => {
     if (!client) {
       setError('Wallet not connected');
@@ -58,9 +57,9 @@ export function useSimpleQuiz() {
 
     setLoading(true);
     setError(null);
-    
+
     try {
-      const quiz = await client.getQuizById(quizId, questionId, topicId);
+      const quiz = await client.getQuizById(quizSetId, questionIndex);
       setCurrentQuiz(quiz);
       return quiz;
     } catch (err: any) {
@@ -139,14 +138,13 @@ export function useSimpleQuiz() {
   }, [client]);
 
   /**
-   * Submit answer to quiz
-   * ONLY validates answer on-chain when user submits
+   * Submit answer to quiz (NEW: uses QuizSet architecture)
+   * TEMPORARY: Mock validation until Arcium MPC integration is complete
    */
   const submitAnswer = useCallback(async (
-    quizId: number,
+    quizSetId: string,
     answer: "A" | "B" | "C" | "D",
-    questionId: number = 1,
-    topicId: number = 100
+    questionIndex: number = 0
   ): Promise<QuizResult | null> => {
     if (!client) {
       setError('Wallet not connected');
@@ -155,15 +153,15 @@ export function useSimpleQuiz() {
 
     setSubmitting(true);
     setError(null);
-    
+
     try {
       console.log('🎯 Submitting answer to quiz...');
-      const result = await client.submitAnswer(quizId, questionId, topicId, answer);
-      console.log('✅ Answer validated on-chain!');
-      
+      const result = await client.submitAnswer(quizSetId, questionIndex, answer);
+      console.log('✅ Answer validated (mock)!');
+
       // DON'T auto-refresh quiz - result already contains winner info
       // User will see result immediately from returned data
-      
+
       return result;
     } catch (err: any) {
       console.error('❌ Error submitting answer:', err);
@@ -175,9 +173,9 @@ export function useSimpleQuiz() {
   }, [client]);
 
   /**
-   * Claim reward (winner only)
+   * Claim reward (winner only) - NEW: uses string quizSetId
    */
-  const claimReward = useCallback(async (quizId: number): Promise<{
+  const claimReward = useCallback(async (quizSetId: string): Promise<{
     success: boolean;
     amount: number;
   }> => {
@@ -188,14 +186,14 @@ export function useSimpleQuiz() {
 
     setClaiming(true);
     setError(null);
-    
+
     try {
-      const result = await client.claimReward(quizId);
+      const result = await client.claimReward(quizSetId);
       console.log('✅ Reward claimed:', result);
-      
+
       // Refresh quiz list
       await fetchQuizzes();
-      
+
       return {
         success: result.success,
         amount: result.amountClaimed
