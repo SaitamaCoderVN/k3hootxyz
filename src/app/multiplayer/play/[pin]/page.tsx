@@ -5,10 +5,25 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTemplate } from '@/components/layout/PageTemplate';
 import { Typography, GlassCard, colors } from '@/design-system';
-import { FaClock, FaTrophy, FaCheck } from 'react-icons/fa';
+
 import { supabase } from '@/lib/supabase-client';
 import { KahootAnswerButton } from '@/components/KahootAnswerButton';
 import type { GameSession, GamePhase, Question } from '@/types/multiplayer';
+
+const TerminalFooter = ({ phase, participantId }: { phase: string, participantId: string | null }) => (
+  <div className="fixed bottom-0 left-0 right-0 py-4 sm:py-6 px-4 sm:px-12 border-t-4 border-black bg-white flex flex-col sm:flex-row justify-between items-center z-50 gap-4 sm:gap-0">
+    <div className="flex items-center gap-4 sm:gap-8 overflow-hidden w-full sm:w-auto">
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="w-2 h-2 bg-green-500 rounded-full" />
+        <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40">Live</Typography>
+      </div>
+      <Typography variant="body-xs" className="font-black uppercase tracking-widest truncate">Operator: {participantId?.slice(0, 8)}</Typography>
+    </div>
+    <Typography variant="body-xs" className="font-black uppercase tracking-widest flex items-center gap-2 flex-shrink-0">
+      Phase: <span className="text-red-500">{phase.replace('_', ' ')}</span>
+    </Typography>
+  </div>
+);
 
 export default function MultiplayerPlayPageV2() {
   const router = useRouter();
@@ -261,14 +276,11 @@ export default function MultiplayerPlayPageV2() {
 
   if (reconnecting) {
     return (
-      <PageTemplate title="Reconnecting..." subtitle="Restoring your game session">
-        <div className="flex flex-col items-center justify-center pt-12 space-y-4">
-          <div
-            className="animate-spin rounded-full h-16 w-16 border-b-4"
-            style={{ borderColor: colors.primary.purple[400] }}
-          />
-          <Typography variant="body" color={colors.text.secondary}>
-            Please wait while we restore your progress...
+      <PageTemplate title="Channel Sync" subtitle="Restoring Secure Connection">
+        <div className="flex flex-col items-center justify-center pt-24 space-y-8">
+          <div className="w-20 h-20 border-8 border-black border-t-transparent animate-spin" />
+          <Typography variant="body" className="font-black uppercase tracking-[0.3em] animate-pulse">
+            Syncing Ledger State...
           </Typography>
         </div>
       </PageTemplate>
@@ -277,12 +289,9 @@ export default function MultiplayerPlayPageV2() {
 
   if (!session) {
     return (
-      <PageTemplate title="Loading..." subtitle="Please wait">
-        <div className="flex justify-center pt-12">
-          <div
-            className="animate-spin rounded-full h-16 w-16 border-b-4"
-            style={{ borderColor: colors.primary.purple[400] }}
-          />
+      <PageTemplate title="Initialising" subtitle="Booting Session Parameters">
+        <div className="flex justify-center pt-24">
+          <div className="w-12 h-12 border-4 border-black border-dashed animate-spin" />
         </div>
       </PageTemplate>
     );
@@ -293,58 +302,46 @@ export default function MultiplayerPlayPageV2() {
   // LOBBY PHASE
   if (phase === 'lobby') {
     return (
-      <PageTemplate title={`Game PIN: ${pin}`} subtitle="Waiting for host to start">
-        <div className="max-w-md mx-auto pt-8 pb-24 space-y-6">
-          <GlassCard variant="purple" size="lg">
-            <div className="text-center space-y-6">
-              <div className="animate-pulse">
-                <Typography variant="h2" gradient="purple-pink">
-                  Get Ready!
-                </Typography>
+      <PageTemplate title={`Node: ${pin}`} subtitle="Awaiting Host Authorization">
+        <div className="max-w-xl mx-auto pt-12 pb-32 px-4 space-y-12">
+          <div className="border-8 border-black p-12 bg-white text-center shadow-[24px_24px_0px_#00000010]">
+            <div className="space-y-8">
+              <div className="inline-block px-4 py-2 bg-black text-white font-black text-xs tracking-widest uppercase mb-4">
+                Linked
               </div>
-              <Typography variant="body-lg" color={colors.text.secondary}>
-                The game will start soon...
+              <Typography variant="display-sm" className="font-black uppercase leading-tight">
+                Stand By
               </Typography>
-              <div className="pt-4">
-                <Typography variant="body-sm" color={colors.text.muted}>
-                  Your current score: {myScore}
-                </Typography>
-              </div>
+              <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 leading-relaxed flex items-center justify-center gap-2 flex-wrap">
+                Verification sequence will initiate upon host command. Current Score: <span className="text-black break-all">{myScore}</span>
+              </Typography>
             </div>
-          </GlassCard>
+          </div>
 
           {/* Leave Room Button */}
           <div className="flex justify-center">
             <button
               onClick={handleLeaveRoom}
               disabled={leaving}
-              className="px-6 py-3 rounded-lg transition-all"
-              style={{
-                background: leaving ? `${colors.text.muted}40` : `${colors.state.error}20`,
-                border: `2px solid ${leaving ? colors.text.muted : colors.state.error}`,
-                color: leaving ? colors.text.muted : colors.state.error,
-                cursor: leaving ? 'not-allowed' : 'pointer',
-                opacity: leaving ? 0.5 : 1
-              }}
+              className={`
+                px-10 py-4 border-4 font-black uppercase tracking-widest transition-all
+                ${leaving ? 'border-black/10 text-black/20' : 'border-black hover:bg-black hover:text-white'}
+              `}
             >
-              <Typography variant="body" color={leaving ? colors.text.muted : colors.state.error}>
-                {leaving ? 'Leaving...' : 'Leave Room'}
-              </Typography>
+              {leaving ? 'Severing...' : 'Sever Connection'}
             </button>
           </div>
         </div>
+        <TerminalFooter phase={phase} participantId={participantId} />
       </PageTemplate>
     );
   }
 
   if (!currentQuestion) {
     return (
-      <PageTemplate title="Loading Question..." subtitle="Please wait">
-        <div className="flex justify-center pt-12">
-          <div
-            className="animate-spin rounded-full h-16 w-16 border-b-4"
-            style={{ borderColor: colors.primary.purple[400] }}
-          />
+      <PageTemplate title="Fetching Data" subtitle="Loading Verification Unit">
+        <div className="flex justify-center pt-24">
+          <div className="w-12 h-12 border-4 border-black border-t-transparent animate-spin" />
         </div>
       </PageTemplate>
     );
@@ -354,144 +351,119 @@ export default function MultiplayerPlayPageV2() {
 
   return (
     <PageTemplate
-      title={`Question ${currentIndex}/${questions.length}`}
-      subtitle={`PIN: ${pin} | Score: ${myScore}`}
+      title={`Inquiry ${currentIndex}/${questions.length}`}
+      subtitle={`Session: ${pin} | Score: ${myScore}`}
     >
-      <div className="max-w-4xl mx-auto pt-8 pb-24 space-y-6">
-        {/* Timer (only show during question phase) */}
+      <div className="max-w-5xl mx-auto pt-12 pb-40 px-4 space-y-12">
+        {/* Timer Container */}
         {phase === 'question' && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="flex justify-center"
-          >
-            <div
-              className="px-8 py-4 rounded-2xl flex items-center gap-3"
-              style={{
-                background: `${colors.primary.orange[500]}30`,
-                border: `2px solid ${colors.primary.orange[400]}`,
-              }}
+          <div className="flex justify-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className={`
+                px-10 py-5 border-8 border-black bg-white flex items-center gap-6 shadow-[12px_12px_0px_#00000005]
+                ${timeLeft <= 5 ? 'animate-pulse border-red-600 outline outline-4 outline-red-600' : ''}
+              `}
             >
-              <FaClock className="text-3xl" style={{ color: colors.primary.orange[400] }} />
-              <Typography variant="display-sm" color={colors.primary.orange[400]}>
-                {timeLeft}
+              <div className={`w-3 h-3 bg-black ${timeLeft <= 5 ? 'bg-red-600' : ''}`} />
+              <Typography variant="display-sm" className={`font-black leading-none ${timeLeft <= 5 ? 'text-red-600' : ''}`}>
+                {timeLeft < 10 ? `0${timeLeft}` : timeLeft}s
               </Typography>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         )}
 
-        {/* Question */}
+        {/* Question Area */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            className="space-y-12"
           >
-            <GlassCard variant="purple" size="xl">
-              <Typography variant="h2" className="text-center leading-relaxed mb-8">
+            <div className="border-8 border-black p-12 bg-white relative">
+              <div className="absolute -top-6 left-12 px-4 py-2 bg-black text-white font-black text-[10px] tracking-[0.3em] uppercase">
+                Enquiry
+              </div>
+              <Typography variant="h2" className="text-center font-black uppercase leading-tight tracking-tight">
                 {currentQuestion.question_text}
               </Typography>
+            </div>
 
-              {/* Answer buttons (Kahoot style) */}
-              <div className="space-y-4">
-                {currentQuestion.choices.map((choice, index) => {
-                  const letter = ['A', 'B', 'C', 'D'][index] as 'A' | 'B' | 'C' | 'D';
-                  const showAnswer = phase === 'answer_reveal' || phase === 'leaderboard';
+            {/* Answer Matrix */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {currentQuestion.choices.map((choice, index) => {
+                const letter = ['A', 'B', 'C', 'D'][index] as 'A' | 'B' | 'C' | 'D';
+                const showAnswer = phase === 'answer_reveal' || phase === 'leaderboard';
 
-                  return (
-                    <KahootAnswerButton
-                      key={index}
-                      letter={letter}
-                      text={choice}
-                      selected={selectedAnswer === letter}
-                      onClick={() => !hasAnswered && phase === 'question' && setSelectedAnswer(letter)}
-                      disabled={hasAnswered || phase !== 'question'}
-                      correctAnswer={showAnswer ? currentQuestion.correct_answer : undefined}
-                      showIncorrect={showAnswer}
-                    />
-                  );
-                })}
-              </div>
+                return (
+                  <KahootAnswerButton
+                    key={index}
+                    letter={letter}
+                    text={choice}
+                    selected={selectedAnswer === letter}
+                    onClick={() => !hasAnswered && phase === 'question' && setSelectedAnswer(letter)}
+                    disabled={hasAnswered || phase !== 'question'}
+                    correctAnswer={showAnswer ? currentQuestion.correct_answer : undefined}
+                    showIncorrect={showAnswer}
+                  />
+                );
+              })}
+            </div>
 
-              {/* Submit button (only during question phase) */}
+            {/* Interaction Layer */}
+            <div className="flex flex-col items-center pt-8">
               {phase === 'question' && !hasAnswered && (
-                <motion.button
+                <button
                   onClick={handleAnswerSubmit}
                   disabled={!selectedAnswer}
-                  whileHover={selectedAnswer ? { scale: 1.02 } : {}}
-                  whileTap={selectedAnswer ? { scale: 0.98 } : {}}
-                  className="mt-6 w-full py-4 rounded-xl font-bold text-lg transition-all"
-                  style={{
-                    background: selectedAnswer
-                      ? `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`
-                      : colors.background.secondary,
-                    color: selectedAnswer ? colors.text.primary : colors.text.muted,
-                    opacity: selectedAnswer ? 1 : 0.5,
-                    cursor: selectedAnswer ? 'pointer' : 'not-allowed',
-                  }}
+                  className={`
+                    px-20 py-6 font-black uppercase tracking-[0.5em] transition-all border-8
+                    ${selectedAnswer ? 'bg-black border-black text-white hover:scale-105 active:scale-95 shadow-[12px_12px_0px_#00000020]' : 'border-black/5 text-black/10 cursor-not-allowed'}
+                  `}
                 >
-                  <span className="flex items-center justify-center gap-2">
-                    <FaCheck />
-                    Submit Answer
-                  </span>
-                </motion.button>
+                  Confirm Execution
+                </button>
               )}
 
-              {/* Waiting message after answer */}
               {hasAnswered && phase === 'question' && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-6 text-center"
-                >
-                  <Typography variant="body-lg" color={colors.text.muted}>
-                    ⏳ Waiting for other players...
+                <div className="flex items-center gap-4 px-12 py-6 border-4 border-black/10 animate-pulse">
+                  <div className="w-3 h-3 bg-black/20" />
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-20">
+                    Inquiry Session Active
+                    Awaiting Network Finality...
                   </Typography>
-                </motion.div>
+                </div>
               )}
 
-              {/* Answer result */}
+              {/* Phase specific feedback */}
               {lastResult && phase === 'answer_reveal' && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="mt-6 p-6 rounded-xl text-center"
-                  style={{
-                    background: lastResult.isCorrect
-                      ? `${colors.state.success}20`
-                      : `${colors.state.error}20`,
-                    border: `2px solid ${lastResult.isCorrect ? colors.state.success : colors.state.error}`,
-                  }}
+                  className={`
+                    w-full max-w-2xl p-10 border-8 text-center
+                    ${lastResult.isCorrect ? 'border-black bg-white' : 'border-black/20 bg-bone'}
+                  `}
                 >
-                  <div className="text-6xl mb-4">
-                    {lastResult.isCorrect ? '🎉' : '😔'}
-                  </div>
                   <Typography
-                    variant="h3"
-                    color={lastResult.isCorrect ? colors.state.success : colors.state.error}
+                    variant="h2"
+                    className={`font-black uppercase mb-4 ${lastResult.isCorrect ? 'text-black' : 'opacity-20'}`}
                   >
-                    {lastResult.isCorrect ? 'Correct!' : 'Incorrect'}
+                    {lastResult.isCorrect ? 'SUCCESS' : 'FAILED'}
                   </Typography>
-                  {lastResult.isCorrect && (
-                    <Typography variant="h4" color={colors.primary.orange[400]} className="mt-2">
-                      +{lastResult.points} points
-                    </Typography>
-                  )}
+                  <Typography variant="body-xs" className="font-black uppercase tracking-[0.3em] opacity-40">
+                    {lastResult.isCorrect ? `Verification Node Secured: +${lastResult.points} PT` : 'Credential Mismatch Detected'}
+                  </Typography>
                 </motion.div>
               )}
-            </GlassCard>
+            </div>
           </motion.div>
         </AnimatePresence>
 
-        {/* Phase indicator */}
-        <div className="text-center">
-          <Typography variant="body-sm" color={colors.text.muted}>
-            {phase === 'question' && 'Answer now!'}
-            {phase === 'answer_reveal' && 'Revealing answer...'}
-            {phase === 'leaderboard' && 'Check the leaderboard!'}
-          </Typography>
-        </div>
+        {/* Global Terminal Footer */}
+        <TerminalFooter phase={phase} participantId={participantId} />
       </div>
     </PageTemplate>
   );

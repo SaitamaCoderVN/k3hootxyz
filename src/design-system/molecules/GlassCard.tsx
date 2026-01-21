@@ -23,14 +23,22 @@ const sizeClasses: Record<GlassCardSize, string> = {
 };
 
 const getVariantStyles = (variant: GlassCardVariant) => {
-  const variantColor = variant === 'default' ? 'purple' : variant;
-  const primaryColor = colors.primary[variantColor][500];
-  
-  return {
-    borderColor: `${primaryColor}40`,
-    borderColorHover: `${primaryColor}60`,
-    glowColor: `${primaryColor}20`,
-  };
+  switch (variant) {
+    case 'orange':
+    case 'purple':
+    case 'pink':
+      return {
+        bg: colors.background.contrast, // Ink Black
+        text: colors.text.inverse,      // Bone White
+        borderColor: colors.grayscale.graphite,
+      };
+    default:
+      return {
+        bg: colors.background.tertiary, // Pure White
+        text: colors.text.primary,      // Ink Black
+        borderColor: colors.grayscale.ink,
+      };
+  }
 };
 
 export function GlassCard({
@@ -45,19 +53,13 @@ export function GlassCard({
 
   const cardContent = (
     <div
-      className={`relative rounded-2xl backdrop-blur-xl border transition-all duration-300 ${sizeClass} ${className}`}
+      className={`relative rounded-none border-2 transition-all duration-300 ${sizeClass} ${className}`}
       style={{
-        background: `linear-gradient(135deg, ${colors.background.glass}dd, ${colors.background.glass}aa)`,
+        background: variantStyles.bg,
         borderColor: variantStyles.borderColor,
-        boxShadow: `0 20px 60px ${colors.semantic.shadow}80, 0 8px 32px ${variantStyles.glowColor}, inset 0 1px 0 rgba(255, 255, 255, 0.1)`,
+        color: variantStyles.text,
       }}
     >
-      <div 
-        className="absolute inset-0 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at 50% 0%, ${variantStyles.glowColor}, transparent 70%)`,
-        }}
-      />
       <div className="relative z-10">
         {children}
       </div>
@@ -67,30 +69,23 @@ export function GlassCard({
   if (hover) {
     return (
       <motion.div
-        whileHover={{ y: -8, scale: 1.02 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={{ x: 4, y: -4 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         className="relative"
       >
-        <div
-          className="absolute -inset-1 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500 blur-xl"
-          style={{
-            background: `linear-gradient(135deg, ${variantStyles.glowColor}80, transparent)`,
-          }}
+        {/* Layered shadow effect for luxury feel */}
+        <div 
+          className="absolute inset-0 bg-black translate-x-[4px] translate-y-[4px] -z-10" 
+          style={{ opacity: 0.1 }}
         />
         <div
-          className={`relative rounded-2xl backdrop-blur-xl border transition-all duration-500 hover:border-opacity-80 ${sizeClass} ${className}`}
+          className={`relative rounded-none border-2 transition-all duration-300 ${sizeClass} ${className}`}
           style={{
-            background: `linear-gradient(135deg, ${colors.background.glass}dd, ${colors.background.glass}aa)`,
+            background: variantStyles.bg,
             borderColor: variantStyles.borderColor,
-            boxShadow: `0 20px 60px ${colors.semantic.shadow}80, 0 8px 32px ${variantStyles.glowColor}, inset 0 1px 0 rgba(255, 255, 255, 0.1)`,
+            color: variantStyles.text,
           }}
         >
-          <div 
-            className="absolute inset-0 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-            style={{
-              background: `radial-gradient(circle at 50% 0%, ${variantStyles.glowColor}60, transparent 70%)`,
-            }}
-          />
           <div className="relative z-10">
             {children}
           </div>

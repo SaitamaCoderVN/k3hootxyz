@@ -9,21 +9,19 @@ const WalletMultiButtonDynamic = dynamic(
     ssr: false,
     loading: () => (
       <button 
-        className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors"
+        className="px-6 py-2 border-2 border-black font-black uppercase text-[10px] tracking-widest opacity-20"
         disabled
       >
-        Loading...
+        Syncing...
       </button>
     ),
   }
 );
 
 export default function WalletButton() {
-  const { connected, wallet } = useWallet();
-  
   return (
     <WalletMultiButtonDynamic 
-      className="!bg-gradient-to-r !from-purple-600 !to-pink-600 hover:!from-purple-700 hover:!to-pink-700 !text-white !font-semibold !px-4 !py-2 !rounded-lg !transition-all !duration-200 !border-0" 
+      className="!bg-black !text-white !font-black !px-8 !py-4 !rounded-none !uppercase !tracking-[0.2em] !text-[12px] !transition-all !duration-200 hover:!scale-[1.02] active:!scale-95 !shadow-[12px_12px_0px_rgba(0,0,0,0.1)] !border-0 !h-auto !flex !items-center !justify-center" 
     />
   );
-} 
+}

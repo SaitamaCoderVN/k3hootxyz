@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FaTrophy, FaMedal, FaAward } from 'react-icons/fa';
+
 import { GlassCard, Typography, colors } from '@/design-system';
 
 interface LeaderboardEntry {
@@ -13,25 +13,17 @@ interface LeaderboardEntry {
 }
 
 const mockLeaderboard: LeaderboardEntry[] = [
-  { rank: 1, name: 'CryptoMaster', score: 12500, reward: '2.5 SOL', avatar: '👑' },
-  { rank: 2, name: 'QuizWizard', score: 11800, reward: '1.8 SOL', avatar: '⭐' },
-  { rank: 3, name: 'BlockchainPro', score: 11200, reward: '1.2 SOL', avatar: '🔥' },
-  { rank: 4, name: 'Web3Expert', score: 9800, reward: '0.8 SOL', avatar: '💎' },
-  { rank: 5, name: 'SolanaKing', score: 9200, reward: '0.6 SOL', avatar: '🚀' },
+  { rank: 1, name: 'CryptoMaster', score: 12500, reward: '2.5 SOL' },
+  { rank: 2, name: 'QuizWizard', score: 11800, reward: '1.8 SOL' },
+  { rank: 3, name: 'BlockchainPro', score: 11200, reward: '1.2 SOL' },
+  { rank: 4, name: 'Web3Expert', score: 9800, reward: '0.8 SOL' },
+  { rank: 5, name: 'SolanaKing', score: 9200, reward: '0.6 SOL' },
 ];
 
 const getRankIcon = (rank: number) => {
-  if (rank === 1) return <FaTrophy style={{ color: '#FFD700', fontSize: '1.5rem' }} />;
-  if (rank === 2) return <FaMedal style={{ color: '#C0C0C0', fontSize: '1.5rem' }} />;
-  if (rank === 3) return <FaAward style={{ color: '#CD7F32', fontSize: '1.5rem' }} />;
   return (
     <div 
-      className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
-      style={{
-        background: `linear-gradient(135deg, ${colors.primary.purple[500]}40, ${colors.primary.pink[500]}40)`,
-        border: `1px solid ${colors.primary.purple[400]}60`,
-        color: colors.primary.purple[200],
-      }}
+      className="w-8 h-8 rounded-none flex items-center justify-center font-black text-xs border border-black"
     >
       {rank}
     </div>
@@ -39,72 +31,62 @@ const getRankIcon = (rank: number) => {
 };
 
 const getRankGradient = (rank: number): [string, string] => {
-  if (rank === 1) return ['rgba(234, 179, 8, 0.2)', 'rgba(249, 115, 22, 0.2)'];
-  if (rank === 2) return ['rgba(156, 163, 175, 0.2)', 'rgba(107, 114, 128, 0.2)'];
-  if (rank === 3) return ['rgba(217, 119, 6, 0.2)', 'rgba(180, 83, 9, 0.2)'];
-  return [`${colors.primary.purple[500]}20`, `${colors.primary.pink[500]}10`];
+  if (rank === 1) return ['#FFFFFF', '#EDEDED'];
+  if (rank === 2) return ['#FFFFFF', '#FBFBFB'];
+  if (rank === 3) return ['#FBFBFB', '#EDEDED'];
+  return ['#FBFBFB', '#FBFBFB'];
 };
 
 export function LeaderboardPreview() {
   return (
-    <GlassCard variant="purple" size="lg" hover={false} className="w-full">
-      <div className="mb-6">
-        <Typography variant="h4" gradient="purple-pink" className="mb-2">
-          Top Players
-        </Typography>
-        <Typography variant="body-sm" color={`${colors.primary.purple[300]}99`}>
-          Global rankings updated in real-time
-        </Typography>
+    <div className="w-full">
+      <div className="mb-8 border-b-2 border-black pb-4 flex justify-between items-end">
+        <div>
+          <Typography variant="h3" className="font-black uppercase text-black">
+            Top Players
+          </Typography>
+          <Typography variant="body-xs" className="uppercase font-black opacity-30 tracking-widest">
+            Protocol Rankings
+          </Typography>
+        </div>
+        <Typography variant="display-xs" className="font-black opacity-10 leading-none">01</Typography>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {mockLeaderboard.map((entry, index) => (
           <motion.div
             key={entry.rank}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
+            transition={{ delay: index * 0.05, duration: 0.3 }}
             className={`
-              flex items-center gap-4 p-4 rounded-xl border transition-all duration-300
-              ${entry.rank <= 3 ? 'hover:scale-[1.02]' : 'hover:scale-[1.01]'}
+              flex items-center gap-6 p-4 border-2 transition-all duration-300
+              ${entry.rank === 1 ? 'border-black bg-white' : 'border-black/5 bg-transparent'}
             `}
-            style={{
-              background: `linear-gradient(135deg, ${getRankGradient(entry.rank)[0]}, ${getRankGradient(entry.rank)[1]})`,
-              borderColor: entry.rank <= 3 
-                ? `${colors.primary.purple[400]}60` 
-                : `${colors.semantic.border}40`,
-              boxShadow: entry.rank <= 3 
-                ? `0 4px 20px ${colors.primary.purple[400]}20` 
-                : 'none',
-            }}
           >
             {/* Rank */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 w-8 flex justify-center">
               {getRankIcon(entry.rank)}
             </div>
 
             {/* Avatar & Name */}
-            <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
               <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.primary.purple[500]}40, ${colors.primary.pink[500]}40)`,
-                  border: `1px solid ${colors.primary.purple[400]}60`,
-                }}
+                className="w-12 h-12 rounded-none flex items-center justify-center font-black text-lg flex-shrink-0 border border-black/10 uppercase"
+                style={{ background: getRankGradient(entry.rank)[0] }}
               >
-                {entry.avatar}
+                {entry.name.slice(0, 2)}
               </div>
               <div className="min-w-0 flex-1">
                 <Typography 
                   variant="body" 
-                  className="font-semibold truncate"
-                  style={{ color: entry.rank <= 3 ? colors.primary.purple[200] : colors.primary.purple[300] }}
+                  className="font-black uppercase tracking-tight truncate text-black"
                 >
                   {entry.name}
                 </Typography>
-                <Typography variant="body-xs" color={`${colors.primary.purple[400]}99`}>
-                  {entry.reward} earned
+                <Typography variant="body-xs" className="font-black uppercase opacity-40 text-[10px]">
+                  {entry.reward} CLAIMED
                 </Typography>
               </div>
             </div>
@@ -112,15 +94,13 @@ export function LeaderboardPreview() {
             {/* Score */}
             <div className="flex-shrink-0 text-right">
               <Typography 
-                variant="h5" 
-                gradient={entry.rank <= 3 ? "purple-pink" : undefined}
-                style={entry.rank > 3 ? { color: colors.primary.purple[300] } : undefined}
-                className="font-bold"
+                variant="h4" 
+                className="font-black leading-none text-black"
               >
                 {entry.score.toLocaleString()}
               </Typography>
-              <Typography variant="body-xs" color={`${colors.primary.purple[400]}99`}>
-                points
+              <Typography variant="body-xs" className="uppercase font-black tracking-widest text-[10px] opacity-30">
+                POINTS
               </Typography>
             </div>
           </motion.div>
@@ -131,19 +111,17 @@ export function LeaderboardPreview() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ delay: 0.6 }}
-        className="mt-6 pt-6 border-t"
-        style={{ borderColor: `${colors.semantic.border}40` }}
+        transition={{ delay: 0.4 }}
+        className="mt-8 pt-8 border-t-2 border-black/5"
       >
         <Typography 
-          variant="body-sm" 
-          color={`${colors.primary.purple[400]}cc`}
-          className="text-center"
+          variant="body-xs" 
+          className="text-center font-black uppercase tracking-[0.2em] opacity-40"
         >
-          🎯 Compete now to climb the leaderboard!
+          ARENA STATUS: ACTIVE
         </Typography>
       </motion.div>
-    </GlassCard>
+    </div>
   );
 }
 

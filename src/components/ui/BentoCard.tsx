@@ -14,7 +14,7 @@ interface BentoCardProps {
 export default function BentoCard({ 
   children, 
   className = '', 
-  glowColor = 'rgba(139, 92, 246, 0.4)',
+  glowColor = 'rgba(250, 204, 21, 0.4)',
   size = 'medium',
   delay = 0
 }: BentoCardProps) {

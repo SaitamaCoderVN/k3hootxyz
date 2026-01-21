@@ -28,14 +28,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const variantStyles = {
       default: {
-        background: 'rgba(17, 24, 39, 0.5)',
-        border: `2px solid ${colors.semantic.border}`,
-        focusBorder: colors.primary.purple[500],
+        background: colors.background.tertiary,
+        border: `2px solid ${colors.grayscale.ink}`,
+        focusBorder: colors.grayscale.ink,
       },
       neon: {
-        background: colors.background.glass,
-        border: `2px solid ${colors.primary.purple[500]}40`,
-        focusBorder: colors.primary.purple[500],
+        background: colors.background.secondary,
+        border: `2px solid ${colors.grayscale.ink}`,
+        focusBorder: colors.grayscale.ink,
       },
     };
 
@@ -46,11 +46,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       <div className={`${fullWidth ? 'w-full' : ''}`}>
         {label && (
           <label
-            className="block font-semibold mb-2"
+            className="block font-black uppercase tracking-widest mb-2"
             style={{
-              fontFamily: typography.fontFamily.body,
-              fontSize: '0.875rem',
-              color: colors.text.secondary,
+              fontFamily: typography.fontFamily.display,
+              fontSize: '10px',
+              color: colors.text.primary,
             }}
           >
             {label}
@@ -61,10 +61,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={`
             transition-all backdrop-blur-sm
-            focus:outline-none
+            focus:outline-none rounded-none
             disabled:opacity-50 disabled:cursor-not-allowed
-            placeholder:text-gray-500
-            ${error ? 'border-red-500' : ''}
+            placeholder:text-gray-400
             ${fullWidth ? 'w-full' : ''}
             ${className}
           `}
@@ -73,27 +72,28 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             fontSize: currentSize.fontSize,
             padding: currentSize.padding,
             background: currentVariant.background,
-            border: error ? `2px solid ${colors.state.error}` : currentVariant.border,
-            borderRadius: borderRadius.lg,
+            border: error ? `2px solid ${colors.semantic.error}` : currentVariant.border,
             color: colors.text.primary,
-            transition: `all ${animations.duration.normal} ${animations.easing.smooth}`,
+            transition: `all ${animations.duration.normal} ease-in-out`,
           }}
           onFocus={(e) => {
-            e.target.style.borderColor = error ? colors.state.error : currentVariant.focusBorder;
+            e.target.style.borderColor = error ? colors.semantic.error : currentVariant.focusBorder;
+            e.target.style.boxShadow = `4px 4px 0px ${colors.grayscale.ink}10`;
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = error ? colors.state.error : currentVariant.border;
+            e.target.style.borderColor = error ? colors.semantic.error : currentVariant.border;
+            e.target.style.boxShadow = 'none';
           }}
           {...props}
         />
         
         {error && (
           <p
-            className="mt-1"
+            className="mt-1 font-bold uppercase tracking-tight"
             style={{
               fontFamily: typography.fontFamily.body,
               fontSize: '0.75rem',
-              color: colors.state.error,
+              color: colors.semantic.error,
             }}
           >
             {error}
@@ -102,11 +102,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         
         {hint && !error && (
           <p
-            className="mt-1"
+            className="mt-1 opacity-50 font-medium"
             style={{
               fontFamily: typography.fontFamily.body,
               fontSize: '0.75rem',
-              color: colors.text.muted,
+              color: colors.text.primary,
             }}
           >
             {hint}
@@ -129,14 +129,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const variantStyles = {
       default: {
-        background: 'rgba(17, 24, 39, 0.5)',
-        border: `2px solid ${colors.semantic.border}`,
-        focusBorder: colors.primary.purple[500],
+        background: colors.background.tertiary,
+        border: `2px solid ${colors.grayscale.ink}`,
+        focusBorder: colors.grayscale.ink,
       },
       neon: {
-        background: colors.background.glass,
-        border: `2px solid ${colors.primary.purple[500]}40`,
-        focusBorder: colors.primary.purple[500],
+        background: colors.background.secondary,
+        border: `2px solid ${colors.grayscale.ink}`,
+        focusBorder: colors.grayscale.ink,
       },
     };
 
@@ -147,11 +147,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className={`${fullWidth ? 'w-full' : ''}`}>
         {label && (
           <label
-            className="block font-semibold mb-2"
+            className="block font-black uppercase tracking-widest mb-2"
             style={{
-              fontFamily: typography.fontFamily.body,
-              fontSize: '0.875rem',
-              color: colors.text.secondary,
+              fontFamily: typography.fontFamily.display,
+              fontSize: '10px',
+              color: colors.text.primary,
             }}
           >
             {label}
@@ -163,10 +163,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           rows={rows}
           className={`
             transition-all backdrop-blur-sm resize-none
-            focus:outline-none
+            focus:outline-none rounded-none
             disabled:opacity-50 disabled:cursor-not-allowed
-            placeholder:text-gray-500
-            ${error ? 'border-red-500' : ''}
+            placeholder:text-gray-400
             ${fullWidth ? 'w-full' : ''}
             ${className}
           `}
@@ -175,27 +174,28 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             fontSize: currentSize.fontSize,
             padding: currentSize.padding,
             background: currentVariant.background,
-            border: error ? `2px solid ${colors.state.error}` : currentVariant.border,
-            borderRadius: borderRadius.lg,
+            border: error ? `2px solid ${colors.semantic.error}` : currentVariant.border,
             color: colors.text.primary,
-            transition: `all ${animations.duration.normal} ${animations.easing.smooth}`,
+            transition: `all ${animations.duration.normal} ease-in-out`,
           }}
           onFocus={(e) => {
-            e.target.style.borderColor = error ? colors.state.error : currentVariant.focusBorder;
+            e.target.style.borderColor = error ? colors.semantic.error : currentVariant.focusBorder;
+            e.target.style.boxShadow = `4px 4px 0px ${colors.grayscale.ink}10`;
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = error ? colors.state.error : currentVariant.border;
+            e.target.style.borderColor = error ? colors.semantic.error : currentVariant.border;
+            e.target.style.boxShadow = 'none';
           }}
           {...props}
         />
         
         {error && (
           <p
-            className="mt-1"
+            className="mt-1 font-bold uppercase tracking-tight"
             style={{
               fontFamily: typography.fontFamily.body,
               fontSize: '0.75rem',
-              color: colors.state.error,
+              color: colors.semantic.error,
             }}
           >
             {error}
@@ -204,11 +204,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         
         {hint && !error && (
           <p
-            className="mt-1"
+            className="mt-1 opacity-50 font-medium"
             style={{
               fontFamily: typography.fontFamily.body,
               fontSize: '0.75rem',
-              color: colors.text.muted,
+              color: colors.text.primary,
             }}
           >
             {hint}

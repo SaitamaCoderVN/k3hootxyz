@@ -6,7 +6,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTemplate } from '@/components/layout/PageTemplate';
 import { Typography, NeonButton, GlassCard, colors } from '@/design-system';
-import { FaCopy, FaUsers, FaRocket, FaUser, FaCheckCircle } from 'react-icons/fa';
+import { Copy, Rocket, User, CheckCircle } from 'lucide-react';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 import { supabase } from '@/lib/supabase-client';
 import dynamic from 'next/dynamic';
@@ -149,7 +149,6 @@ export default function HostGamePage() {
         },
         async () => {
           // Refetch participants to ensure we have the latest state
-          // This is more reliable than filtering by session_id on DELETE events
           const { data } = await supabase
             .from('game_participants')
             .select('id, player_name, wallet_address, joined_at')
@@ -170,224 +169,156 @@ export default function HostGamePage() {
 
   if (!mounted) return null;
 
-  if (!connected) {
-    return (
-      <PageTemplate
-        title="Host Multiplayer Game"
-        subtitle="Connect your wallet to host a game"
-      >
-        <div className="flex justify-center pt-8">
-          <WalletMultiButton />
-        </div>
-      </PageTemplate>
-    );
-  }
-
-  if (!quizId) {
-    return (
-      <PageTemplate title="No Quiz Selected" subtitle="Please select a quiz from the play page">
-        <div className="flex justify-center pt-8">
-          <NeonButton onClick={() => router.push('/play')} neonColor="purple">
-            Go to Play Page
-          </NeonButton>
-        </div>
-      </PageTemplate>
-    );
-  }
-
   return (
     <PageTemplate
-      title="Host Multiplayer Game"
-      subtitle={currentQuiz ? currentQuiz.question : 'Loading quiz...'}
+      title="Protocol Interface"
+      subtitle="Initialise Sequence Verification Environment"
     >
-      <div className="max-w-2xl mx-auto pt-8 pb-24 space-y-8">
-        {/* Quiz Info */}
-        {currentQuiz && !gamePin && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <GlassCard variant="purple" size="lg">
-              <div className="text-center space-y-4">
-                <Typography variant="h3" gradient="purple-pink">
-                  {currentQuiz.question}
+      <div className="max-w-4xl mx-auto pt-12 pb-32 px-4 space-y-12">
+        {!connected ? (
+          <div className="max-w-2xl mx-auto border-4 border-black p-12 bg-white text-center">
+            <Typography variant="h3" className="font-black uppercase mb-6">
+              Authentication Required
+            </Typography>
+            <div className="flex justify-center">
+              <WalletMultiButton className="!bg-black !text-white !font-black !px-10 !py-5 !rounded-none !uppercase !tracking-[0.2em] !text-[12px] !transition-all !duration-200 hover:!scale-[1.02] active:!scale-95 !shadow-[12px_12px_0px_rgba(0,0,0,0.1)] !border-0 !h-auto !flex !items-center !justify-center" />
+            </div>
+          </div>
+        ) : !quizId ? (
+          <div className="max-w-2xl mx-auto border-4 border-black p-12 bg-white text-center">
+            <Typography variant="h3" className="font-black uppercase mb-6">
+              Target Selection Missing
+            </Typography>
+            <button
+              onClick={() => router.push('/play')}
+              className="px-12 py-4 bg-black text-white font-black uppercase tracking-widest hover:scale-105 transition-all"
+            >
+              Select Protocol
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Left side: Quiz Info & PIN */}
+            <div className="space-y-12">
+              <div className="border-8 border-black p-10 bg-white shadow-[16px_16px_0px_#00000010]">
+                <Typography variant="body-xs" className="font-black uppercase tracking-[0.3em] opacity-40 mb-6 underline">
+                  Target Identity
                 </Typography>
-                <div className="flex items-center justify-center gap-4">
+                <Typography variant="h3" className="font-black uppercase leading-tight mb-8">
+                  {currentQuiz?.question || 'SYNCING...'}
+                </Typography>
+                <div className="grid grid-cols-2 gap-8 border-t-2 border-black pt-8">
                   <div>
-                    <Typography variant="body-sm" color={colors.text.muted}>
-                      Reward
-                    </Typography>
-                    <Typography variant="h4" gradient="orange">
-                      {currentQuiz.rewardAmount} SOL
-                    </Typography>
+                    <Typography variant="body-xs" className="font-black uppercase opacity-40 mb-1">Assigned Reward</Typography>
+                    <Typography variant="h4" className="font-black">{currentQuiz?.rewardAmount} SOL</Typography>
                   </div>
                   <div>
-                    <Typography variant="body-sm" color={colors.text.muted}>
-                      Questions
-                    </Typography>
-                    <Typography variant="h4" color={colors.text.primary}>
-                      {currentQuiz.options.length}
-                    </Typography>
+                    <Typography variant="body-xs" className="font-black uppercase opacity-40 mb-1">Nodes</Typography>
+                    <Typography variant="h4" className="font-black">{currentQuiz?.options.length || 0}</Typography>
                   </div>
                 </div>
-                <NeonButton
-                  onClick={handleCreateSession}
-                  loading={creating}
-                  neonColor="purple"
-                  size="lg"
-                  fullWidth
-                  leftIcon={<FaRocket />}
-                >
-                  Create Game Room
-                </NeonButton>
-              </div>
-            </GlassCard>
-          </motion.div>
-        )}
 
-        {/* Game PIN Display */}
-        {gamePin && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="space-y-6"
-          >
-            {/* PIN Card */}
-            <GlassCard variant="orange" size="xl">
-              <div className="text-center space-y-6">
-                <FaUsers className="text-6xl mx-auto" style={{ color: colors.primary.orange[400] }} />
-                <div>
-                  <Typography variant="body" color={colors.text.muted}>
-                    Game PIN
+                {!gamePin && (
+                  <button
+                    onClick={handleCreateSession}
+                    disabled={creating}
+                    className="w-full mt-10 py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.02] active:scale-95 transition-all shadow-[8px_8px_0px_#00000020]"
+                  >
+                    {creating ? 'GENERATING...' : 'GENERATE PORT'}
+                  </button>
+                )}
+              </div>
+
+              {gamePin && (
+                <div className="border-8 border-black p-10 bg-black text-white shadow-[16px_16px_0px_#00000010]">
+                  <Typography variant="body-xs" className="font-black uppercase tracking-[0.3em] opacity-50 mb-6 text-white">
+                    Access Code
                   </Typography>
-                  <div className="flex items-center justify-center gap-4 mt-2">
-                    <Typography variant="display-lg" gradient="orange-pink" className="font-mono">
+                  <div className="flex items-center justify-between gap-6">
+                    <Typography variant="display-sm" className="font-black tracking-[0.2em] leading-none text-2xl sm:text-3xl md:text-5xl">
                       {gamePin}
                     </Typography>
                     <button
                       onClick={copyPin}
-                      className="p-3 rounded-lg transition-colors"
-                      style={{
-                        background: `${colors.primary.orange[500]}20`,
-                        color: colors.primary.orange[400]
-                      }}
+                      className="p-3 border-2 border-white/20 hover:border-white hover:bg-white/10 transition-all flex-shrink-0"
                     >
-                      <FaCopy />
+                      <Copy size={18} />
                     </button>
                   </div>
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mt-8 leading-relaxed">
+                    Distribute code to operators for arena synchronization.
+                  </Typography>
                 </div>
-                <Typography variant="body-lg" color={colors.text.secondary}>
-                  Share this PIN with players to join the game
-                </Typography>
-              </div>
-            </GlassCard>
+              )}
+            </div>
 
-            {/* Real-time Players List */}
-            <GlassCard variant="purple" size="lg">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="p-3 rounded-lg"
-                      style={{
-                        background: `${colors.primary.purple[500]}20`,
-                        border: `1px solid ${colors.primary.purple[400]}40`
-                      }}
-                    >
-                      <FaUsers style={{ color: colors.primary.purple[400] }} />
-                    </div>
-                    <div>
-                      <Typography variant="h4" color={colors.text.primary}>
-                        Players in Lobby
-                      </Typography>
-                      <Typography variant="body-sm" color={colors.text.muted}>
-                        {participants.length} {participants.length === 1 ? 'player' : 'players'} joined
+            {/* Right side: Players List */}
+            {gamePin && (
+              <div className="space-y-12">
+                <div className="border-8 border-black p-10 bg-white shadow-[16px_16px_0px_#00000010]">
+                  <div className="flex justify-between items-center mb-10 border-b-4 border-black pb-6">
+                      <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mt-2">
+                        {participants.length} Operatives Ready
                       </Typography>
                     </div>
-                  </div>
-                  <div
-                    className="px-4 py-2 rounded-full"
-                    style={{
-                      background: `${colors.primary.purple[500]}30`,
-                      border: `1px solid ${colors.primary.purple[400]}`
-                    }}
-                  >
-                    <Typography variant="h3" gradient="purple-pink">
-                      {participants.length}
-                    </Typography>
-                  </div>
-                </div>
 
-                {/* Players Grid */}
-                {participants.length > 0 ? (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                     <AnimatePresence>
-                      {participants.map((participant, index) => (
-                        <motion.div
-                          key={participant.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 20 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="p-3 rounded-lg flex items-center gap-3"
-                          style={{
-                            background: `${colors.background.secondary}80`,
-                            border: `1px solid ${colors.primary.purple[500]}20`
-                          }}
-                        >
-                          <div
-                            className="w-10 h-10 rounded-full flex items-center justify-center"
-                            style={{
-                              background: `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`,
-                            }}
+                      {participants.length > 0 ? (
+                        participants.map((participant, index) => (
+                          <motion.div
+                            key={participant.id}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="p-4 border-2 border-black flex items-center justify-between hover:bg-bone transition-all"
                           >
-                            <FaUser className="text-white text-sm" />
-                          </div>
-                          <div className="flex-1">
-                            <Typography variant="body" color={colors.text.primary}>
-                              {participant.player_name}
-                            </Typography>
+                            <div className="flex items-center gap-4">
+                              <div className="w-8 h-8 border-2 border-black flex items-center justify-center font-black text-xs">
+                                {index + 1}
+                              </div>
+                              <Typography variant="body" className="font-black uppercase truncate max-w-[120px]">
+                                {participant.player_name}
+                              </Typography>
+                            </div>
                             {participant.wallet_address && (
-                              <Typography variant="body-sm" color={colors.text.muted} className="font-mono">
+                              <Typography variant="body-xs" className="font-black uppercase opacity-30 font-mono">
                                 {participant.wallet_address.slice(0, 4)}...{participant.wallet_address.slice(-4)}
                               </Typography>
                             )}
-                          </div>
-                          <FaCheckCircle style={{ color: colors.state.success }} />
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="text-center py-12 border-4 border-black border-dashed opacity-20">
+                          <Typography variant="body-xs" className="font-black uppercase tracking-widest">
+                            Awaiting Signal...
+                          </Typography>
+                        </div>
+                      )}
                     </AnimatePresence>
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Typography variant="body" color={colors.text.muted}>
-                      Waiting for players to join...
-                    </Typography>
-                    <Typography variant="body-sm" color={colors.text.muted} className="mt-2">
-                      Share the PIN above to start playing
-                    </Typography>
-                  </div>
-                )}
-              </div>
-            </GlassCard>
 
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <NeonButton
-                onClick={handleStartGame}
-                disabled={participants.length === 0}
-                neonColor="orange"
-                size="lg"
-                fullWidth
-              >
-                {participants.length === 0 ? 'Waiting for Players...' : `Start Game (${participants.length} Players)`}
-              </NeonButton>
-              <button
-                onClick={() => router.push('/play')}
-                className="w-full py-3 text-center transition-colors"
-                style={{ color: colors.text.muted }}
-              >
-                Cancel
-              </button>
-            </div>
-          </motion.div>
+                  <div className="mt-12 space-y-4">
+                    <button
+                      onClick={handleStartGame}
+                      disabled={participants.length === 0}
+                      className={`
+                        w-full py-6 font-black uppercase tracking-[0.4em] transition-all border-4
+                        ${participants.length > 0 ? 'bg-black text-white hover:scale-[1.02] shadow-[8px_8px_0px_#00000020]' : 'border-black/5 text-black/10 cursor-not-allowed'}
+                      `}
+                    >
+                      {participants.length === 0 ? 'WAITING' : 'OPEN INQUIRY CHANNEL'}
+                    </button>
+                    <button
+                      onClick={() => router.push('/play')}
+                      className="w-full py-3 font-black uppercase tracking-widest text-[10px] opacity-20 hover:opacity-100 transition-all"
+                    >
+                      ABORT COMMAND
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </PageTemplate>

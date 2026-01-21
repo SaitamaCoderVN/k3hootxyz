@@ -9,11 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#e879f9',
-        'primary-dark': '#d946ef',
+        primary: '#FACC15', // Yellow-400
+        'primary-dark': '#EAB308', // Yellow-600
       },
       fontFamily: {
-        sans: ['var(--font-pixelify)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-plex-mono)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-plex-mono)', 'monospace'],
       },
       backgroundImage: {
         'gradient-primary': 'linear-gradient(to right, #e879f9, #f472b6)',

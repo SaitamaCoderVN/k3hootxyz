@@ -18,7 +18,7 @@ export default function GlowingButton({
   const baseClasses = 'pixel-button pixel-corners transform-gpu backface-hidden';
   const variantClasses = {
     primary: 'bg-primary hover:bg-primary-dark text-white',
-    secondary: 'bg-purple-900/30 hover:bg-purple-900/50 text-primary border-2 border-primary/30'
+    secondary: 'bg-amber-100 hover:bg-amber-200 text-black border-2 border-amber-400/30'
   };
 
   return (

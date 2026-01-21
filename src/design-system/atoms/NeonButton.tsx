@@ -48,105 +48,77 @@ export function NeonButton({
 
   const variantStyles = {
     primary: {
-      background: `linear-gradient(135deg, ${colors.primary[neonColor][500]}, ${colors.primary[neonColor][400]})`,
-      boxShadow: shadows.neon[neonColor].md,
-      border: 'none',
-      color: colors.text.primary,
+      background: colors.grayscale.ink,
+      border: `2px solid ${colors.grayscale.ink}`,
+      color: colors.text.inverse,
     },
     secondary: {
-      background: colors.background.glass,
-      boxShadow: shadows.neon[neonColor].md,
-      border: `2px solid ${colors.primary[neonColor][500]}40`,
+      background: 'transparent',
+      border: `2px solid ${colors.grayscale.ink}`,
       color: colors.text.primary,
     },
     ghost: {
       background: 'transparent',
-      boxShadow: 'none',
-      border: 'none',
-      color: colors.primary[neonColor][400],
-    },
-    danger: {
-      background: `linear-gradient(135deg, ${colors.state.error}, #DC2626)`,
-      boxShadow: '0 0 40px rgba(239, 68, 68, 0.4), 0 10px 30px rgba(0, 0, 0, 0.3)',
       border: 'none',
       color: colors.text.primary,
+    },
+    danger: {
+      background: colors.semantic.error,
+      border: `2px solid ${colors.grayscale.ink}`,
+      color: colors.text.inverse,
     },
   };
 
   const currentSize = sizeStyles[size];
   const currentVariant = variantStyles[variant];
 
-  const hoverShadow = variant === 'primary' || variant === 'secondary'
-    ? shadows.neon[neonColor].xl
-    : variant === 'danger'
-    ? '0 0 80px rgba(239, 68, 68, 0.6), 0 20px 40px rgba(0, 0, 0, 0.4)'
-    : 'none';
-
   return (
     <motion.button
       onClick={handleClick}
       disabled={disabled || loading}
       className={`
-        group relative font-bold rounded-full overflow-hidden transition-all
+        group relative font-black rounded-none overflow-hidden transition-all
         ${fullWidth ? 'w-full' : ''}
         ${disabled || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         ${className}
       `}
       style={{
-        fontFamily: typography.fontFamily.body,
+        fontFamily: typography.fontFamily.display,
         fontSize: currentSize.text,
         paddingLeft: currentSize.px,
         paddingRight: currentSize.px,
         paddingTop: currentSize.py,
         paddingBottom: currentSize.py,
         ...currentVariant,
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
       }}
       whileHover={
         !disabled && !loading
           ? {
-              y: -8,
-              boxShadow: hoverShadow,
-              scale: 1.02,
-            }
-          : {}
-      }
-      whileTap={
-        !disabled && !loading
-          ? {
+              background: variant === 'primary' ? colors.grayscale.bone : colors.grayscale.ink,
+              color: variant === 'primary' ? colors.grayscale.ink : colors.grayscale.bone,
               scale: 0.98,
-              y: -4,
             }
           : {}
       }
-      transition={{
-        duration: parseFloat(animations.duration.normal) / 1000,
-        ease: animations.easing.smooth.split('(')[1].split(')')[0].split(',').map(Number),
-      }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
       {...props}
     >
-      {variant === 'primary' && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{
-            background: `linear-gradient(135deg, ${colors.primary[neonColor][600]}, ${colors.primary[neonColor][500]})`,
-          }}
-        />
-      )}
-
-      <span className="relative flex items-center justify-center gap-2">
+      <span className="relative flex items-center justify-center gap-3 px-1">
         {loading && (
-          <div
-            className="animate-spin rounded-full border-b-2 border-white"
-            style={{ width: '1em', height: '1em' }}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="border-2 border-current border-t-transparent"
+            style={{ width: '1.2em', height: '1.2em' }}
           />
         )}
         {!loading && leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-        <span>{children}</span>
+        <span className="tracking-widest">{children}</span>
         {!loading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
       </span>
-
-      {/* Ripple effect container */}
-      <span className="absolute inset-0 pointer-events-none" />
     </motion.button>
   );
 }

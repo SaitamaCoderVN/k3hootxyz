@@ -110,13 +110,13 @@ const variantStyles: Record<TypographyVariant, { font: any; element: string; sty
 };
 
 const gradientMap: Record<GradientDirection, string> = {
-  orange: `linear-gradient(135deg, ${colors.primary.orange[500]}, ${colors.primary.orange[400]})`,
-  purple: `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.purple[400]})`,
-  pink: `linear-gradient(135deg, ${colors.primary.pink[500]}, ${colors.primary.pink[400]})`,
-  'orange-purple': `linear-gradient(135deg, ${colors.primary.orange[500]}, ${colors.primary.purple[500]})`,
-  'purple-pink': `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`,
-  'orange-pink': `linear-gradient(135deg, ${colors.primary.orange[500]}, ${colors.primary.pink[500]})`,
-  'purple-orange': `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.orange[500]})`,
+  orange: 'linear-gradient(135deg, #0A0A0A, #404040)',
+  purple: 'linear-gradient(135deg, #0A0A0A, #262626)',
+  pink: 'linear-gradient(135deg, #0A0A0A, #737373)',
+  'orange-purple': 'linear-gradient(135deg, #0A0A0A, #000000)',
+  'purple-pink': 'linear-gradient(135deg, #0A0A0A, #171717)',
+  'orange-pink': 'linear-gradient(135deg, #0A0A0A, #262626)',
+  'purple-orange': 'linear-gradient(135deg, #0A0A0A, #404040)',
 };
 
 export function Typography({

@@ -44,6 +44,7 @@ export default function CreatePage() {
   }, []);
 
   const addQuestion = () => {
+    if (questions.length >= 20) return;
     setQuestions([...questions, { ...defaultQuestion }]);
   };
 
@@ -87,32 +88,13 @@ export default function CreatePage() {
     setSuccessMessage(false);
 
     if (!quizName.trim()) {
-      alert('Please enter a quiz name');
+      alert('Please enter a protocol name');
       return;
     }
 
     if (questions.length === 0) {
-      alert('Please add at least one question');
+      alert('Please add at least one node');
       return;
-    }
-
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
-      
-      if (!q.questionText.trim()) {
-        alert(`Question ${i + 1}: Please enter a question`);
-        return;
-      }
-
-      if (q.choices.some(c => !c.trim())) {
-        alert(`Question ${i + 1}: Please fill in all 4 options`);
-        return;
-      }
-
-      if (q.rewardAmount <= 0) {
-        alert(`Question ${i + 1}: Reward amount must be greater than 0`);
-        return;
-      }
     }
 
     const quizSetData: QuizSetCreationData = {
@@ -137,353 +119,191 @@ export default function CreatePage() {
 
   return (
     <PageTemplate
-      title="Create Quiz Set"
-      subtitle="Design your quiz with multiple questions and custom rewards!"
-      containerClassName="pb-16"
+      title="Protocol Designer"
+      subtitle="Architect New Verification Sequences"
     >
-      <div className="max-w-4xl mx-auto pt-8">
+      <div className="max-w-5xl mx-auto pt-12 pb-32 px-4 space-y-12">
         {!connected && (
-          <ScrollReveal type="scaleIn" delay={0.2} amount={40}>
-            <div className="mb-12 text-center">
-              <GlassCard variant="purple" size="lg" hover={true} className="text-center">
-                <div 
-                  className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.primary.purple[500]}20, ${colors.primary.pink[500]}10)`,
-                    border: `1px solid ${colors.primary.purple[400]}30`,
-                    boxShadow: `0 0 40px ${colors.primary.purple[400]}20`,
-                  }}
-                >
-                  <FaRocket style={{ fontSize: '4rem', color: colors.primary.purple[400], filter: 'drop-shadow(0 0 20px rgba(168, 85, 247, 0.5))' }} />
-                </div>
-                <Typography variant="h3" gradient="purple-pink" className="mb-4">Connect Your Wallet</Typography>
-                <Typography variant="body-lg" color={`${colors.primary.purple[300]}dd`} className="mb-8 leading-relaxed">
-                  Connect your Solana wallet to create quizzes
-                </Typography>
-                <div className="flex justify-center">
-                  <WalletMultiButton 
-                    style={{
-                      background: `linear-gradient(135deg, ${colors.primary.purple[500]}, ${colors.primary.pink[500]})`,
-                      color: colors.text.primary,
-                      fontWeight: 700,
-                      padding: '1rem 2rem',
-                      borderRadius: '0.75rem',
-                      transition: 'all 200ms',
-                      boxShadow: `0 4px 20px ${colors.primary.purple[400]}40`,
-                    }}
-                  />
-                </div>
-              </GlassCard>
+          <div className="max-w-2xl mx-auto border-4 border-black p-12 bg-white text-center">
+            <Typography variant="h3" className="font-black uppercase mb-6">
+              Authentication Required
+            </Typography>
+            <Typography variant="body" className="font-black uppercase tracking-widest opacity-40 mb-10 block">
+              Connect wallet to access designer tools
+            </Typography>
+            <div className="flex justify-center">
+              <WalletMultiButton />
             </div>
-          </ScrollReveal>
+          </div>
         )}
 
         {successMessage && (
-          <ScrollReveal type="scaleIn" delay={0.1} amount={40}>
-            <div className="mb-8 text-center">
-              <GlassCard variant="orange" size="lg" hover={false} className="text-center">
-                <div 
-                  className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.state.success}20, ${colors.state.success}10)`,
-                    border: `1px solid ${colors.state.success}30`,
-                  }}
-                >
-                  <FaCheckCircle style={{ fontSize: '4rem', color: colors.state.success, filter: 'drop-shadow(0 0 20px rgba(34, 197, 94, 0.5))' }} />
-                </div>
-                <Typography variant="h3" gradient="orange" className="mb-2">Quiz Created Successfully!</Typography>
-                <Typography variant="body-lg" color={`${colors.primary.purple[300]}dd`}>Redirecting to quiz list...</Typography>
-              </GlassCard>
-            </div>
-          </ScrollReveal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-bone/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="border-8 border-black p-16 bg-white text-center shadow-[24px_24px_0px_#00000020]"
+            >
+              <FaCheckCircle className="text-6xl mx-auto mb-8" />
+              <Typography variant="h2" className="font-black uppercase mb-4">Deployment Successful</Typography>
+              <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40">Syncing with Mainnet...</Typography>
+            </motion.div>
+          </div>
         )}
 
         {error && (
-          <ScrollReveal type="scaleIn" delay={0.1} amount={40}>
-            <div className="mb-8 text-center">
-              <GlassCard variant="default" size="lg" hover={false}>
-                <Typography variant="h4" color={colors.state.error} className="mb-4">{error}</Typography>
-                <NeonButton
-                  variant="secondary"
-                  neonColor="orange"
-                  size="md"
-                  onClick={clearError}
-                >
-                  Dismiss
-                </NeonButton>
-              </GlassCard>
-            </div>
-          </ScrollReveal>
+          <div className="border-4 border-black p-6 bg-black text-white flex justify-between items-center">
+            <Typography variant="body" className="font-black uppercase">{error}</Typography>
+            <button onClick={clearError} className="px-4 py-2 border border-white/20 hover:bg-white/10 font-black uppercase text-xs">Dismiss</button>
+          </div>
         )}
 
         {connected && (
-          <ScrollReveal type="fadeInUp" delay={0.3} amount={50}>
-            <motion.form
-              onSubmit={handleSubmit}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <GlassCard variant="purple" size="xl" hover={false}>
-                <div className="mb-8 pb-8" style={{ borderBottom: `1px solid ${colors.semantic.border}60` }}>
-                  <Typography variant="h4" gradient="purple-pink" className="mb-4">
-                    Quiz Name
-                  </Typography>
+          <form onSubmit={handleSubmit} className="space-y-16">
+            {/* Global Settings */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              <div className="lg:col-span-2">
+                <div className="border-4 border-black p-10 bg-white">
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mb-8">Manifest Configuration</Typography>
+                  <label className="block mb-3 font-black uppercase text-[10px] tracking-widest">Protocol Title *</label>
                   <input
                     type="text"
                     value={quizName}
                     onChange={(e) => setQuizName(e.target.value)}
-                    placeholder="e.g., Solana Basics Quiz"
-                    className="w-full px-6 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
+                    placeholder="ENTER PROTOCOL NAME"
+                    className="w-full bg-bone border-2 border-black p-5 font-black uppercase tracking-tight focus:bg-white focus:shadow-[8px_8px_0px_#00000005] transition-all outline-none"
                     disabled={creating}
-                    style={{ 
-                      fontFamily: 'var(--font-space)',
-                      background: `${colors.background.glass}dd`,
-                      border: `2px solid ${colors.primary.purple[400]}40`,
-                      color: colors.text.primary,
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = `${colors.primary.purple[400]}80`;
-                      e.target.style.boxShadow = `0 0 20px ${colors.primary.purple[400]}30`;
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = `${colors.primary.purple[400]}40`;
-                      e.target.style.boxShadow = 'none';
-                    }}
                   />
                 </div>
+              </div>
 
-                <div className="space-y-6 mb-6">
-                  <div className="flex items-center justify-between">
-                    <Typography variant="h4" gradient="purple">
-                      Questions ({questions.length})
-                    </Typography>
-                    <NeonButton
-                      type="button"
-                      onClick={addQuestion}
-                      disabled={creating}
-                      variant="secondary"
-                      neonColor="purple"
-                      size="sm"
-                      leftIcon={<FaPlus />}
-                    >
-                      Add Question
-                    </NeonButton>
+              <div className="space-y-8">
+                <div className="border-4 border-black p-10 bg-black text-white shadow-[12px_12px_0px_#00000010]">
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mb-8 text-white">Consolidated Returns</Typography>
+                  <div className="flex justify-between items-end">
+                    <Typography variant="display-sm" className="font-black text-white leading-none">{getTotalReward().toFixed(2)}</Typography>
+                    <Typography variant="h4" className="font-black text-white opacity-40">SOL</Typography>
                   </div>
+                  <div className="mt-8 pt-8 border-t border-white/10 flex justify-between">
+                    <Typography variant="body-xs" className="font-black uppercase opacity-40 text-white leading-none">{questions.length} Nodes</Typography>
+                    <Typography variant="body-xs" className="font-black uppercase opacity-40 text-white leading-none">Locked</Typography>
+                  </div>
+                </div>
 
-                  <AnimatePresence mode="popLayout">
-                    {questions.map((question, qIndex) => (
-                      <motion.div
-                        key={qIndex}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                      >
-                        <GlassCard variant="default" size="lg" hover={true} className="mb-6">
-                          <div className="flex items-center justify-between mb-6">
-                            <Typography variant="h4" gradient="pink" className="mb-0">
-                              Question {qIndex + 1}
-                            </Typography>
-                            {questions.length > 1 && (
-                              <NeonButton
-                                type="button"
-                                onClick={() => removeQuestion(qIndex)}
-                                disabled={creating}
-                                variant="ghost"
-                                neonColor="pink"
-                                size="sm"
-                                leftIcon={<FaTrash className="text-sm" />}
-                              >
-                                Remove
-                              </NeonButton>
-                            )}
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className={`
+                    w-full py-8 font-black uppercase tracking-[0.4em] transition-all border-4
+                    ${creating ? 'bg-bone text-black/20 border-black/5' : 'bg-black text-white border-black hover:scale-105 active:scale-95 shadow-[12px_12px_0px_#00000020]'}
+                  `}
+                >
+                  {creating ? 'Simulating...' : 'Execute Deploy'}
+                </button>
+              </div>
+            </div>
+
+            {/* Questions Nodes */}
+            <div className="space-y-8">
+              <div className="flex items-center justify-between border-b-4 border-black pb-8">
+                <Typography variant="h3" className="font-black uppercase">Sequence Data</Typography>
+                <button
+                  type="button"
+                  onClick={addQuestion}
+                  disabled={creating || questions.length >= 20}
+                  className="px-8 py-4 border-4 border-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all flex items-center gap-4"
+                >
+                  <FaPlus /> Add Node
+                </button>
+              </div>
+
+              <div className="space-y-12">
+                <AnimatePresence mode="popLayout">
+                  {questions.map((question, qIndex) => (
+                    <motion.div
+                      key={qIndex}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      className="border-4 border-black p-10 bg-white relative hover:shadow-[16px_16px_0px_#00000005] transition-all"
+                    >
+                      <div className="flex items-center justify-between mb-10">
+                        <div className="flex items-center gap-6">
+                          <div className="w-16 h-16 border-4 border-black flex items-center justify-center font-black text-2xl">
+                            {qIndex + 1}
                           </div>
+                          <Typography variant="h4" className="font-black uppercase tracking-tight">Data Unit</Typography>
+                        </div>
+                        {questions.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeQuestion(qIndex)}
+                            disabled={creating}
+                            className="p-4 border-2 border-black/10 text-black/20 hover:border-red-600 hover:text-red-600 transition-all font-black uppercase text-xs"
+                          >
+                            Purge
+                          </button>
+                        )}
+                      </div>
 
-                          <div className="mb-6">
-                            <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-3 font-medium">
-                              Question Text
-                            </Typography>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                        <div className="space-y-8">
+                          <div>
+                            <label className="block mb-3 font-black uppercase text-[10px] tracking-widest">Enquiry Payload *</label>
                             <textarea
                               value={question.questionText}
                               onChange={(e) => updateQuestionText(qIndex, e.target.value)}
-                              placeholder="Enter your question here..."
-                              className="w-full px-6 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none resize-none transition-all duration-300"
+                              placeholder="DEFINE NODE PROBLEM"
+                              className="w-full bg-bone border-2 border-black p-5 font-black uppercase tracking-tight focus:bg-white outline-none resize-none"
                               rows={3}
                               disabled={creating}
-                              style={{ 
-                                fontFamily: 'var(--font-space)',
-                                background: `${colors.background.glass}dd`,
-                                border: `2px solid ${colors.primary.purple[400]}40`,
-                                color: colors.text.primary,
-                              }}
-                              onFocus={(e) => {
-                                e.target.style.borderColor = `${colors.primary.purple[400]}80`;
-                                e.target.style.boxShadow = `0 0 20px ${colors.primary.purple[400]}30`;
-                              }}
-                              onBlur={(e) => {
-                                e.target.style.borderColor = `${colors.primary.purple[400]}40`;
-                                e.target.style.boxShadow = 'none';
-                              }}
                             />
                           </div>
-
-                          <div className="mb-6">
-                            <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-4 font-medium">
-                              Answer Options
-                            </Typography>
-                            <div className="space-y-3">
-                              {['A', 'B', 'C', 'D'].map((letter, cIndex) => {
-                                const optionColors = {
-                                  A: colors.primary.orange,
-                                  B: colors.primary.purple,
-                                  C: colors.primary.pink,
-                                  D: colors.primary.purple,
-                                };
-                                const color = optionColors[letter as keyof typeof optionColors];
-                                return (
-                                  <div key={letter} className="flex items-center gap-3">
-                                    <div 
-                                      className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-xl font-bold text-base transition-all duration-300"
-                                      style={{ 
-                                        background: `linear-gradient(135deg, ${color[500]}40, ${color[400]}20)`,
-                                        border: `1px solid ${color[400]}60`,
-                                        color: color[300],
-                                        boxShadow: `0 2px 10px ${color[400]}20`,
-                                      }}
-                                    >
-                                      {letter}
-                                    </div>
-                                    <input
-                                      type="text"
-                                      value={question.choices[cIndex]}
-                                      onChange={(e) => updateChoice(qIndex, cIndex, e.target.value)}
-                                      placeholder={`Option ${letter}`}
-                                      className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
-                                      disabled={creating}
-                                      style={{ 
-                                        fontFamily: 'var(--font-space)',
-                                        background: `${colors.background.glass}dd`,
-                                        border: `2px solid ${color[400]}40`,
-                                        color: colors.text.primary,
-                                      }}
-                                      onFocus={(e) => {
-                                        e.target.style.borderColor = `${color[400]}80`;
-                                        e.target.style.boxShadow = `0 0 15px ${color[400]}30`;
-                                      }}
-                                      onBlur={(e) => {
-                                        e.target.style.borderColor = `${color[400]}40`;
-                                        e.target.style.boxShadow = 'none';
-                                      }}
-                                    />
-                                  </div>
-                                );
-                              })}
-                            </div>
+                          <div>
+                            <label className="block mb-3 font-black uppercase text-[10px] tracking-widest">Allocation (SOL)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              value={question.rewardAmount}
+                              onChange={(e) => updateRewardAmount(qIndex, parseFloat(e.target.value) || 0.01)}
+                              className="w-full bg-bone border-2 border-black p-5 font-black focus:bg-white outline-none"
+                              disabled={creating}
+                            />
                           </div>
+                        </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                              <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-3 font-medium">
-                                Correct Answer
-                              </Typography>
-                              <select
-                                value={question.correctAnswer}
-                                onChange={(e) => updateCorrectAnswer(qIndex, e.target.value as "A" | "B" | "C" | "D")}
-                                className="w-full px-6 py-4 rounded-xl text-white focus:outline-none transition-all duration-300"
-                                disabled={creating}
-                                style={{ 
-                                  fontFamily: 'var(--font-space)',
-                                  background: `${colors.background.glass}dd`,
-                                  border: `2px solid ${colors.primary.purple[400]}40`,
-                                  color: colors.text.primary,
-                                  fontSize: '1rem',
-                                }}
-                                onFocus={(e) => {
-                                  e.target.style.borderColor = `${colors.primary.purple[400]}80`;
-                                  e.target.style.boxShadow = `0 0 20px ${colors.primary.purple[400]}30`;
-                                }}
-                                onBlur={(e) => {
-                                  e.target.style.borderColor = `${colors.primary.purple[400]}40`;
-                                  e.target.style.boxShadow = 'none';
-                                }}
-                              >
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="C">C</option>
-                                <option value="D">D</option>
-                              </select>
-                            </div>
-                            <div>
-                              <Typography variant="body-lg" color={`${colors.primary.purple[200]}dd`} className="mb-3 font-medium">
-                                Reward (SOL)
-                              </Typography>
-                              <input
-                                type="number"
-                                step="0.01"
-                                min="0.01"
-                                value={question.rewardAmount}
-                                onChange={(e) => updateRewardAmount(qIndex, parseFloat(e.target.value) || 0.01)}
-                                className="w-full px-6 py-4 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
-                                disabled={creating}
-                                placeholder="0.1"
-                                style={{ 
-                                  fontFamily: 'var(--font-space)',
-                                  background: `${colors.background.glass}dd`,
-                                  border: `2px solid ${colors.primary.orange[400]}40`,
-                                  color: colors.text.primary,
-                                  fontSize: '1rem',
-                                }}
-                                onFocus={(e) => {
-                                  e.target.style.borderColor = `${colors.primary.orange[400]}80`;
-                                  e.target.style.boxShadow = `0 0 20px ${colors.primary.orange[400]}30`;
-                                }}
-                                onBlur={(e) => {
-                                  e.target.style.borderColor = `${colors.primary.orange[400]}40`;
-                                  e.target.style.boxShadow = 'none';
-                                }}
-                              />
-                            </div>
+                        <div className="space-y-6">
+                          <label className="block mb-3 font-black uppercase text-[10px] tracking-widest">Verification Branches *</label>
+                          <div className="space-y-4">
+                            {['A', 'B', 'C', 'D'].map((letter, cIndex) => (
+                              <div key={letter} className="flex items-center gap-4">
+                                <button
+                                  type="button"
+                                  onClick={() => updateCorrectAnswer(qIndex, letter as "A" | "B" | "C" | "D")}
+                                  className={`w-12 h-12 border-2 flex items-center justify-center font-black transition-all ${question.correctAnswer === letter ? 'bg-black text-white border-black' : 'border-black/10 text-black/40 hover:border-black'}`}
+                                >
+                                  {letter}
+                                </button>
+                                <input
+                                  type="text"
+                                  value={question.choices[cIndex]}
+                                  onChange={(e) => updateChoice(qIndex, cIndex, e.target.value)}
+                                  placeholder={`BRANCH ${letter} CONTENT`}
+                                  className="flex-1 bg-bone border-2 border-black p-4 font-black uppercase text-sm focus:bg-white outline-none"
+                                  disabled={creating}
+                                />
+                              </div>
+                            ))}
                           </div>
-                        </GlassCard>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-
-                <GlassCard variant="orange" size="md" hover={false} className="mb-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <Typography variant="h4" gradient="orange" className="mb-0">
-                      Total Reward Pool
-                    </Typography>
-                    <Typography variant="display-sm" gradient="orange">
-                      {getTotalReward().toFixed(2)} SOL
-                    </Typography>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm">
-                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}cc`}>
-                      {questions.length} question{questions.length > 1 ? 's' : ''}
-                    </Typography>
-                    <span style={{ color: `${colors.semantic.border}60` }}>•</span>
-                    <Typography variant="body-sm" color={`${colors.primary.purple[300]}cc`}>
-                      Avg {(getTotalReward() / questions.length).toFixed(2)} SOL/question
-                    </Typography>
-                  </div>
-                </GlassCard>
-
-                <NeonButton
-                  type="submit"
-                  disabled={creating}
-                  variant="primary"
-                  neonColor="purple"
-                  size="xl"
-                  fullWidth
-                  loading={creating}
-                  leftIcon={!creating ? <FaPlus /> : undefined}
-                >
-                  {creating ? 'Creating Quiz Set...' : 'Create Quiz Set'}
-                </NeonButton>
-              </GlassCard>
-            </motion.form>
-          </ScrollReveal>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          </form>
         )}
       </div>
     </PageTemplate>

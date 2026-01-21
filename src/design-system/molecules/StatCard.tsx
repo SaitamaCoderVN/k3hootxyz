@@ -21,35 +21,28 @@ export function StatCard({
   className = '',
 }: StatCardProps) {
   return (
-    <GlassCard variant={variant} size="md" className={className}>
-      <div className="flex items-center gap-4">
-        <div
-          className="p-3 rounded-lg flex-shrink-0"
-          style={{
-            background: `${colors.primary[variant === 'default' ? 'purple' : variant][500]}20`,
-          }}
-        >
-          <div
-            style={{
-              color: colors.primary[variant === 'default' ? 'purple' : variant][400],
-              fontSize: '2rem',
-            }}
-          >
+    <div 
+      className={`border-2 border-black p-8 bg-white transition-all duration-300 hover:shadow-[8px_8px_0px_#00000010] ${className}`}
+    >
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between border-b-2 border-black opacity-10 pb-4">
+          <div className="text-3xl text-black grayscale opacity-100">
             {icon}
           </div>
+          <div className="w-2 h-2 bg-black" />
         </div>
         <div>
-          <Typography variant="h3" color={colors.text.primary}>
+          <Typography variant="display-sm" className="font-black leading-none mb-2">
             {value}
           </Typography>
           <Typography
-            variant="body-sm"
-            color={colors.primary[variant === 'default' ? 'purple' : variant][300]}
+            variant="body-xs"
+            className="font-black uppercase tracking-[0.2em] opacity-40"
           >
             {label}
           </Typography>
         </div>
       </div>
-    </GlassCard>
+    </div>
   );
 }

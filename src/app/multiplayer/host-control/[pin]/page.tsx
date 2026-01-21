@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTemplate } from '@/components/layout/PageTemplate';
 import { Typography, NeonButton, GlassCard, colors } from '@/design-system';
-import { FaClock, FaUsers, FaArrowRight, FaTrophy, FaCheck } from 'react-icons/fa';
+import { Clock, Users, ArrowRight, Trophy, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
 import type { GameSession, GamePhase, Question } from '@/types/multiplayer';
 import { GAME_TIMING, ANSWER_COLORS } from '@/types/multiplayer';
@@ -190,94 +190,14 @@ export default function HostControlPage() {
     }
   };
 
-  const getPhaseButton = () => {
-    if (!session) return null;
-
-    const phase = session.game_phase;
-
-    switch (phase) {
-      case 'lobby':
-        return (
-          <NeonButton
-            onClick={() => handleAdvancePhase('question')}
-            loading={advancing}
-            neonColor="orange"
-            size="lg"
-            fullWidth
-            leftIcon={<FaArrowRight />}
-          >
-            Start Game
-          </NeonButton>
-        );
-
-      case 'question':
-        return (
-          <NeonButton
-            onClick={() => handleAdvancePhase('answer_reveal')}
-            loading={advancing}
-            neonColor="purple"
-            size="lg"
-            fullWidth
-            leftIcon={<FaCheck />}
-          >
-            Show Answer ({timeLeft}s)
-          </NeonButton>
-        );
-
-      case 'answer_reveal':
-        return (
-          <NeonButton
-            onClick={() => handleAdvancePhase('leaderboard')}
-            loading={advancing}
-            neonColor="orange"
-            size="lg"
-            fullWidth
-            leftIcon={<FaTrophy />}
-          >
-            Show Leaderboard
-          </NeonButton>
-        );
-
-      case 'leaderboard':
-        const isLastQuestion = (session.current_question_index ?? 0) >= questions.length - 1;
-        return (
-          <NeonButton
-            onClick={() => handleAdvancePhase()}
-            loading={advancing}
-            neonColor={isLastQuestion ? 'purple' : 'orange'}
-            size="lg"
-            fullWidth
-            leftIcon={isLastQuestion ? <FaTrophy /> : <FaArrowRight />}
-          >
-            {isLastQuestion ? 'Show Final Results' : 'Next Question'}
-          </NeonButton>
-        );
-
-      case 'finished':
-        return (
-          <NeonButton
-            onClick={() => router.push('/play')}
-            variant="secondary"
-            neonColor="purple"
-            size="lg"
-            fullWidth
-          >
-            Back to Play
-          </NeonButton>
-        );
-    }
-  };
 
   if (!mounted) return null;
 
   if (!session) {
     return (
-      <PageTemplate title="Loading..." subtitle="Please wait">
-        <div className="flex justify-center pt-12">
-          <div
-            className="animate-spin rounded-full h-16 w-16 border-b-4"
-            style={{ borderColor: colors.primary.purple[400] }}
-          />
+      <PageTemplate title="Channel Sync" subtitle="Restoring Secure Link">
+        <div className="flex justify-center pt-24">
+          <div className="w-12 h-12 border-4 border-black border-dashed animate-spin" />
         </div>
       </PageTemplate>
     );
@@ -287,118 +207,169 @@ export default function HostControlPage() {
   const totalPlayers = participants.length;
   const currentIndex = (session.current_question_index ?? 0) + 1;
 
+  const getPhaseButton = () => {
+    if (!session) return null;
+
+    const phase = session.game_phase;
+
+    switch (phase) {
+      case 'lobby':
+        return (
+          <button
+            onClick={() => handleAdvancePhase('question')}
+            disabled={advancing}
+            className="w-full py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.02] shadow-[12px_12px_0px_#00000020] transition-all"
+          >
+            {advancing ? 'STARTING...' : 'INITIALISE SEQUENCE'}
+          </button>
+        );
+
+      case 'question':
+        return (
+          <button
+            onClick={() => handleAdvancePhase('answer_reveal')}
+            disabled={advancing}
+            className="w-full py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.02] shadow-[12px_12px_0px_#00000020] transition-all border-4 border-white/20"
+          >
+            {advancing ? 'PROCESSING...' : `CLOSE WINDOW (${timeLeft}s)`}
+          </button>
+        );
+
+      case 'answer_reveal':
+        return (
+          <button
+            onClick={() => handleAdvancePhase('leaderboard')}
+            disabled={advancing}
+            className="w-full py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.02] shadow-[12px_12px_0px_#00000020] transition-all"
+          >
+            {advancing ? 'SYNCING...' : 'REVEAL STANDINGS'}
+          </button>
+        );
+
+      case 'leaderboard':
+        const isLastQuestion = (session.current_question_index ?? 0) >= questions.length - 1;
+        return (
+          <button
+            onClick={() => handleAdvancePhase()}
+            disabled={advancing}
+            className="w-full py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.02] shadow-[12px_12px_0px_#00000020] transition-all"
+          >
+            {advancing ? 'LOADING...' : isLastQuestion ? 'FINAL ANALYSIS' : 'NEXT SEQUENCE'}
+          </button>
+        );
+
+      case 'finished':
+        return (
+          <button
+            onClick={() => router.push('/play')}
+            className="w-full py-6 border-4 border-black font-black uppercase tracking-[0.4em] hover:bg-black hover:text-white transition-all shadow-[12px_12px_0px_#00000010]"
+          >
+            TERMINATE SESSION
+          </button>
+        );
+    }
+  };
+
   return (
     <PageTemplate
-      title={`Host Control - PIN: ${pin}`}
-      subtitle={`Question ${currentIndex}/${questions.length}`}
+      title="Host Console"
+      subtitle={`Arena: ${pin} | Unit ${currentIndex}/${questions.length}`}
     >
-      <div className="max-w-6xl mx-auto pt-8 pb-24 space-y-6">
-        {/* Status Bar */}
-        <div className="grid grid-cols-3 gap-4">
-          <GlassCard variant="purple" size="sm">
-            <div className="text-center">
-              <FaUsers className="text-3xl mx-auto mb-2" style={{ color: colors.primary.purple[400] }} />
-              <Typography variant="h4" color={colors.primary.purple[400]}>
-                {totalPlayers}
-              </Typography>
-              <Typography variant="body-sm" color={colors.text.muted}>
-                Players
-              </Typography>
+      <div className="max-w-6xl mx-auto pt-12 pb-40 px-4 space-y-12">
+        {/* Status Nodes */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0px_#00000005]">
+            <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mb-4">Operatives</Typography>
+            <div className="flex items-center gap-4">
+              <Users className="opacity-10" size={24} />
+              <Typography variant="h3" className="font-black">{totalPlayers}</Typography>
             </div>
-          </GlassCard>
+          </div>
 
-          <GlassCard variant="orange" size="sm">
-            <div className="text-center">
-              <FaClock className="text-3xl mx-auto mb-2" style={{ color: colors.primary.orange[400] }} />
-              <Typography variant="h4" color={colors.primary.orange[400]}>
-                {session.game_phase === 'question' ? `${timeLeft}s` : '-'}
-              </Typography>
-              <Typography variant="body-sm" color={colors.text.muted}>
-                Time Left
+          <div className="border-4 border-black p-6 sm:p-8 bg-white shadow-[8px_8px_0px_#00000005]">
+            <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mb-4">Sync Window</Typography>
+            <div className="flex items-center gap-4">
+              <Clock className="opacity-10" size={24} />
+              <Typography variant="h3" className="font-black">
+                {session.game_phase === 'question' ? `${timeLeft}s` : '---'}
               </Typography>
             </div>
-          </GlassCard>
+          </div>
 
-          <GlassCard variant="pink" size="sm">
-            <div className="text-center">
-              <FaCheck className="text-3xl mx-auto mb-2" style={{ color: colors.primary.pink[400] }} />
-              <Typography variant="h4" color={colors.primary.pink[400]}>
-                {answersSubmitted}/{totalPlayers}
-              </Typography>
-              <Typography variant="body-sm" color={colors.text.muted}>
-                Answered
-              </Typography>
+          <div className="border-4 border-black p-6 sm:p-8 bg-black text-white shadow-[8px_8px_0px_#00000010]">
+            <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mb-4 text-white">Responses</Typography>
+            <div className="flex items-center gap-4">
+              <Check className="opacity-20 text-white" size={24} />
+              <Typography variant="h3" className="font-black text-white">{answersSubmitted}/{totalPlayers}</Typography>
             </div>
-          </GlassCard>
+          </div>
         </div>
 
-        {/* Current Question */}
+        {/* Current Data Plane */}
         {currentQuestion && session.game_phase !== 'lobby' && session.game_phase !== 'finished' && (
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuestion.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              className="space-y-12"
             >
-              <GlassCard variant="purple" size="xl">
-                <div className="space-y-6">
-                  <Typography variant="h2" className="text-center leading-relaxed">
-                    {currentQuestion.question_text}
-                  </Typography>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {currentQuestion.choices.map((choice, index) => {
-                      const letter = ['A', 'B', 'C', 'D'][index] as 'A' | 'B' | 'C' | 'D';
-                      const answerColor = ANSWER_COLORS[letter];
-                      const isCorrect = currentQuestion.correct_answer === letter;
-                      const showAnswer = session.game_phase === 'answer_reveal' || session.game_phase === 'leaderboard';
-
-                      return (
-                        <div
-                          key={index}
-                          className="p-4 rounded-lg relative"
-                          style={{
-                            backgroundColor: answerColor.bg,
-                            border: showAnswer && isCorrect ? '4px solid #4CAF50' : 'none',
-                          }}
-                        >
-                          {showAnswer && isCorrect && (
-                            <div className="absolute top-2 right-2 bg-green-500 rounded-full p-2">
-                              <span className="text-xl">✓</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl font-bold" style={{ color: answerColor.text }}>
-                              {letter}
-                            </span>
-                            <p className="text-base font-bold" style={{ color: answerColor.text }}>
-                              {choice}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+              <div className="border-8 border-black p-12 bg-white relative">
+                <div className="absolute -top-6 left-12 px-4 py-2 bg-black text-white font-black text-[10px] tracking-[0.3em] uppercase">
+                  Active Enquiry
                 </div>
-              </GlassCard>
+                <Typography variant="h2" className="text-center font-black uppercase leading-tight tracking-tight">
+                  {currentQuestion.question_text}
+                </Typography>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {currentQuestion.choices.map((choice, index) => {
+                  const letter = ['A', 'B', 'C', 'D'][index] as 'A' | 'B' | 'C' | 'D';
+                  const isCorrect = currentQuestion.correct_answer === letter;
+                  const showAnswer = session.game_phase === 'answer_reveal' || session.game_phase === 'leaderboard';
+
+                  return (
+                    <div
+                      key={index}
+                      className={`
+                        p-6 border-4 flex items-center justify-between transition-all
+                        ${showAnswer && isCorrect ? 'border-black bg-black text-white' : 'border-black/5 bg-bone text-black/40'}
+                      `}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-8 h-8 border-2 flex items-center justify-center font-black ${showAnswer && isCorrect ? 'border-white/20' : 'border-black/10'}`}>
+                          {letter}
+                        </div>
+                        <Typography variant="body" className="font-black uppercase tracking-tight">
+                          {choice}
+                        </Typography>
+                      </div>
+                      {showAnswer && isCorrect && (
+                        <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-black">
+                          ✓
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
           </AnimatePresence>
         )}
 
-        {/* Phase Control */}
-        <div className="max-w-md mx-auto">
+        {/* Command Interface */}
+        <div className="max-w-xl mx-auto pt-12 space-y-8">
+          <div className="border-t-4 border-black pt-8 text-center text-[10px] font-black uppercase tracking-[0.5em] opacity-20 mb-4">
+            Command Override
+          </div>
           {getPhaseButton()}
-        </div>
-
-        {/* Phase Indicator */}
-        <div className="text-center">
-          <Typography variant="body-sm" color={colors.text.muted}>
-            Current Phase:{' '}
-            <span style={{ color: colors.primary.purple[400] }} className="font-bold">
-              {session.game_phase.toUpperCase()}
-            </span>
-          </Typography>
+          
+          <div className="text-center pt-8">
+            <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40">
+              Protocol State: <span className="opacity-100 text-black underline underline-offset-4">{session.game_phase.replace('_', ' ')}</span>
+            </Typography>
+          </div>
         </div>
       </div>
     </PageTemplate>

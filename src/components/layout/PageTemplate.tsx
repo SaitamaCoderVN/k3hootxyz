@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Header from './Header';
 import Footer from './Footer';
 import { PageWrapper } from './MinHeightContainer';
-import { colors, animations } from '@/design-system';
+import { colors, animations, Typography } from '@/design-system';
 
 const WebGLBackground = dynamic(() => import('@/components/animations/WebGLBackground'), {
   ssr: false,
@@ -20,7 +20,7 @@ const PixelEffect = dynamic(() => import('@/components/animations/PixelEffect'),
 
 interface PageTemplateProps {
   children: ReactNode;
-  title?: string;
+  title?: ReactNode;
   subtitle?: string;
   showBackground?: boolean;
   className?: string;
@@ -36,51 +36,44 @@ export function PageTemplate({
   containerClassName = '',
 }: PageTemplateProps) {
   return (
-    <PageWrapper minHeight="screen" className={`text-white overflow-hidden ${className}`} style={{ backgroundColor: colors.background.primary }}>
-      {showBackground && (
-        <>
-          <WebGLBackground />
-          <PixelEffect />
-        </>
-      )}
+    <PageWrapper 
+      minHeight="screen" 
+      className={`text-black overflow-hidden ${className} bg-bone selection:bg-black selection:text-white`}
+    >
       <Header />
       
       <main className="relative z-10">
         {(title || subtitle) && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: parseFloat(animations.duration.normal) / 1000 }}
-            className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="container mx-auto px-6 sm:px-8 lg:px-12 pt-32 pb-16"
           >
             {title && (
-              <h1 className="text-center mb-4">
-                <span
-                  className="text-4xl sm:text-5xl lg:text-6xl font-bold"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.primary.orange[400]}, ${colors.primary.purple[400]}, ${colors.primary.pink[400]})`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    textShadow: '0 0 60px rgba(168, 85, 247, 0.3)',
-                  }}
+              <div className="mb-4">
+                <Typography 
+                  variant="display-lg" 
+                  className="font-black uppercase leading-[0.85] tracking-tighter"
                 >
                   {title}
-                </span>
-              </h1>
+                </Typography>
+              </div>
             )}
             {subtitle && (
-              <p
-                className="text-center text-lg sm:text-xl max-w-2xl mx-auto"
-                style={{ color: `${colors.primary.purple[300]}dd` }}
-              >
-                {subtitle}
-              </p>
+              <div className="max-w-3xl border-l-4 border-black pl-6 py-2">
+                <Typography 
+                  variant="body-lg" 
+                  className="font-black uppercase tracking-widest opacity-40 leading-relaxed"
+                >
+                  {subtitle}
+                </Typography>
+              </div>
             )}
           </motion.div>
         )}
         
-        <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${containerClassName}`}>
+        <div className={`container mx-auto px-6 sm:px-8 lg:px-12 ${containerClassName}`}>
           {children}
         </div>
       </main>

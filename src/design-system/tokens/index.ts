@@ -2,112 +2,91 @@
 // All design values must reference these tokens for consistency
 
 export const colors = {
-  // Primary Palette
+  // Monochromatic Luxury Palette
+  grayscale: {
+    ink: '#0A0A0A',      // Purest black for text/headers
+    charcoal: '#262626', // Secondary text
+    neutral: '#404040',  // Darkened from #737373
+    graphite: '#737373', // Darkened from #A3A3A3
+    paper: '#EDEDED',    // Secondary background/Cards
+    bone: '#FBFBFB',     // Main background
+  },
+
   primary: {
-    orange: {
-      50: '#FFF7ED',
-      100: '#FFEDD5',
-      200: '#FED7AA',
-      300: '#FDBA74',
-      400: '#FB923C', // Main Orange
-      500: '#F97316', // Primary Orange
-      600: '#EA580C',
-      700: '#C2410C',
-      800: '#9A3412',
-      900: '#7C2D12',
+    black: {
+      900: '#0A0A0A',
     },
-    purple: {
-      50: '#FAF5FF',
-      100: '#F3E8FF',
-      200: '#E9D5FF',
-      300: '#D8B4FE',
-      400: '#C084FC',
-      500: '#A855F7', // Primary Purple
-      600: '#9333EA',
-      700: '#7E22CE',
-      800: '#6B21A8',
-      900: '#581C87',
+    gray: {
+      500: '#404040',
+      100: '#EDEDED',
     },
-    pink: {
-      50: '#FDF2F8',
-      100: '#FCE7F3',
-      200: '#FBCFE8',
-      300: '#F9A8D4',
-      400: '#F472B6',
-      500: '#EC4899', // Primary Pink
-      600: '#DB2777',
-      700: '#BE185D',
-      800: '#9F1239',
-      900: '#831843',
-    },
+    // Compatibility Shim for Minimalist Redesign
+    orange: { 500: '#0A0A0A', 400: '#262626' },
+    purple: { 500: '#FACC15', 400: '#EAB308', 300: '#EAB308', 200: '#FEF08A' },
+    pink: { 500: '#FACC15', 400: '#EAB308' },
   },
-  
-  // Background
+
   background: {
-    primary: '#0A001F', // Deep Space
-    secondary: 'rgba(255, 255, 255, 0.02)',
-    tertiary: 'rgba(255, 255, 255, 0.05)',
-    glass: 'rgba(255, 255, 255, 0.03)',
+    primary: '#FBFBFB',   // Bone White
+    secondary: '#EDEDED', // Paper Gray
+    tertiary: '#FFFFFF',  // Pure White
+    contrast: '#0A0A0A',  // Ink Black
   },
-  
-  // Text
+
   text: {
-    primary: '#FFFFFF',
-    secondary: 'rgba(255, 255, 255, 0.85)',
-    tertiary: 'rgba(255, 255, 255, 0.60)',
-    muted: 'rgba(255, 255, 255, 0.40)',
+    primary: '#0A0A0A',   // Ink
+    secondary: '#262626', // Charcoal
+    muted: '#737373',     // Neutral
+    inverse: '#FBFBFB',   // Bone
   },
-  
-  // State Colors
-  state: {
+
+  semantic: {
     success: '#10B981',
     error: '#EF4444',
     warning: '#F59E0B',
     info: '#3B82F6',
-  },
-  
-  // Semantic
-  semantic: {
-    border: 'rgba(255, 255, 255, 0.10)',
-    borderHover: 'rgba(168, 85, 247, 0.40)',
-    borderActive: 'rgba(168, 85, 247, 0.80)',
-    shadow: 'rgba(0, 0, 0, 0.40)',
+    border: '#0A0A0A',    // High-contrast solid black border
+    borderSubtle: '#D4D4D4',
+    shadow: 'rgba(0, 0, 0, 0.1)',
   },
 } as const;
 
 export const typography = {
   fontFamily: {
-    display: "'Space Grotesk', 'Inter', system-ui, sans-serif",
-    body: "'Inter', system-ui, sans-serif",
-    mono: "'Fira Code', 'Courier New', monospace",
+    display: "var(--font-plex-mono), 'Archive', 'Inter', system-ui, sans-serif",
+    body: "var(--font-plex-mono), 'Inter', system-ui, sans-serif",
+    mono: "var(--font-plex-mono), 'Fira Code', 'Courier New', monospace",
   },
-  
+
   fontSize: {
     // Display (Hero sections)
     display: {
-      // Responsive scaling: clamp(min_mobile, preferred, max_desktop)
-      '2xl': 'clamp(4rem, 8vw + 2rem, 12rem)',      // 64px → 192px (was 256px)
-      'xl': 'clamp(3rem, 6vw + 1.5rem, 8rem)',      // 48px → 128px
-      'lg': 'clamp(2.5rem, 5vw + 1rem, 6rem)',      // 40px → 96px
-      'md': 'clamp(2rem, 4vw + 0.5rem, 4.5rem)',    // 32px → 72px
-      'sm': 'clamp(1.75rem, 3vw + 0.5rem, 3.5rem)', // 28px → 56px
-      'xs': 'clamp(1.5rem, 2.5vw + 0.5rem, 2.5rem)',// 24px → 40px
+      '6xl': '8rem',
+      '5xl': '6rem',
+      '4xl': '4.5rem',
+      '3xl': '3rem',
+      '2xl': '2.5rem',
+      'xl': '2rem',
+      'lg': '1.5rem',
+      'md': '1.25rem',
+      'sm': '1.125rem',
+      'xs': '1rem',
     },
-    
+
     // Headings
-    h1: ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }], // 56px
-    h2: ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }], // 48px
-    h3: ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }], // 36px
-    h4: ['1.875rem', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '700' }], // 30px
-    h5: ['1.5rem', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }], // 24px
-    h6: ['1.25rem', { lineHeight: '1.4', letterSpacing: '0', fontWeight: '600' }], // 20px
-    
+    h1: ['4.5rem', { lineHeight: '0.9', letterSpacing: '-0.04em', fontWeight: '900' }],
+    h2: ['3.5rem', { lineHeight: '1', letterSpacing: '-0.03em', fontWeight: '800' }],
+    h3: ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+    h4: ['1.75rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
+    h5: ['1.25rem', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }],
+    h6: ['1rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '600' }],
+
     // Body
-    xl: ['1.25rem', { lineHeight: '1.75', letterSpacing: '0', fontWeight: '400' }], // 20px
-    lg: ['1.125rem', { lineHeight: '1.75', letterSpacing: '0', fontWeight: '400' }], // 18px
-    base: ['1rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }], // 16px
-    sm: ['0.875rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }], // 14px
-    xs: ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.02em', fontWeight: '400' }], // 12px
+    xl: ['1.5rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+    lg: ['1.25rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+    base: ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+    sm: ['0.875rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }],
+    xs: ['0.75rem', { lineHeight: '1.6', letterSpacing: '0.1em', fontWeight: '500' }],
   },
 } as const;
 
@@ -157,16 +136,18 @@ export const animations = {
     slower: '800ms',
     slowest: '1200ms',
   },
-  
+
   // Easing curves
   easing: {
     linear: 'linear',
     easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
     easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
     easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    smooth: 'cubic-bezier(0.22, 1, 0.36, 1)', // Custom smooth curve
+    smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    expo: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    bounce: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
   },
-  
+
   // Named animations
   variants: {
     'fade-in': {

@@ -54,34 +54,29 @@ export function SectionNav() {
           <button
             key={section.id}
             onClick={() => scrollToSection(section.id)}
-            className="group flex items-center" style={{ gap: spacing[3] }}
+            className="group flex flex-row-reverse items-center" style={{ gap: spacing[4] }}
           >
+            <div
+              className={`
+                h-4 border-l-4 transition-all duration-300
+                ${activeSection === section.id ? 'border-black h-12' : 'border-black/5 group-hover:border-black/40'}
+              `}
+            />
             <span
               style={{
-                fontSize: typography.fontSize.xs[0],
-                fontFamily: typography.fontFamily.body,
-                fontWeight: 500,
-                color: activeSection === section.id ? colors.primary.orange[400] : `${colors.primary.purple[300]}66`,
+                fontSize: '10px',
+                fontFamily: typography.fontFamily.display,
+                fontWeight: 900,
+                color: colors.grayscale.ink,
                 opacity: activeSection === section.id ? 1 : 0,
                 transition: `all ${animations.duration.normal}`,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
               }}
               className="group-hover:opacity-100"
             >
               {section.label}
             </span>
-            <div
-              style={{
-                height: spacing[2],
-                borderRadius: '9999px',
-                width: activeSection === section.id ? spacing[12] : spacing[8],
-                background: activeSection === section.id 
-                  ? `linear-gradient(to right, ${colors.primary.orange[500]}, ${colors.primary.purple[500]})`
-                  : `${colors.primary.purple[300]}33`,
-                boxShadow: activeSection === section.id ? shadows.neon.orange.sm : 'none',
-                transition: `all ${animations.duration.normal}`,
-              }}
-              className="group-hover:bg-purple-300/40"
-            />
           </button>
         ))}
       </div>

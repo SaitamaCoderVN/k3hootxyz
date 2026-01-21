@@ -14,9 +14,9 @@ interface KahootAnswerButtonProps {
   correctAnswer?: 'A' | 'B' | 'C' | 'D'; // For answer reveal
 }
 
-// Shape icons for each answer (Kahoot style)
+// Shape icons for each answer (Kahoot style) - Now monochromatic
 const ShapeIcon = ({ letter }: { letter: 'A' | 'B' | 'C' | 'D' }) => {
-  const size = 24;
+  const size = 20;
 
   switch (letter) {
     case 'A': // Triangle
@@ -56,95 +56,62 @@ export function KahootAnswerButton({
   showIncorrect = false,
   correctAnswer,
 }: KahootAnswerButtonProps) {
-  const colors = ANSWER_COLORS[letter];
   const isCorrectAnswer = correctAnswer === letter;
+  const isSelectedIncorrect = showIncorrect && selected && !isCorrectAnswer;
 
   return (
     <motion.button
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      whileHover={!disabled ? { scale: 1.02, y: -2 } : {}}
-      whileTap={!disabled ? { scale: 0.98 } : {}}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-      className="relative w-full rounded-xl overflow-hidden group"
-      style={{
-        backgroundColor: selected ? colors.bg : `${colors.bg}dd`,
-        opacity: disabled && !selected && !isCorrectAnswer ? 0.5 : 1,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        border: selected ? '4px solid white' : showCorrect ? '4px solid #4CAF50' : 'none',
-        boxShadow: selected
-          ? `0 8px 24px ${colors.bg}60, 0 0 0 4px white`
-          : `0 4px 12px ${colors.bg}40`,
-      }}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className={`
+        relative w-full border-4 transition-all duration-200 flex items-center gap-6 p-6 overflow-hidden
+        ${selected ? 'border-black bg-black text-white' : 'border-black/10 bg-white text-black'}
+        ${!disabled && !selected ? 'hover:border-black hover:bg-bone' : ''}
+        ${isCorrectAnswer && correctAnswer !== undefined ? 'ring-8 ring-black ring-inset' : ''}
+        ${isSelectedIncorrect ? 'border-red-600 bg-red-600 text-white' : ''}
+        ${disabled && !selected && !isCorrectAnswer ? 'opacity-20' : 'opacity-100'}
+      `}
     >
-      {/* Incorrect overlay */}
-      {showIncorrect && selected && !isCorrectAnswer && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.8 }}
-          className="absolute inset-0 bg-black z-10 flex items-center justify-center"
-        >
-          <span className="text-6xl">❌</span>
-        </motion.div>
-      )}
+      {/* Letter Indicator */}
+      <div className={`
+        w-14 h-14 border-2 flex flex-col items-center justify-center flex-shrink-0 transition-colors
+        ${selected || isSelectedIncorrect ? 'border-white/20 text-white' : 'border-black/10 text-black'}
+      `}>
+        <span className="text-xs font-black uppercase tracking-tighter mb-1">{letter}</span>
+        <ShapeIcon letter={letter} />
+      </div>
 
-      {/* Correct answer highlight */}
-      {isCorrectAnswer && (correctAnswer !== undefined) && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="absolute top-2 right-2 z-20 bg-green-500 rounded-full p-2"
-        >
-          <span className="text-xl">✓</span>
-        </motion.div>
-      )}
+      {/* Answer Text */}
+      <div className="flex-1 text-left">
+        <p className="text-xl font-black uppercase leading-tight tracking-tight">
+          {text}
+        </p>
+      </div>
 
-      {/* Button content */}
-      <div className="relative z-0 px-6 py-6 flex items-center gap-4">
-        {/* Letter + Shape icon */}
-        <div className="flex items-center gap-3 min-w-[80px]">
-          <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-white/20">
-            <span className="text-2xl font-bold" style={{ color: colors.text }}>
-              {letter}
-            </span>
+      {/* Status Icons */}
+      <div className="flex-shrink-0">
+        {selected && !showIncorrect && !showCorrect && (
+          <div className="w-8 h-8 border-2 border-white/40 flex items-center justify-center">
+            <span className="text-xs font-black">ACTIVE</span>
           </div>
-          <div style={{ color: colors.text, opacity: 0.9 }}>
-            <ShapeIcon letter={letter} />
+        )}
+        {isCorrectAnswer && (correctAnswer !== undefined) && (
+          <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-black">
+            ✓
           </div>
-        </div>
-
-        {/* Answer text */}
-        <div className="flex-1 text-left">
-          <p
-            className="text-lg sm:text-xl font-bold leading-tight"
-            style={{ color: colors.text }}
-          >
-            {text}
-          </p>
-        </div>
-
-        {/* Selected indicator */}
-        {selected && !showIncorrect && (
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            className="w-8 h-8 bg-white rounded-full flex items-center justify-center"
-          >
-            <span className="text-lg" style={{ color: colors.bg }}>✓</span>
-          </motion.div>
+        )}
+        {isSelectedIncorrect && (
+          <div className="w-10 h-10 bg-white text-red-600 flex items-center justify-center font-black">
+            ✕
+          </div>
         )}
       </div>
 
-      {/* Hover effect */}
-      {!disabled && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-          style={{
-            background: `linear-gradient(135deg, transparent, ${colors.hover}40)`,
-          }}
-        />
+      {/* Correct Reveal Pattern */}
+      {isCorrectAnswer && (correctAnswer !== undefined) && (
+        <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:8px_8px]" />
       )}
     </motion.button>
   );

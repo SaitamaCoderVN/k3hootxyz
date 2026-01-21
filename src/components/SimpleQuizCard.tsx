@@ -46,78 +46,74 @@ export function SimpleQuizCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
       className="relative"
     >
-      <GlassCard 
-        variant={hasWinner ? "default" : "purple"} 
-        size="md" 
-        hover={!hasWinner}
+      <div 
+        className="border-4 border-black p-8 bg-white transition-all duration-300 hover:translate-y-[-8px]"
       >
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-8 border-b-2 border-black pb-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Typography variant="body-sm" color={colors.text.muted} className="font-mono">
-                {quizId.slice(0, 4)}...{quizId.slice(-4)}
+            <div className="flex items-center gap-3 mb-2">
+              <Typography variant="body-xs" className="font-black opacity-30 tracking-widest uppercase">
+                Node {quizId.slice(-4)}
               </Typography>
               {hasWinner && (
                 <span
-                  className="px-2 py-1 rounded-full text-xs font-semibold"
+                  className="px-2 py-0.5 border border-black text-[10px] font-black uppercase tracking-tighter"
                   style={{
-                    background: isClaimed ? `${colors.state.success}33` : `${colors.primary.orange[500]}33`,
-                    color: isClaimed ? colors.state.success : colors.primary.orange[400]
+                    background: isClaimed ? colors.grayscale.ink : 'transparent',
+                    color: isClaimed ? colors.grayscale.bone : colors.grayscale.ink
                   }}
                 >
-                  {isClaimed ? 'Claimed' : 'Won'}
+                  {isClaimed ? 'Secured' : 'Won'}
                 </span>
               )}
               {!hasWinner && (
                 <span
-                  className="px-2 py-1 rounded-full text-xs font-semibold animate-pulse"
-                  style={{
-                    background: `${colors.primary.purple[500]}33`,
-                    color: colors.primary.purple[400]
-                  }}
+                  className="px-2 py-0.5 border border-black bg-black text-white text-[10px] font-black uppercase tracking-tighter"
                 >
                   Available
                 </span>
               )}
             </div>
             <Typography
-              variant="body-lg"
-              className="line-clamp-2 font-bold transition-colors group-hover:text-cyan-400"
+              variant="h4"
+              className="line-clamp-2 font-black uppercase leading-tight"
             >
               {question}
             </Typography>
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">💰</span>
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 border border-black/10 flex items-center justify-center grayscale opacity-80">
+              <span className="text-xl">💰</span>
+            </div>
             <div>
-              <Typography variant="body-xs" color={colors.text.muted}>
+              <Typography variant="body-xs" className="font-black uppercase opacity-40">
                 Reward
               </Typography>
-              <Typography variant="h5" gradient="purple">
+              <Typography variant="h5" className="font-black uppercase">
                 {rewardAmount} SOL
               </Typography>
             </div>
           </div>
 
           {hasWinner && (
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🏆</span>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 border border-black/10 flex items-center justify-center grayscale opacity-80">
+                <span className="text-xl">🏆</span>
+              </div>
               <div className="text-right">
-                <Typography variant="body-xs" color={colors.text.muted}>
+                <Typography variant="body-xs" className="font-black uppercase opacity-40">
                   Winner
                 </Typography>
                 <Typography 
                   variant="body-xs" 
-                  color={colors.primary.pink[400]}
-                  className="font-mono"
+                  className="font-black uppercase truncate max-w-[80px]"
                 >
                   {winner.toString().slice(0, 4)}...{winner.toString().slice(-4)}
                 </Typography>
@@ -126,50 +122,29 @@ export function SimpleQuizCard({
           )}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           <NeonButton
             onClick={handleClick}
             disabled={hasWinner}
             variant={hasWinner ? "ghost" : "primary"}
-            neonColor="purple"
             size="md"
             fullWidth
           >
-            {hasWinner ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Completed
-              </span>
-            ) : (
-              <span className="flex items-center justify-center gap-2">
-                <span>Play Now</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
-            )}
+            {hasWinner ? "Protocol Secured" : "Engage Program"}
           </NeonButton>
 
           {!hasWinner && (
             <NeonButton
               onClick={handleHostGame}
               variant="secondary"
-              neonColor="orange"
               size="sm"
               fullWidth
             >
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span>Host Multiplayer</span>
-              </span>
+              Host Arena
             </NeonButton>
           )}
         </div>
-      </GlassCard>
+      </div>
     </motion.div>
   );
 }

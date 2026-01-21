@@ -6,7 +6,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { motion } from 'framer-motion';
 import { PageTemplate } from '@/components/layout/PageTemplate';
 import { Typography, NeonButton, GlassCard, colors } from '@/design-system';
-import { FaTrophy, FaMedal, FaCoins } from 'react-icons/fa';
+
 import { supabase } from '@/lib/supabase-client';
 import { useSimpleQuiz } from '@/hooks/useSimpleQuiz';
 
@@ -150,234 +150,152 @@ export default function MultiplayerResultsPage() {
 
   if (!session) {
     return (
-      <PageTemplate title="Loading..." subtitle="Please wait">
-        <div className="flex justify-center pt-12">
-          <div
-            className="animate-spin rounded-full h-16 w-16 border-b-4"
-            style={{ borderColor: colors.primary.purple[400] }}
-          />
+      <PageTemplate title="Channel Sync" subtitle="Retrieving Final Ledger">
+        <div className="flex justify-center pt-24">
+          <div className="w-12 h-12 border-4 border-black border-dashed animate-spin" />
         </div>
       </PageTemplate>
     );
   }
 
-  const getPodiumColor = (rank: number) => {
-    if (rank === 1) return colors.primary.orange[400];
-    if (rank === 2) return colors.primary.purple[400];
-    if (rank === 3) return colors.primary.pink[400];
-    return colors.text.muted;
-  };
-
-  const getPodiumIcon = (rank: number) => {
-    if (rank === 1) return <FaTrophy />;
-    if (rank === 2 || rank === 3) return <FaMedal />;
-    return null;
-  };
-
   return (
-    <PageTemplate title="Game Results" subtitle={`Game PIN: ${pin}`}>
-      <div className="max-w-4xl mx-auto pt-8 pb-24 space-y-8">
-        {/* Top 3 Podium */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <GlassCard variant="orange" size="xl">
-            <div className="grid grid-cols-3 gap-4 items-end">
-              {/* 2nd Place */}
-              {leaderboard[1] && (
-                <div className="text-center space-y-2">
-                  <div className="text-4xl" style={{ color: getPodiumColor(2) }}>
-                    {getPodiumIcon(2)}
-                  </div>
-                  <Typography variant="h4" color={getPodiumColor(2)}>
-                    #2
-                  </Typography>
-                  <Typography variant="body" className="font-bold">
-                    {leaderboard[1].player_name}
-                  </Typography>
-                  <Typography variant="h5" color={colors.primary.purple[400]}>
-                    {leaderboard[1].score}
-                  </Typography>
-                </div>
-              )}
-
-              {/* 1st Place */}
-              {leaderboard[0] && (
-                <div className="text-center space-y-2">
-                  <div className="text-6xl animate-bounce" style={{ color: getPodiumColor(1) }}>
-                    {getPodiumIcon(1)}
-                  </div>
-                  <Typography variant="h3" gradient="orange-pink">
-                    WINNER
-                  </Typography>
-                  <Typography variant="h4" className="font-bold">
-                    {leaderboard[0].player_name}
-                  </Typography>
-                  <Typography variant="h3" gradient="orange">
-                    {leaderboard[0].score}
-                  </Typography>
-                </div>
-              )}
-
-              {/* 3rd Place */}
-              {leaderboard[2] && (
-                <div className="text-center space-y-2">
-                  <div className="text-4xl" style={{ color: getPodiumColor(3) }}>
-                    {getPodiumIcon(3)}
-                  </div>
-                  <Typography variant="h4" color={getPodiumColor(3)}>
-                    #3
-                  </Typography>
-                  <Typography variant="body" className="font-bold">
-                    {leaderboard[2].player_name}
-                  </Typography>
-                  <Typography variant="h5" color={colors.primary.pink[400]}>
-                    {leaderboard[2].score}
-                  </Typography>
-                </div>
-              )}
-            </div>
-          </GlassCard>
-        </motion.div>
-
-        {/* My Result */}
-        {myRank && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <GlassCard
-              variant={myRank === 1 ? 'orange' : 'purple'}
-              size="lg"
+    <PageTemplate
+      title="Sequence Terminated"
+      subtitle={`Arena: ${pin} | HOOT Summary`}
+    >
+      <div className="max-w-4xl mx-auto pt-12 pb-40 px-4 space-y-16">
+        {/* Top 3 Ledger */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+          {/* 2nd Place */}
+          {leaderboard[1] && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="border-4 border-black p-8 bg-white text-center shadow-[12px_12px_0px_#00000005]"
             >
-              <div className="text-center space-y-4">
-                <Typography variant="h3" gradient={myRank === 1 ? 'orange-pink' : 'purple-pink'}>
-                  You finished {myRank === 1 ? '1st' : myRank === 2 ? '2nd' : myRank === 3 ? '3rd' : `${myRank}th`}!
-                </Typography>
+              <Typography variant="body-xs" className="font-black uppercase opacity-20 mb-4 tracking-widest">Rank 02</Typography>
+              <Typography variant="h3" className="font-black uppercase mb-2 truncate px-2">{leaderboard[1].player_name}</Typography>
+              <Typography variant="h4" className="font-black opacity-30 break-all">{leaderboard[1].score} PT</Typography>
+            </motion.div>
+          )}
 
-                {myRank === 1 && canClaim && !claimed && (
-                  <div className="space-y-4 pt-4">
-                    <div
-                      className="p-4 rounded-lg flex items-center justify-center gap-3"
-                      style={{
-                        background: `${colors.primary.orange[500]}20`,
-                        border: `1px solid ${colors.primary.orange[400]}40`
-                      }}
-                    >
-                      <FaCoins className="text-3xl" style={{ color: colors.primary.orange[400] }} />
-                      <div className="text-left">
-                        <Typography variant="body-sm" color={colors.text.muted}>
-                          Your Reward
-                        </Typography>
-                        <Typography variant="h4" gradient="orange">
-                          {/* Reward amount will be shown from session */}
-                          SOL Reward Available!
-                        </Typography>
-                      </div>
-                    </div>
-
-                    {claimError && (
-                      <div
-                        className="p-3 rounded-lg"
-                        style={{
-                          background: `${colors.state.error}20`,
-                          border: `1px solid ${colors.state.error}40`
-                        }}
-                      >
-                        <Typography variant="body-sm" color={colors.state.error}>
-                          {claimError}
-                        </Typography>
-                      </div>
-                    )}
-
-                    <NeonButton
-                      onClick={handleClaimReward}
-                      loading={verifying || claiming}
-                      disabled={!connected}
-                      neonColor="orange"
-                      size="lg"
-                      fullWidth
-                      leftIcon={<FaTrophy />}
-                    >
-                      Claim Your Reward
-                    </NeonButton>
-                  </div>
-                )}
-
-                {claimed && (
-                  <div
-                    className="p-6 rounded-lg text-center"
-                    style={{
-                      background: `${colors.state.success}20`,
-                      border: `1px solid ${colors.state.success}40`
-                    }}
-                  >
-                    <Typography variant="h4" color={colors.state.success}>
-                      ✅ Reward Claimed Successfully!
-                    </Typography>
-                  </div>
-                )}
+          {/* 1st Place */}
+          {leaderboard[0] && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="border-8 border-black p-12 bg-black text-white text-center shadow-[24px_24px_0px_#00000010] relative z-10"
+            >
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-white text-black font-black text-[10px] tracking-[0.5em] uppercase border-4 border-black flex items-center gap-2">
+                Winner
               </div>
-            </GlassCard>
-          </motion.div>
+              <Typography variant="display-sm" className="font-black uppercase leading-none mb-6 tracking-tighter truncate px-4">
+                {leaderboard[0].player_name}
+              </Typography>
+              <Typography variant="h2" className="font-black text-white/40 mb-2 break-all">{leaderboard[0].score} PT</Typography>
+              <div className="w-12 h-[2px] bg-white/20 mx-auto" />
+            </motion.div>
+          )}
+
+          {/* 3rd Place */}
+          {leaderboard[2] && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="border-4 border-black p-8 bg-white text-center shadow-[12px_12px_0px_#00000005]"
+            >
+              <Typography variant="body-xs" className="font-black uppercase opacity-20 mb-4 tracking-widest">Rank 03</Typography>
+              <Typography variant="h3" className="font-black uppercase mb-2 truncate px-2">{leaderboard[2].player_name}</Typography>
+              <Typography variant="h4" className="font-black opacity-30 break-all">{leaderboard[2].score} PT</Typography>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Action Layer: Claim / Status */}
+        {myRank && (
+          <div className="max-w-2xl mx-auto space-y-8">
+            <div className="text-center">
+              <Typography variant="body-xs" className="font-black uppercase tracking-[0.3em] opacity-40 mb-2">Performance Analysis</Typography>
+              <Typography variant="h3" className="font-black uppercase">
+                {myRank === 1 ? 'Node Priority: High' : `Efficiency Rating: #${myRank}`}
+              </Typography>
+            </div>
+
+            {myRank === 1 && canClaim && !claimed && (
+              <div className="border-8 border-black p-10 bg-white shadow-[12px_12px_0px_#00000005] space-y-8">
+                <div className="flex items-center gap-6 border-b-2 border-black pb-8">
+                  <div className="w-16 h-16 border-4 border-black flex items-center justify-center font-black text-2xl">
+                    $
+                  </div>
+                  <div>
+                    <Typography variant="body-xs" className="font-black uppercase opacity-40">Allocated Prize Pool</Typography>
+                    <Typography variant="h3" className="font-black uppercase">Secure Reward Available</Typography>
+                  </div>
+                </div>
+
+                {claimError && (
+                  <div className="p-4 border-2 border-red-600 bg-red-50 text-red-600 text-xs font-black uppercase tracking-widest">
+                    ERROR: {claimError}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleClaimReward}
+                  disabled={verifying || claiming}
+                  className="w-full py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.02] active:scale-95 transition-all shadow-[8px_8px_0px_#00000020]"
+                >
+                  {verifying || claiming ? 'VERIFYING...' : 'INITIATE SECURE TRANSFER'}
+                </button>
+              </div>
+            )}
+
+            {claimed && (
+              <div className="border-8 border-black p-10 bg-black text-white text-center shadow-[12px_12px_0px_#00000005]">
+                <Typography variant="h3" className="font-black uppercase mb-2">Transfer Finalised</Typography>
+                <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40">Assets Dispatched to Authorised Wallet</Typography>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Full Leaderboard */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <GlassCard variant="purple" size="lg">
-            <Typography variant="h3" gradient="purple-pink" className="mb-6">
-              Full Leaderboard
-            </Typography>
-            <div className="space-y-2">
-              {leaderboard.map((participant, index) => (
-                <div
-                  key={participant.id}
-                  className="p-4 rounded-lg flex items-center justify-between"
-                  style={{
-                    background: participant.id === participantId
-                      ? `${colors.primary.purple[500]}30`
-                      : `${colors.background.secondary}40`,
-                    border: participant.id === participantId
-                      ? `2px solid ${colors.primary.purple[400]}`
-                      : `1px solid ${colors.background.secondary}`
-                  }}
-                >
-                  <div className="flex items-center gap-4">
-                    <Typography variant="h4" color={getPodiumColor(index + 1)} className="w-8">
-                      #{index + 1}
-                    </Typography>
-                    <Typography variant="body-lg" className="font-bold">
-                      {participant.player_name}
-                    </Typography>
+        {/* Complete Ledger */}
+        <div className="max-w-2xl mx-auto space-y-8 pt-12 border-t-4 border-black/5">
+          <Typography variant="body-xs" className="font-black uppercase tracking-[0.5em] text-center opacity-40">Complete Unit Ledger</Typography>
+          <div className="space-y-3">
+            {leaderboard.map((participant, index) => (
+              <div
+                key={participant.id}
+                className={`
+                  p-5 border-2 flex items-center justify-between transition-all
+                  ${participant.id === participantId ? 'border-black bg-bone' : 'border-black/5 opacity-60'}
+                `}
+              >
+                <div className="flex items-center gap-6">
+                  <div className={`w-8 h-8 border flex items-center justify-center font-black text-[10px] ${participant.id === participantId ? 'bg-black text-white border-black' : 'border-black/20'}`}>
+                    {index + 1}
                   </div>
-                  <Typography variant="h5" color={colors.primary.purple[400]}>
-                    {participant.score}
-                  </Typography>
+                  <Typography variant="body" className="font-black uppercase">{participant.player_name}</Typography>
                 </div>
-              ))}
-            </div>
-          </GlassCard>
-        </motion.div>
+                <Typography variant="h4" className="font-black tracking-tighter">{participant.score} PT</Typography>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        {/* Actions */}
-        <div className="flex gap-4 justify-center">
-          <NeonButton
+        {/* Global Navigation */}
+        <div className="flex flex-col sm:flex-row gap-6 justify-center pt-24">
+          <button
             onClick={() => router.push('/play')}
-            variant="secondary"
-            neonColor="purple"
+            className="px-12 py-5 bg-black text-white font-black uppercase tracking-[0.3em] hover:scale-105 transition-all shadow-[12px_12px_0px_#00000020]"
           >
-            Play More Quizzes
-          </NeonButton>
-          <NeonButton
+            New Protocol
+          </button>
+          <button
             onClick={() => router.push('/')}
-            variant="ghost"
-            neonColor="purple"
+            className="px-12 py-5 border-4 border-black font-black uppercase tracking-[0.3em] hover:bg-black hover:text-white transition-all shadow-[12px_12px_0px_#00000010]"
           >
-            Back to Home
-          </NeonButton>
+            System Root
+          </button>
         </div>
       </div>
     </PageTemplate>

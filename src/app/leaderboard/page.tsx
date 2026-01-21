@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaMedal, FaAward, FaSpinner } from 'react-icons/fa';
+
 import { GlassCard, Typography, colors, spacing } from '@/design-system';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { SimpleK3HootClient } from '@/lib/simple-solana-client';
@@ -10,28 +10,11 @@ import { LeaderboardEntry } from '@/types/quiz';
 import { PageTemplate } from '@/components/layout/PageTemplate';
 
 const getRankIcon = (rank: number) => {
-  if (rank === 1) return <FaTrophy style={{ color: '#FFD700', fontSize: '1.5rem' }} />;
-  if (rank === 2) return <FaMedal style={{ color: '#C0C0C0', fontSize: '1.5rem' }} />;
-  if (rank === 3) return <FaAward style={{ color: '#CD7F32', fontSize: '1.5rem' }} />;
   return (
-    <div
-      className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
-      style={{
-        background: `linear-gradient(135deg, ${colors.primary.purple[500]}40, ${colors.primary.pink[500]}40)`,
-        border: `1px solid ${colors.primary.purple[400]}60`,
-        color: colors.primary.purple[200],
-      }}
-    >
-      {rank}
+    <div className="w-10 h-10 border-2 border-black flex items-center justify-center font-black text-xs">
+      {rank < 10 ? `0${rank}` : rank}
     </div>
   );
-};
-
-const getRankGradient = (rank: number): [string, string] => {
-  if (rank === 1) return ['rgba(234, 179, 8, 0.2)', 'rgba(249, 115, 22, 0.2)'];
-  if (rank === 2) return ['rgba(156, 163, 175, 0.2)', 'rgba(107, 114, 128, 0.2)'];
-  if (rank === 3) return ['rgba(217, 119, 6, 0.2)', 'rgba(180, 83, 9, 0.2)'];
-  return [`${colors.primary.purple[500]}20`, `${colors.primary.pink[500]}10`];
 };
 
 export default function LeaderboardPage() {
@@ -78,182 +61,128 @@ export default function LeaderboardPage() {
   }, [wallet.publicKey]);
 
   return (
-    <PageTemplate>
-      <div className="py-12 max-w-4xl mx-auto">
+    <PageTemplate
+      title="Global Rankings"
+      subtitle="The High-Stakes Performance Ledger"
+    >
+      <div className="pt-12 max-w-5xl mx-auto px-4">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-16 border-b-4 border-black pb-8 flex justify-between items-end"
         >
-          <Typography variant="h1" gradient="purple-pink" className="mb-4">
-            🏆 Global Leaderboard
-          </Typography>
-          <Typography variant="body" color={`${colors.primary.purple[300]}cc`}>
-            Top players competing for rewards on K3HOOT
-          </Typography>
+          <div>
+            <Typography variant="display-sm" className="font-black uppercase leading-none">
+              Top Operators
+            </Typography>
+            <Typography variant="body-xs" className="font-black uppercase tracking-[0.3em] opacity-40 mt-2">
+              Blockchain Verified Standings
+            </Typography>
+          </div>
+          <Typography variant="display-xs" className="font-black opacity-10">02</Typography>
         </motion.div>
 
-        {/* Wallet Connection Required */}
         {!wallet.connected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <GlassCard variant="purple" size="lg" className="text-center">
-              <Typography variant="h4" gradient="purple-pink" className="mb-4">
-                Connect Your Wallet
-              </Typography>
-              <Typography variant="body" color={`${colors.primary.purple[300]}99`}>
-                Please connect your wallet to view the leaderboard
-              </Typography>
-            </GlassCard>
-          </motion.div>
-        )}
-
-        {/* Loading State */}
-        {wallet.connected && loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <FaSpinner className="animate-spin text-4xl mb-4 mx-auto" style={{ color: colors.primary.purple[400] }} />
-            <Typography variant="body" color={`${colors.primary.purple[300]}99`}>
-              Loading leaderboard from blockchain...
+          <div className="max-w-2xl mx-auto border-4 border-black p-12 bg-white text-center">
+            <Typography variant="h3" className="font-black uppercase mb-6">
+              Authentication Required
             </Typography>
-          </motion.div>
+            <Typography variant="body-lg" className="mb-10 font-bold uppercase opacity-50 tracking-widest">
+              Please connect wallet to view protocol rankings
+            </Typography>
+          </div>
         )}
 
-        {/* Error State */}
+        {wallet.connected && loading && (
+          <div className="text-center py-24 border-4 border-black border-dashed">
+            <div className="inline-block animate-spin w-12 h-12 border-4 border-black border-t-transparent mb-6" />
+            <Typography variant="body" className="font-black uppercase tracking-widest">
+              Syncing Ledger...
+            </Typography>
+          </div>
+        )}
+
         {wallet.connected && error && !loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <GlassCard variant="purple" size="lg" className="text-center">
-              <Typography variant="h4" className="mb-4" style={{ color: '#ef4444' }}>
-                ❌ Error Loading Leaderboard
-              </Typography>
-              <Typography variant="body" color={`${colors.primary.purple[300]}99`}>
-                {error}
-              </Typography>
-            </GlassCard>
-          </motion.div>
+          <div className="p-12 border-4 border-black bg-white text-center">
+            <Typography variant="h4" className="font-black uppercase text-red-600 mb-4">
+              Protocol Error
+            </Typography>
+            <Typography variant="body" className="font-bold opacity-70 mb-0">
+              {error}
+            </Typography>
+          </div>
         )}
 
-        {/* Leaderboard Content */}
         {wallet.connected && !loading && !error && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <GlassCard variant="purple" size="lg" hover={false}>
-              {leaderboard.length === 0 ? (
-                <div className="text-center py-12">
-                  <Typography variant="h4" className="mb-4" style={{ color: colors.primary.purple[300] }}>
-                    No Winners Yet
-                  </Typography>
-                  <Typography variant="body" color={`${colors.primary.purple[400]}99`}>
-                    Be the first to win a quiz and appear on the leaderboard!
-                  </Typography>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {leaderboard.map((entry, index) => {
-                    const rank = index + 1;
-                    const isCurrentUser = entry.winner === wallet.publicKey?.toString();
+          <div className="space-y-4">
+            {leaderboard.length === 0 ? (
+              <div className="text-center py-24 border-4 border-black bg-white">
+                <Typography variant="h3" className="font-black uppercase mb-4">
+                  No Logs Found
+                </Typography>
+                <Typography variant="body" className="font-bold uppercase opacity-40 tracking-widest">
+                  Be the first to secure a node
+                </Typography>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {leaderboard.map((entry, index) => {
+                  const rank = index + 1;
+                  const isCurrentUser = entry.winner === wallet.publicKey?.toString();
 
-                    return (
-                      <motion.div
-                        key={`${entry.quizSetId}-${entry.questionIndex}`}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05, duration: 0.4 }}
-                        className={`
-                          flex items-center gap-4 p-4 rounded-xl border transition-all duration-300
-                          ${rank <= 3 ? 'hover:scale-[1.02]' : 'hover:scale-[1.01]'}
-                          ${isCurrentUser ? 'ring-2 ring-purple-400' : ''}
-                        `}
-                        style={{
-                          background: `linear-gradient(135deg, ${getRankGradient(rank)[0]}, ${getRankGradient(rank)[1]})`,
-                          borderColor: rank <= 3
-                            ? `${colors.primary.purple[400]}60`
-                            : `${colors.semantic.border}40`,
-                          boxShadow: rank <= 3
-                            ? `0 4px 20px ${colors.primary.purple[400]}20`
-                            : 'none',
-                        }}
-                      >
-                        {/* Rank */}
-                        <div className="flex-shrink-0">
-                          {getRankIcon(rank)}
-                        </div>
+                  return (
+                    <motion.div
+                      key={`${entry.quizSetId}-${entry.questionIndex}`}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className={`
+                        flex items-center gap-4 sm:gap-8 p-4 sm:p-6 border-4 transition-all duration-300
+                        ${isCurrentUser ? 'border-black bg-white' : 'border-black/5 bg-transparent'}
+                        hover:border-black hover:bg-white overflow-hidden
+                      `}
+                    >
+                      {/* Rank */}
+                      <div className="w-12 flex justify-center flex-shrink-0">
+                        {getRankIcon(rank)}
+                      </div>
 
-                        {/* Winner Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <Typography
-                              variant="body"
-                              className="font-semibold font-mono truncate"
-                              style={{ color: rank <= 3 ? colors.primary.purple[200] : colors.primary.purple[300] }}
-                            >
-                              {entry.winnerDisplay}
-                            </Typography>
-                            {isCurrentUser && (
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-200">
-                                You
-                              </span>
-                            )}
-                          </div>
-                          <Typography variant="body-xs" color={`${colors.primary.purple[400]}99`} className="truncate">
-                            {entry.quizSetName || `Quiz #${entry.quizSetId}`}
-                          </Typography>
-                        </div>
-
-                        {/* Reward */}
-                        <div className="flex-shrink-0 text-right">
+                      {/* Winner Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-4 mb-1">
                           <Typography
                             variant="h5"
-                            gradient={rank <= 3 ? 'purple-pink' : undefined}
-                            style={rank > 3 ? { color: colors.primary.purple[300] } : undefined}
-                            className="font-bold"
+                            className="font-black uppercase tracking-tighter truncate"
                           >
-                            {entry.rewardAmount.toFixed(2)} SOL
+                            {entry.winnerDisplay}
                           </Typography>
-                          <Typography variant="body-xs" color={`${colors.primary.purple[400]}99`}>
-                            {entry.isClaimed ? '✅ Claimed' : '⏳ Pending'}
-                          </Typography>
+                          {isCurrentUser && (
+                            <span className="text-[10px] px-2 py-0.5 border border-black font-black uppercase tracking-widest">
+                              You
+                            </span>
+                          )}
                         </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
+                        <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest truncate">
+                          Task ID: {entry.quizSetName || entry.quizSetId.slice(0, 12)}
+                        </Typography>
+                      </div>
 
-              {/* Footer */}
-              {leaderboard.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="mt-6 pt-6 border-t"
-                  style={{ borderColor: `${colors.semantic.border}40` }}
-                >
-                  <Typography
-                    variant="body-sm"
-                    color={`${colors.primary.purple[400]}cc`}
-                    className="text-center"
-                  >
-                    🎯 Play now to join the leaderboard and win rewards!
-                  </Typography>
-                </motion.div>
-              )}
-            </GlassCard>
-          </motion.div>
+                      {/* Reward */}
+                      <div className="text-right flex-shrink-0">
+                        <Typography variant="h4" className="font-black leading-none mb-1">
+                          {entry.rewardAmount.toFixed(2)}
+                        </Typography>
+                        <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest">
+                          {entry.isClaimed ? 'Secured' : 'Open'}
+                        </Typography>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </PageTemplate>

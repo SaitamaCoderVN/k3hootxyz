@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import dynamic from 'next/dynamic';
 import { PageTemplate } from '@/components/layout/PageTemplate';
-import { ScrollReveal, StaggerContainer, StaggerItem } from '@/components/animations';
-import { FaRocket, FaGamepad, FaTrophy, FaPlus, FaUsers } from 'react-icons/fa';
-import { Typography, NeonButton, GlassCard, StatCard, colors } from '@/design-system';
+import { ScrollReveal } from '@/components/animations';
+import { FaRocket, FaGamepad, FaPlus, FaUsers } from 'react-icons/fa';
+import { Typography, colors } from '@/design-system';
 import { supabase } from '@/lib/supabase-client';
 
 const WalletMultiButton = dynamic(
@@ -64,7 +64,10 @@ export default function PlayPage() {
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (allError) throw allError;
+      if (allError) {
+        console.error('Supabase allError:', allError);
+        throw allError;
+      }
 
       // Fetch user's quiz sets
       const { data: userQuizSets, error: userError } = await supabase
@@ -74,13 +77,16 @@ export default function PlayPage() {
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (userError) throw userError;
+      if (userError) {
+        console.error('Supabase userError:', userError);
+        throw userError;
+      }
 
       setQuizSets(allQuizSets || []);
       setMyQuizSets(userQuizSets || []);
     } catch (err: any) {
       console.error('Error fetching quiz sets:', err);
-      setError(err.message || 'Failed to load quiz sets');
+      setError(err?.message || 'Failed to load quiz sets. Check console for details.');
     } finally {
       setLoading(false);
     }
@@ -97,35 +103,30 @@ export default function PlayPage() {
 
   return (
     <PageTemplate
-      title="Quiz Sets"
-      subtitle="Play or host multi-question quiz games"
+      title="Protocol Hub"
+      subtitle="Executive Quiz Management & Participation"
       containerClassName="pb-24"
     >
-      <div className="pt-8 max-w-7xl mx-auto">
+      <div className="pt-12 max-w-7xl mx-auto px-4">
         {!connected && (
-          <ScrollReveal type="scaleIn" delay={0.2} amount={40}>
-            <div className="max-w-md mx-auto mb-12 text-center">
-              <GlassCard variant="purple" size="lg" hover={true} className="text-center">
-                <div
-                  className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.primary.purple[500]}20, ${colors.primary.pink[500]}10)`,
-                    border: `1px solid ${colors.primary.purple[400]}30`,
-                    boxShadow: `0 0 40px ${colors.primary.purple[400]}20`,
-                  }}
-                >
-                  <FaRocket style={{ fontSize: '4rem', color: colors.primary.purple[400], filter: 'drop-shadow(0 0 20px rgba(168, 85, 247, 0.5))' }} />
+          <ScrollReveal type="fadeInUp" delay={0.2} amount={40}>
+            <div className="max-w-2xl mx-auto mb-12">
+              <div className="border-4 border-black p-12 bg-white text-center">
+                <div className="flex justify-center mb-8">
+                  <div className="w-24 h-24 border-2 border-black flex items-center justify-center">
+                    <FaRocket className="text-4xl" />
+                  </div>
                 </div>
-                <Typography variant="h3" gradient="purple-pink" className="mb-4">
-                  Connect Your Wallet
+                <Typography variant="h2" className="font-black uppercase mb-6">
+                  Access Denied
                 </Typography>
-                <Typography variant="body-lg" color={`${colors.primary.purple[300]}dd`} className="mb-8 leading-relaxed">
-                  Connect your Solana wallet to play quizzes and claim rewards
+                <Typography variant="body-lg" className="mb-10 font-bold uppercase opacity-60 tracking-widest">
+                  Connect Solana Wallet to Authenticate
                 </Typography>
                 <div className="flex justify-center">
                   <WalletMultiButton />
                 </div>
-              </GlassCard>
+              </div>
             </div>
           </ScrollReveal>
         )}
@@ -134,201 +135,181 @@ export default function PlayPage() {
           <>
             {/* Quick Action Buttons */}
             <ScrollReveal type="fadeInUp" delay={0.1} amount={50}>
-              <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <NeonButton
+              <div className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <button
                   onClick={() => router.push('/create-quiz')}
-                  neonColor="purple"
-                  size="lg"
-                  fullWidth
-                  leftIcon={<FaPlus />}
+                  className="group relative p-8 border-4 border-black bg-white hover:bg-black transition-all duration-300"
                 >
-                  Create Quiz Set
-                </NeonButton>
-                <NeonButton
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 border-2 border-black flex items-center justify-center group-hover:border-white group-hover:text-white">
+                      <FaPlus className="text-2xl" />
+                    </div>
+                    <div className="text-left">
+                      <Typography variant="h4" className="font-black uppercase group-hover:text-white">
+                        Deploy Quiz
+                      </Typography>
+                      <Typography variant="body-xs" className="font-bold uppercase opacity-50 tracking-widest group-hover:text-white">
+                        Create New Protocol
+                      </Typography>
+                    </div>
+                  </div>
+                </button>
+                <button
                   onClick={() => router.push('/multiplayer/join')}
-                  neonColor="orange"
-                  size="lg"
-                  fullWidth
-                  leftIcon={<FaUsers />}
+                  className="group relative p-8 border-4 border-black bg-transparent hover:bg-black transition-all duration-300"
                 >
-                  Join Multiplayer
-                </NeonButton>
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 border-2 border-black flex items-center justify-center group-hover:border-white group-hover:text-white">
+                      <FaUsers className="text-2xl" />
+                    </div>
+                    <div className="text-left">
+                      <Typography variant="h4" className="font-black uppercase group-hover:text-white">
+                        Join Arena
+                      </Typography>
+                      <Typography variant="body-xs" className="font-bold uppercase opacity-50 tracking-widest group-hover:text-white">
+                        Engage Multiplayer
+                      </Typography>
+                    </div>
+                  </div>
+                </button>
               </div>
             </ScrollReveal>
 
             {/* Stats */}
             <ScrollReveal type="fadeInUp" delay={0.2} amount={50}>
-              <div className="mb-12">
-                <StaggerContainer staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <StaggerItem type="scaleIn" delay={0.1}>
-                    <StatCard
-                      icon={<FaGamepad />}
-                      value={quizSets.length.toString()}
-                      label="Total Quiz Sets"
-                      variant="orange"
-                    />
-                  </StaggerItem>
-                  <StaggerItem type="scaleIn" delay={0.2}>
-                    <StatCard
-                      icon={<FaTrophy />}
-                      value={myQuizSets.length.toString()}
-                      label="My Quiz Sets"
-                      variant="purple"
-                    />
-                  </StaggerItem>
-                  <StaggerItem type="scaleIn" delay={0.3}>
-                    <StatCard
-                      icon={<FaGamepad />}
-                      value={quizSets.reduce((sum, q) => sum + q.total_questions, 0).toString()}
-                      label="Total Questions"
-                      variant="pink"
-                    />
-                  </StaggerItem>
-                </StaggerContainer>
+              <div className="mb-16 grid grid-cols-1 md:grid-cols-3 gap-0 border-4 border-black divide-y-4 md:divide-y-0 md:divide-x-4 divide-black">
+                <div className="p-8 bg-white">
+                  <Typography variant="body-xs" className="font-black uppercase opacity-40 mb-2 tracking-[0.2em]">Live Protocols</Typography>
+                  <Typography variant="display-sm" className="font-black leading-none">{quizSets.length}</Typography>
+                </div>
+                <div className="p-8 bg-white">
+                  <Typography variant="body-xs" className="font-black uppercase opacity-40 mb-2 tracking-[0.2em]">Owned Units</Typography>
+                  <Typography variant="display-sm" className="font-black leading-none">{myQuizSets.length}</Typography>
+                </div>
+                <div className="p-8 bg-white">
+                  <Typography variant="body-xs" className="font-black uppercase opacity-40 mb-2 tracking-[0.2em]">Total Questions</Typography>
+                  <Typography variant="display-sm" className="font-black leading-none">{quizSets.reduce((sum, q) => sum + q.total_questions, 0)}</Typography>
+                </div>
               </div>
             </ScrollReveal>
 
             {/* Tabs */}
-            <div className="mb-6 flex gap-4">
+            <div className="mb-8 border-b-4 border-black flex gap-0 px-0">
               <button
                 onClick={() => setActiveTab('all')}
-                className="px-6 py-3 rounded-lg transition-all"
-                style={{
-                  background: activeTab === 'all' ? `${colors.primary.purple[500]}40` : 'transparent',
-                  border: `2px solid ${activeTab === 'all' ? colors.primary.purple[400] : colors.primary.purple[500]}40`,
-                  color: activeTab === 'all' ? colors.text.primary : colors.text.muted,
-                }}
+                className={`px-8 py-4 font-black uppercase tracking-widest transition-all ${
+                  activeTab === 'all' ? 'bg-black text-white' : 'hover:bg-black/5'
+                }`}
               >
-                <Typography variant="body" color={activeTab === 'all' ? colors.text.primary : colors.text.muted}>
-                  All Quiz Sets ({quizSets.length})
-                </Typography>
+                Global List [{quizSets.length}]
               </button>
               <button
                 onClick={() => setActiveTab('mine')}
-                className="px-6 py-3 rounded-lg transition-all"
-                style={{
-                  background: activeTab === 'mine' ? `${colors.primary.orange[500]}40` : 'transparent',
-                  border: `2px solid ${activeTab === 'mine' ? colors.primary.orange[400] : colors.primary.orange[500]}40`,
-                  color: activeTab === 'mine' ? colors.text.primary : colors.text.muted,
-                }}
+                className={`px-8 py-4 font-black uppercase tracking-widest transition-all ${
+                  activeTab === 'mine' ? 'bg-black text-white' : 'hover:bg-black/5'
+                }`}
               >
-                <Typography variant="body" color={activeTab === 'mine' ? colors.text.primary : colors.text.muted}>
-                  My Quiz Sets ({myQuizSets.length})
-                </Typography>
+                Registered [{myQuizSets.length}]
               </button>
             </div>
 
             {/* Loading State */}
             {loading && (
-              <div className="text-center py-12">
-                <div
-                  className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 mb-4"
-                  style={{ borderColor: colors.primary.purple[400] }}
-                />
-                <Typography variant="body" color={colors.text.secondary}>
-                  Loading quiz sets...
+              <div className="text-center py-24 border-4 border-black border-dashed">
+                <div className="inline-block animate-spin w-12 h-12 border-4 border-black border-t-transparent mb-6" />
+                <Typography variant="body" className="font-black uppercase tracking-widest">
+                  Initializing Stream...
                 </Typography>
               </div>
             )}
 
             {/* Error State */}
             {error && (
-              <GlassCard variant="default" size="lg" className="text-center">
-                <Typography variant="body" color={colors.state.error}>
+              <div className="p-12 border-4 border-black bg-white text-center">
+                <Typography variant="h4" className="font-black uppercase text-red-600 mb-4">
+                  Critical Error
+                </Typography>
+                <Typography variant="body" className="font-bold opacity-70 mb-0">
                   {error}
                 </Typography>
-              </GlassCard>
+              </div>
             )}
 
             {/* Quiz Sets Grid */}
             {!loading && !error && (
               <ScrollReveal type="fadeInUp" delay={0.3} amount={50}>
                 {displayedQuizSets.length === 0 ? (
-                  <GlassCard variant="purple" hover={false} size="lg" className="text-center py-16">
-                    <div
-                      className="flex justify-center mb-6 p-6 rounded-2xl mx-auto w-fit"
-                      style={{
-                        background: `linear-gradient(135deg, ${colors.primary.purple[500]}20, ${colors.primary.pink[500]}10)`,
-                        border: `1px solid ${colors.primary.purple[400]}30`,
-                      }}
-                    >
-                      <FaGamepad style={{ fontSize: '4rem', color: colors.primary.purple[400] }} />
+                  <div className="text-center py-24 border-4 border-black bg-white">
+                    <div className="w-20 h-20 border-2 border-black flex items-center justify-center mx-auto mb-8">
+                      <FaGamepad className="text-3xl" />
                     </div>
-                    <Typography variant="h4" gradient="purple" className="mb-4">
-                      {activeTab === 'mine' ? 'No quiz sets created yet' : 'No quiz sets available'}
+                    <Typography variant="h3" className="font-black uppercase mb-4">
+                      Protocol Empty
                     </Typography>
-                    <Typography variant="body-lg" color={`${colors.primary.purple[300]}cc`} className="mb-6">
-                      {activeTab === 'mine' ? 'Create your first quiz set to get started!' : 'Check back later for new quiz sets'}
+                    <Typography variant="body-lg" className="font-bold uppercase opacity-40 mb-10 tracking-[0.2em]">
+                      {activeTab === 'mine' ? 'No user deployments found' : 'No available nodes'}
                     </Typography>
                     {activeTab === 'mine' && (
-                      <NeonButton
+                      <button
                         onClick={() => router.push('/create-quiz')}
-                        neonColor="purple"
-                        size="lg"
-                        leftIcon={<FaPlus />}
+                        className="px-8 py-4 bg-black text-white font-black uppercase tracking-widest hover:scale-105 transition-all"
                       >
-                        Create Quiz Set
-                      </NeonButton>
+                        Deploy First System
+                      </button>
                     )}
-                  </GlassCard>
+                  </div>
                 ) : (
-                  <StaggerContainer staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {displayedQuizSets.map((quizSet, index) => (
-                      <StaggerItem key={quizSet.id} type="scaleIn" delay={index * 0.05}>
-                        <GlassCard variant={isOwner(quizSet) ? 'orange' : 'purple'} size="lg" hover={true}>
-                          <div className="space-y-4">
-                            <div>
-                              <Typography variant="h4" color={colors.text.primary}>
-                                {quizSet.title}
+                      <ScrollReveal key={quizSet.id} type="scaleIn" delay={index * 0.05}>
+                        <div className="group border-4 border-black bg-white p-8 hover:translate-y-[-8px] transition-all duration-300">
+                          <div className="mb-8 h-12 border-b-2 border-black flex justify-between items-start">
+                            <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-[0.2em]">
+                              {index < 9 ? `0${index + 1}` : index + 1} // Protocol Node
+                            </Typography>
+                            <div className={`w-3 h-3 ${isOwner(quizSet) ? 'bg-black' : 'bg-transparent border-2 border-black'}`} />
+                          </div>
+                          
+                          <div className="mb-8">
+                            <Typography variant="h4" className="font-black uppercase leading-tight mb-2">
+                              {quizSet.title}
+                            </Typography>
+                            {quizSet.description && (
+                              <Typography variant="body-sm" className="font-bold opacity-60 line-clamp-2">
+                                {quizSet.description}
                               </Typography>
-                              {quizSet.description && (
-                                <Typography variant="body-sm" color={colors.text.muted} className="mt-1">
-                                  {quizSet.description}
-                                </Typography>
-                              )}
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <Typography variant="body-sm" color={colors.text.muted}>
-                                  Questions
-                                </Typography>
-                                <Typography variant="h4" color={colors.text.primary}>
-                                  {quizSet.total_questions}
-                                </Typography>
-                              </div>
-                              <div className="text-right">
-                                <Typography variant="body-sm" color={colors.text.muted}>
-                                  Reward
-                                </Typography>
-                                <Typography variant="h4" gradient="orange">
-                                  {quizSet.reward_amount.toFixed(2)} SOL
-                                </Typography>
-                              </div>
-                            </div>
-
-                            {isOwner(quizSet) ? (
-                              <NeonButton
-                                onClick={() => handleHostQuiz(quizSet.id)}
-                                neonColor="orange"
-                                size="md"
-                                fullWidth
-                                leftIcon={<FaUsers />}
-                              >
-                                Host Game
-                              </NeonButton>
-                            ) : (
-                              <div className="text-center py-2">
-                                <Typography variant="body-sm" color={colors.text.muted}>
-                                  Created by {quizSet.owner_wallet.slice(0, 4)}...{quizSet.owner_wallet.slice(-4)}
-                                </Typography>
-                              </div>
                             )}
                           </div>
-                        </GlassCard>
-                      </StaggerItem>
+
+                          <div className="grid grid-cols-2 gap-4 mb-8 pt-6 border-t-2 border-black/5">
+                            <div>
+                              <Typography variant="body-xs" className="font-black uppercase opacity-40 tracking-widest mb-1">Items</Typography>
+                              <Typography variant="h5" className="font-black">{quizSet.total_questions}</Typography>
+                            </div>
+                            <div className="text-right">
+                              <Typography variant="body-xs" className="font-black uppercase opacity-40 tracking-widest mb-1">Reward</Typography>
+                              <Typography variant="h5" className="font-black">{quizSet.reward_amount.toFixed(2)} SOL</Typography>
+                            </div>
+                          </div>
+
+                          {isOwner(quizSet) ? (
+                            <button
+                              onClick={() => handleHostQuiz(quizSet.id)}
+                              className="w-full py-4 bg-black text-white font-black uppercase tracking-widest hover:translate-x-1 hover:translate-y-[-1px] transition-all duration-300 shadow-[4px_4px_0px_#00000020]"
+                            >
+                              Host Protocol
+                            </button>
+                          ) : (
+                            <div className="pt-4 border-t-2 border-black/5 text-center">
+                              <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest">
+                                BY {quizSet.owner_wallet.slice(0, 4)}...{quizSet.owner_wallet.slice(-4)}
+                              </Typography>
+                            </div>
+                          )}
+                        </div>
+                      </ScrollReveal>
                     ))}
-                  </StaggerContainer>
+                  </div>
                 )}
               </ScrollReveal>
             )}

@@ -148,277 +148,217 @@ export default function CreateQuizPage() {
 
   if (!mounted) return null;
 
-  if (!connected) {
-    return (
-      <PageTemplate
-        title="Create Quiz Set"
-        subtitle="Connect your wallet to create a quiz"
-      >
-        <div className="flex justify-center pt-8">
-          <WalletMultiButton />
-        </div>
-      </PageTemplate>
-    );
-  }
-
   return (
     <PageTemplate
-      title="Create Quiz Set"
-      subtitle="Build your multi-question quiz game"
+      title="Protocol Designer"
+      subtitle="Architect New Verification Sequences"
     >
-      <div className="max-w-4xl mx-auto pt-8 pb-24 space-y-6">
-        {/* Quiz Info Card */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <GlassCard variant="purple" size="lg">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="p-3 rounded-lg"
-                  style={{
-                    background: `${colors.primary.purple[500]}20`,
-                    border: `1px solid ${colors.primary.purple[400]}40`,
-                  }}
-                >
-                  <FaQuestionCircle style={{ color: colors.primary.purple[400] }} size={24} />
-                </div>
-                <Typography variant="h3" color={colors.text.primary}>
-                  Quiz Information
-                </Typography>
-              </div>
-
-              <div>
-                <label className="block mb-2">
-                  <Typography variant="body" color={colors.text.secondary}>
-                    Quiz Title *
-                  </Typography>
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Solana Blockchain Basics"
-                  className="w-full px-4 py-3 rounded-lg"
-                  style={{
-                    background: `${colors.background.secondary}80`,
-                    border: `2px solid ${colors.primary.purple[500]}40`,
-                    color: colors.text.primary,
-                  }}
-                  maxLength={100}
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2">
-                  <Typography variant="body" color={colors.text.secondary}>
-                    Description (Optional)
-                  </Typography>
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Brief description of your quiz..."
-                  className="w-full px-4 py-3 rounded-lg resize-none"
-                  style={{
-                    background: `${colors.background.secondary}80`,
-                    border: `2px solid ${colors.primary.purple[500]}40`,
-                    color: colors.text.primary,
-                  }}
-                  rows={3}
-                  maxLength={300}
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2">
-                  <Typography variant="body" color={colors.text.secondary}>
-                    Reward Amount (SOL)
-                  </Typography>
-                </label>
-                <input
-                  type="number"
-                  value={rewardAmount}
-                  onChange={(e) => setRewardAmount(e.target.value)}
-                  placeholder="0.1"
-                  step="0.01"
-                  min="0"
-                  className="w-full px-4 py-3 rounded-lg"
-                  style={{
-                    background: `${colors.background.secondary}80`,
-                    border: `2px solid ${colors.primary.orange[500]}40`,
-                    color: colors.text.primary,
-                  }}
-                />
-              </div>
-            </div>
-          </GlassCard>
-        </motion.div>
-
-        {/* Questions Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Typography variant="h3" gradient="purple-pink">
-              Questions ({questions.length}/20)
+      <div className="max-w-5xl mx-auto pt-12 pb-32 px-4 space-y-12">
+        {!connected ? (
+          <div className="max-w-2xl mx-auto border-4 border-black p-12 bg-white text-center">
+            <Typography variant="h3" className="font-black uppercase mb-6">
+              Authentication Required
             </Typography>
-            <NeonButton
-              onClick={addQuestion}
-              disabled={questions.length >= 20}
-              neonColor="purple"
-              size="sm"
-              leftIcon={<FaPlus />}
-            >
-              Add Question
-            </NeonButton>
+            <div className="flex justify-center">
+              <WalletMultiButton />
+            </div>
           </div>
-
-          <AnimatePresence>
-            {questions.map((q, qIndex) => (
-              <motion.div
-                key={qIndex}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ delay: qIndex * 0.05 }}
-              >
-                <GlassCard variant="orange" size="lg">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Typography variant="h4" color={colors.text.primary}>
-                        Question {qIndex + 1}
-                      </Typography>
-                      {questions.length > 1 && (
-                        <button
-                          onClick={() => removeQuestion(qIndex)}
-                          className="p-2 rounded-lg transition-colors"
-                          style={{
-                            background: `${colors.state.error}20`,
-                            color: colors.state.error,
-                          }}
-                        >
-                          <FaTrash />
-                        </button>
-                      )}
-                    </div>
-
+        ) : (
+          <>
+            {/* Header Info Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <div className="border-4 border-black p-8 bg-white">
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mb-6">
+                    Project Manifest
+                  </Typography>
+                  <div className="space-y-6">
                     <div>
-                      <label className="block mb-2">
-                        <Typography variant="body-sm" color={colors.text.secondary}>
-                          Question Text *
-                        </Typography>
-                      </label>
+                      <label className="block mb-2 font-black uppercase text-[10px] tracking-widest">Protocol Title *</label>
                       <input
                         type="text"
-                        value={q.question}
-                        onChange={(e) => updateQuestion(qIndex, 'question', e.target.value)}
-                        placeholder="Enter your question..."
-                        className="w-full px-4 py-3 rounded-lg"
-                        style={{
-                          background: `${colors.background.secondary}80`,
-                          border: `2px solid ${colors.primary.orange[500]}40`,
-                          color: colors.text.primary,
-                        }}
-                        maxLength={200}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="ENTER PROTOCOL NAME"
+                        className="w-full bg-bone border-2 border-black p-4 font-black uppercase tracking-tight focus:bg-white focus:shadow-[4px_4px_0px_#000000] transition-all outline-none"
+                        maxLength={100}
                       />
                     </div>
-
                     <div>
-                      <Typography variant="body-sm" color={colors.text.secondary} className="mb-2">
-                        Answer Options *
-                      </Typography>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {q.options.map((option, optIndex) => (
-                          <div key={optIndex} className="flex items-center gap-2">
-                            <input
-                              type="radio"
-                              name={`correct-${qIndex}`}
-                              checked={q.correctAnswer === optIndex}
-                              onChange={() => updateQuestion(qIndex, 'correctAnswer', optIndex)}
-                              className="w-4 h-4"
-                              style={{ accentColor: colors.primary.purple[400] }}
-                            />
-                            <input
-                              type="text"
-                              value={option}
-                              onChange={(e) => updateOption(qIndex, optIndex, e.target.value)}
-                              placeholder={`Option ${String.fromCharCode(65 + optIndex)}`}
-                              className="flex-1 px-3 py-2 rounded-lg"
-                              style={{
-                                background: `${colors.background.secondary}80`,
-                                border: `2px solid ${q.correctAnswer === optIndex ? colors.primary.purple[400] : colors.primary.orange[500]}40`,
-                                color: colors.text.primary,
-                              }}
-                              maxLength={100}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      <Typography variant="body-sm" color={colors.text.muted} className="mt-1">
-                        Select the radio button for the correct answer
-                      </Typography>
-                    </div>
-
-                    <div>
-                      <label className="block mb-2">
-                        <Typography variant="body-sm" color={colors.text.secondary}>
-                          Time Limit (seconds)
-                        </Typography>
-                      </label>
-                      <input
-                        type="number"
-                        value={q.timeLimit}
-                        onChange={(e) => updateQuestion(qIndex, 'timeLimit', parseInt(e.target.value) || 30)}
-                        min="5"
-                        max="120"
-                        className="w-full px-4 py-2 rounded-lg"
-                        style={{
-                          background: `${colors.background.secondary}80`,
-                          border: `2px solid ${colors.primary.orange[500]}40`,
-                          color: colors.text.primary,
-                        }}
+                      <label className="block mb-2 font-black uppercase text-[10px] tracking-widest">Protocol Brief (Optional)</label>
+                      <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="DEFINE SCOPE OF VERIFICATION"
+                        className="w-full bg-bone border-2 border-black p-4 font-black uppercase tracking-tight focus:bg-white focus:shadow-[4px_4px_0px_#000000] transition-all outline-none resize-none"
+                        rows={3}
+                        maxLength={300}
                       />
                     </div>
                   </div>
-                </GlassCard>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+                </div>
+              </div>
 
-        {/* Error Message */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 rounded-lg text-center"
-            style={{
-              background: `${colors.state.error}20`,
-              border: `1px solid ${colors.state.error}40`,
-            }}
-          >
-            <Typography variant="body" color={colors.state.error}>
-              {error}
-            </Typography>
-          </motion.div>
+              <div className="space-y-8">
+                <div className="border-4 border-black p-8 bg-black text-white">
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-50 mb-6 text-white">
+                    Liquidity Allocation
+                  </Typography>
+                  <div>
+                    <label className="block mb-2 font-black uppercase text-[10px] tracking-widest opacity-60">Reward Pool (SOL)</label>
+                    <input
+                      type="number"
+                      value={rewardAmount}
+                      onChange={(e) => setRewardAmount(e.target.value)}
+                      placeholder="0.1"
+                      step="0.01"
+                      min="0"
+                      className="w-full bg-white/5 border-2 border-white/20 p-4 font-black text-white focus:border-white focus:bg-white/10 outline-none transition-all"
+                    />
+                  </div>
+                  <div className="mt-8 pt-8 border-t border-white/10">
+                    <Typography variant="body-xs" className="font-bold opacity-40 leading-relaxed uppercase">
+                      Assets will be locked in the protocol vault until successful verification.
+                    </Typography>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleCreate}
+                  disabled={creating || questions.length < 3}
+                  className={`
+                    w-full py-6 font-black uppercase tracking-[0.3em] transition-all
+                    ${questions.length < 3 ? 'bg-bone border-4 border-black/10 text-black/20 cursor-not-allowed' : 'bg-black text-white hover:scale-[1.02] active:scale-95 shadow-[8px_8px_0px_#00000020]'}
+                  `}
+                >
+                  {creating ? 'DEPLOYING...' : 'INITIATE DEPLOY'}
+                </button>
+              </div>
+            </div>
+
+            {/* Questions Management */}
+            <div className="space-y-8">
+              <div className="flex items-center justify-between border-b-4 border-black pb-6">
+                <div>
+                  <Typography variant="h3" className="font-black uppercase leading-none">
+                    Sequence Nodes
+                  </Typography>
+                  <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-40 mt-2">
+                    {questions.length} / 20 Loaded
+                  </Typography>
+                </div>
+                <button
+                  onClick={addQuestion}
+                  disabled={questions.length >= 20}
+                  className="px-6 py-3 border-4 border-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all flex items-center gap-3"
+                >
+                  <FaPlus size={12} /> Add Node
+                </button>
+              </div>
+
+              <div className="space-y-8">
+                <AnimatePresence>
+                  {questions.map((q, qIndex) => (
+                    <motion.div
+                      key={qIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="border-4 border-black p-8 bg-white hover:shadow-[12px_12px_0px_#00000005] transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-8">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 border-2 border-black flex items-center justify-center font-black text-xl">
+                            {qIndex + 1}
+                          </div>
+                          <Typography variant="h4" className="font-black uppercase">
+                            Sequence Unit
+                          </Typography>
+                        </div>
+                        {questions.length > 1 && (
+                          <button
+                            onClick={() => removeQuestion(qIndex)}
+                            className="p-3 border-2 border-black/10 text-black/20 hover:border-red-600 hover:text-red-600 transition-all"
+                          >
+                            <FaTrash size={16} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div className="space-y-6">
+                          <div>
+                            <label className="block mb-2 font-black uppercase text-[10px] tracking-widest">Question Payload *</label>
+                            <input
+                              type="text"
+                              value={q.question}
+                              onChange={(e) => updateQuestion(qIndex, 'question', e.target.value)}
+                              placeholder="DEFINE ENQUIRY"
+                              className="w-full bg-bone border-2 border-black p-4 font-black uppercase focus:bg-white outline-none"
+                              maxLength={200}
+                            />
+                          </div>
+                          <div>
+                            <label className="block mb-2 font-black uppercase text-[10px] tracking-widest">Verification Window (Seconds)</label>
+                            <input
+                              type="number"
+                              value={q.timeLimit}
+                              onChange={(e) => updateQuestion(qIndex, 'timeLimit', parseInt(e.target.value) || 30)}
+                              min="5"
+                              max="120"
+                              className="w-full bg-bone border-2 border-black p-4 font-black focus:bg-white outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          <label className="block mb-2 font-black uppercase text-[10px] tracking-widest">Correct Input Branch *</label>
+                          <div className="grid grid-cols-1 gap-3">
+                            {q.options.map((option, optIndex) => (
+                              <div 
+                                key={optIndex} 
+                                className={`flex items-center gap-4 p-2 border-2 transition-all ${q.correctAnswer === optIndex ? 'border-black bg-black/5' : 'border-black/5'}`}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`correct-${qIndex}`}
+                                  checked={q.correctAnswer === optIndex}
+                                  onChange={() => updateQuestion(qIndex, 'correctAnswer', optIndex)}
+                                  className="w-5 h-5 accent-black ml-2"
+                                />
+                                <input
+                                  type="text"
+                                  value={option}
+                                  onChange={(e) => updateOption(qIndex, optIndex, e.target.value)}
+                                  placeholder={`BRANCH ${String.fromCharCode(65 + optIndex)}`}
+                                  className="flex-1 bg-transparent p-2 font-black uppercase outline-none"
+                                  maxLength={100}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Global Error Context */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50 bg-black text-white px-8 py-4 border-4 border-red-600 font-black uppercase tracking-widest shadow-2xl"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
-
-        {/* Create Button */}
-        <div className="sticky bottom-6 z-10">
-          <GlassCard variant="purple" size="sm">
-            <NeonButton
-              onClick={handleCreate}
-              loading={creating}
-              disabled={questions.length < 3}
-              neonColor="purple"
-              size="lg"
-              fullWidth
-              leftIcon={<FaRocket />}
-            >
-              {questions.length < 3
-                ? `Add ${3 - questions.length} More Question${3 - questions.length > 1 ? 's' : ''} (Min 3)`
-                : `Create Quiz Set (${questions.length} Questions)`
-              }
-            </NeonButton>
-          </GlassCard>
-        </div>
       </div>
     </PageTemplate>
   );

@@ -125,218 +125,175 @@ export default function RewardsPage() {
 
   if (!mounted) return null;
 
-  if (!connected) {
-    return (
-      <PageTemplate
-        title="My Rewards"
-        subtitle="Connect your wallet to view your rewards"
-      >
-        <div className="flex justify-center pt-8">
-          <WalletMultiButton />
-        </div>
-      </PageTemplate>
-    );
-  }
-
   return (
     <PageTemplate
-      title="My Rewards"
-      subtitle="Claim your winnings from completed games"
+      title="Asset Redemption"
+      subtitle="Protocol Reward Distribution Center"
     >
-      <div className="max-w-4xl mx-auto pt-8 pb-24">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div
-              className="w-16 h-16 border-4 rounded-full animate-spin mb-4"
-              style={{
-                borderColor: colors.primary.purple[500],
-                borderTopColor: 'transparent',
-              }}
-            />
-            <Typography variant="body" color={colors.text.muted}>
-              Loading your rewards...
+      <div className="pt-12 max-w-5xl mx-auto px-4 pb-24">
+        {!connected ? (
+          <div className="max-w-2xl mx-auto border-4 border-black p-12 bg-white text-center">
+            <Typography variant="h3" className="font-black uppercase mb-6">
+              Authentication Required
             </Typography>
+            <div className="flex justify-center">
+              <WalletMultiButton />
+            </div>
           </div>
-        ) : rewards.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
-          >
-            <GlassCard variant="purple" size="lg">
-              <div className="flex flex-col items-center gap-4">
-                <div
-                  className="p-6 rounded-full"
-                  style={{
-                    background: `${colors.primary.purple[500]}20`,
-                    border: `1px solid ${colors.primary.purple[400]}40`,
-                  }}
-                >
-                  <FaTrophy className="text-5xl" style={{ color: colors.primary.purple[400] }} />
-                </div>
-                <Typography variant="h3" color={colors.text.primary}>
-                  No Unclaimed Rewards
-                </Typography>
-                <Typography variant="body" color={colors.text.muted}>
-                  Win some games to earn rewards!
-                </Typography>
-                <div className="mt-4">
-                  <NeonButton
-                    onClick={() => router.push('/play')}
-                    neonColor="purple"
-                    size="lg"
-                  >
-                    Play Quiz
-                  </NeonButton>
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
         ) : (
-          <div className="space-y-6">
-            {/* Summary Card */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <GlassCard variant="orange" size="lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className="p-4 rounded-full"
-                      style={{
-                        background: `${colors.primary.orange[500]}20`,
-                        border: `1px solid ${colors.primary.orange[400]}40`,
-                      }}
-                    >
-                      <FaTrophy className="text-3xl" style={{ color: colors.primary.orange[400] }} />
+          <>
+            {loading ? (
+              <div className="text-center py-24 border-4 border-black border-dashed">
+                <div className="inline-block animate-spin w-12 h-12 border-4 border-black border-t-transparent mb-6" />
+                <Typography variant="body" className="font-black uppercase tracking-widest">
+                  Scanning Blockchain...
+                </Typography>
+              </div>
+            ) : rewards.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-24 border-4 border-black bg-white"
+              >
+                <div className="w-20 h-20 border-2 border-black flex items-center justify-center mx-auto mb-8 grayscale opacity-20">
+                  <FaTrophy className="text-3xl" />
+                </div>
+                <Typography variant="h3" className="font-black uppercase mb-4">
+                  Warehouse Empty
+                </Typography>
+                <Typography variant="body-lg" className="font-bold uppercase opacity-40 mb-10 tracking-[0.2em]">
+                  No unclaimed assets detected
+                </Typography>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => router.push('/play')}
+                    className="px-8 py-4 bg-black text-white font-black uppercase tracking-widest hover:scale-105 transition-all"
+                  >
+                    Engage Program
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="space-y-12">
+                {/* Summary Section */}
+                <div className="border-4 border-black p-12 bg-white flex flex-col md:flex-row justify-between items-center gap-8">
+                  <div className="flex items-center gap-8">
+                    <div className="w-16 h-16 border-2 border-black flex items-center justify-center grayscale">
+                      <FaTrophy className="text-3xl" />
                     </div>
                     <div>
-                      <Typography variant="body-sm" color={colors.text.muted}>
-                        Total Unclaimed
+                      <Typography variant="body-xs" className="font-black uppercase opacity-40 tracking-widest mb-1">
+                        Aggregate Value
                       </Typography>
-                      <Typography variant="h3" gradient="orange-pink">
+                      <Typography variant="display-sm" className="font-black leading-none">
                         {rewards.reduce((sum, r) => sum + r.reward_amount, 0).toFixed(2)} SOL
                       </Typography>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Typography variant="body-sm" color={colors.text.muted}>
-                      Games Won
+                  <div className="text-center md:text-right border-t-2 md:border-t-0 md:border-l-2 border-black/10 md:pl-12 pt-8 md:pt-0">
+                    <Typography variant="body-xs" className="font-black uppercase opacity-40 tracking-widest mb-1">
+                      Units Found
                     </Typography>
-                    <Typography variant="h3" color={colors.text.primary}>
+                    <Typography variant="display-sm" className="font-black leading-none">
                       {rewards.length}
                     </Typography>
                   </div>
                 </div>
-              </GlassCard>
-            </motion.div>
 
-            {/* Rewards List */}
-            <div className="space-y-4">
-              <AnimatePresence>
-                {rewards.map((reward, index) => (
-                  <motion.div
-                    key={reward.game_id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <GlassCard variant="purple" size="lg">
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between">
+                {/* List Section */}
+                <div className="space-y-6">
+                  <AnimatePresence>
+                    {rewards.map((reward, index) => (
+                      <motion.div
+                        key={reward.game_id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="group border-4 border-black p-8 bg-white hover:translate-x-2 transition-all duration-300"
+                      >
+                        <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
                           <div className="flex-1">
-                            <Typography variant="h4" color={colors.text.primary}>
+                            <Typography variant="h4" className="font-black uppercase mb-2">
                               {reward.quiz_title}
                             </Typography>
-                            <div className="flex items-center gap-4 mt-2">
-                              <Typography variant="body-sm" color={colors.text.muted}>
-                                Game PIN: {reward.pin}
+                            <div className="flex flex-wrap gap-6 items-center">
+                              <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-30">
+                                PIN: {reward.pin}
                               </Typography>
-                              <Typography variant="body-sm" color={colors.text.muted}>
+                              <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-30">
                                 {formatDate(reward.completed_at)}
                               </Typography>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <Typography variant="body-sm" color={colors.text.muted}>
-                              Reward
+                          <div className="text-right md:min-w-[150px]">
+                            <Typography variant="body-xs" className="font-black uppercase tracking-widest opacity-30 mb-1">
+                              Asset Value
                             </Typography>
-                            <Typography variant="h3" gradient="orange">
+                            <Typography variant="h4" className="font-black">
                               {reward.reward_amount.toFixed(2)} SOL
                             </Typography>
                           </div>
                         </div>
 
                         {reward.claim_error && (
-                          <div
-                            className="p-3 rounded-lg flex items-start gap-2"
-                            style={{
-                              background: `${colors.state.warning}20`,
-                              border: `1px solid ${colors.state.warning}40`,
-                            }}
-                          >
-                            <FaExclamationTriangle
-                              className="mt-1"
-                              style={{ color: colors.state.warning }}
-                            />
-                            <div className="flex-1">
-                              <Typography variant="body-sm" color={colors.state.warning}>
-                                Previous claim failed: {reward.claim_error}
+                          <div className="mb-8 p-4 border-2 border-dashed border-red-500 bg-red-50 flex items-start gap-4">
+                            <FaExclamationTriangle className="text-red-500 mt-1" />
+                            <div>
+                              <Typography variant="body-xs" className="font-black uppercase text-red-600">
+                                Distribution Failure: {reward.claim_error}
                               </Typography>
-                              <Typography variant="body-sm" color={colors.text.muted}>
-                                Attempts: {reward.claim_attempts}
+                              <Typography variant="body-xs" className="font-bold opacity-40 text-red-700">
+                                Attempt #{reward.claim_attempts}
                               </Typography>
                             </div>
                           </div>
                         )}
 
-                        <div className="flex gap-3">
-                          <NeonButton
-                            onClick={() => handleClaimReward(reward.game_id, reward.reward_amount)}
-                            loading={claiming === reward.game_id}
-                            disabled={claiming !== null}
-                            neonColor={reward.claim_error ? 'orange' : 'purple'}
-                            size="md"
-                            fullWidth
-                            leftIcon={reward.claim_error ? <FaRedo /> : <FaCheckCircle />}
-                          >
-                            {reward.claim_error ? 'Retry Claim' : 'Claim Reward'}
-                          </NeonButton>
-                        </div>
-                      </div>
-                    </GlassCard>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          </div>
+                        <button
+                          onClick={() => handleClaimReward(reward.game_id, reward.reward_amount)}
+                          disabled={claiming !== null}
+                          className={`
+                            w-full py-4 text-white font-black uppercase tracking-[0.2em] transition-all duration-300
+                            ${reward.claim_error ? 'bg-red-600 hover:bg-black' : 'bg-black hover:scale-[1.01]'}
+                            disabled:opacity-50 disabled:grayscale
+                          `}
+                        >
+                          {claiming === reward.game_id ? 'Syncing...' : reward.claim_error ? 'Retry Transfer' : 'Transfer Assets'}
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Error Message */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-4 rounded-lg text-center"
-            style={{
-              background: `${colors.state.error}20`,
-              border: `1px solid ${colors.state.error}40`,
-            }}
-          >
-            <Typography variant="body" color={colors.state.error}>
-              {error}
-            </Typography>
-            <button
-              onClick={fetchUnclaimedRewards}
-              className="mt-2 px-4 py-2 rounded-lg transition-colors"
-              style={{
-                background: `${colors.state.error}30`,
-                color: colors.state.error,
-              }}
+        {/* Sync Status Notifications */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-12 p-8 border-4 border-black bg-white text-center"
             >
-              Retry
-            </button>
-          </motion.div>
-        )}
+              <Typography variant="h5" className="font-black uppercase text-red-600 mb-4">
+                Transmission Interrupted
+              </Typography>
+              <Typography variant="body-xs" className="font-bold opacity-60 mb-8 max-w-md mx-auto">
+                {error}
+              </Typography>
+              <button
+                onClick={fetchUnclaimedRewards}
+                className="px-6 py-3 border-2 border-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all"
+              >
+                Reconnect Node
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </PageTemplate>
   );
