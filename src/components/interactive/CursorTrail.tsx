@@ -117,10 +117,40 @@ export function CursorTrail() {
     };
   }, [addEmoji]);
 
+  // Manage Magic Cursor State
+  useEffect(() => {
+    let idleTimer: NodeJS.Timeout;
+
+    const activateCursor = () => {
+      document.body.classList.add('magic-cursor');
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        document.body.classList.remove('magic-cursor');
+      }, 100); // Quick revert if stopped, or keep it short? 
+      // Actually, if moving, mousemove fires constantly. 
+      // Let's set a reasonable idle time, e.g. 500ms? 
+      // "Only when moving" implies immediate stop. 
+      // Let's try 100ms for a snappy feel.
+    };
+
+    const handleInteraction = () => activateCursor();
+
+    window.addEventListener('mousemove', handleInteraction);
+    window.addEventListener('mousedown', handleInteraction); // Handle clicks too
+
+    return () => {
+      window.removeEventListener('mousemove', handleInteraction);
+      window.removeEventListener('mousedown', handleInteraction);
+      clearTimeout(idleTimer);
+      document.body.classList.remove('magic-cursor'); // Cleanup
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
       {emojis.map((emoji) => (
         <motion.div
+// ... rest of the render logic remains same ...
           key={emoji.id}
           initial={false}
           animate={

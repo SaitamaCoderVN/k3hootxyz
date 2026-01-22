@@ -63,17 +63,15 @@ export default function Header() {
           </nav>
 
           {/* Right section */}
-          <div className="flex items-center gap-6">
-            <div className="hidden sm:block">
-               <WalletButton />
-            </div>
+          <div className="flex items-center gap-4 sm:gap-6">
+            <WalletButton />
 
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2"
+              className="md:hidden p-2 bg-black text-white"
             >
-              {isMobileMenuOpen ? <FaTimes size={24} className="text-black" /> : <FaBars size={24} className="text-black" />}
+              {isMobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
             </button>
           </div>
         </div>
@@ -82,23 +80,28 @@ export default function Header() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-white border-t-2 border-black overflow-hidden"
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              className="fixed inset-0 top-20 bg-bone border-t-8 border-black z-40 md:hidden flex flex-col"
             >
-              <nav className="flex flex-col p-6 gap-6">
+              <nav className="flex flex-col p-12 gap-10">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-xl font-black uppercase tracking-widest text-black"
+                    className="text-5xl font-black uppercase tracking-[-0.05em] text-black border-b-4 border-transparent hover:border-black transition-all"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}
                   </Link>
                 ))}
               </nav>
+              <div className="mt-auto p-12 border-t-4 border-black/5">
+                <Typography variant="body-xs" className="uppercase font-black opacity-30 tracking-widest">
+                  Protocol: Online
+                </Typography>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

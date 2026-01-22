@@ -60,12 +60,31 @@ export default function LeaderboardPage() {
     return () => clearInterval(interval);
   }, [wallet.publicKey]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Reset to page 1 when data changes (optional, but good UX if filters added later)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [leaderboard.length]);
+
+  const totalPages = Math.ceil(leaderboard.length / ITEMS_PER_PAGE);
+  const paginatedData = leaderboard.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <PageTemplate
       title="Global Rankings"
       subtitle="The High-Stakes Performance Ledger"
     >
-      <div className="pt-12 max-w-5xl mx-auto px-4">
+      <div className="pt-12 pb-32 max-w-5xl mx-auto px-4">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -126,61 +145,99 @@ export default function LeaderboardPage() {
                 </Typography>
               </div>
             ) : (
-              <div className="grid gap-4">
-                {leaderboard.map((entry, index) => {
-                  const rank = index + 1;
-                  const isCurrentUser = entry.winner === wallet.publicKey?.toString();
+              <>
+                <div className="grid gap-4">
+                  {paginatedData.map((entry, index) => {
+                    const rank = (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
+                    const isCurrentUser = entry.winner === wallet.publicKey?.toString();
 
-                  return (
-                    <motion.div
-                      key={`${entry.quizSetId}-${entry.questionIndex}`}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className={`
-                        flex items-center gap-4 sm:gap-8 p-4 sm:p-6 border-4 transition-all duration-300
-                        ${isCurrentUser ? 'border-black bg-white' : 'border-black/5 bg-transparent'}
-                        hover:border-black hover:bg-white overflow-hidden
-                      `}
-                    >
-                      {/* Rank */}
-                      <div className="w-12 flex justify-center flex-shrink-0">
-                        {getRankIcon(rank)}
-                      </div>
-
-                      {/* Winner Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-4 mb-1">
-                          <Typography
-                            variant="h5"
-                            className="font-black uppercase tracking-tighter truncate"
-                          >
-                            {entry.winnerDisplay}
-                          </Typography>
-                          {isCurrentUser && (
-                            <span className="text-[10px] px-2 py-0.5 border border-black font-black uppercase tracking-widest">
-                              You
-                            </span>
-                          )}
+                    return (
+                      <motion.div
+                        key={`${entry.quizSetId}-${entry.questionIndex}`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        className={`
+                          flex items-center gap-4 sm:gap-8 p-4 sm:p-6 border-4 transition-all duration-300
+                          ${isCurrentUser ? 'border-black bg-white' : 'border-black/5 bg-transparent'}
+                          hover:border-black hover:bg-white overflow-hidden
+                        `}
+                      >
+                        {/* Rank */}
+                        <div className="w-12 flex justify-center flex-shrink-0">
+                          {getRankIcon(rank)}
                         </div>
-                        <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest truncate">
-                          Task ID: {entry.quizSetName || entry.quizSetId.slice(0, 12)}
-                        </Typography>
-                      </div>
 
-                      {/* Reward */}
-                      <div className="text-right flex-shrink-0">
-                        <Typography variant="h4" className="font-black leading-none mb-1">
-                          {entry.rewardAmount.toFixed(2)}
-                        </Typography>
-                        <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest">
-                          {entry.isClaimed ? 'Secured' : 'Open'}
-                        </Typography>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                        {/* Winner Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-4 mb-1">
+                            <Typography
+                              variant="h5"
+                              className="font-black uppercase tracking-tighter truncate"
+                            >
+                              {entry.winnerDisplay}
+                            </Typography>
+                            {isCurrentUser && (
+                              <span className="text-[10px] px-2 py-0.5 border border-black font-black uppercase tracking-widest">
+                                You
+                              </span>
+                            )}
+                          </div>
+                          <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest truncate">
+                            Task ID: {entry.quizSetName || entry.quizSetId.slice(0, 12)}
+                          </Typography>
+                        </div>
+
+                        {/* Reward */}
+                        <div className="text-right flex-shrink-0">
+                          <Typography variant="h4" className="font-black leading-none mb-1">
+                            {entry.rewardAmount.toFixed(2)}
+                          </Typography>
+                          <Typography variant="body-xs" className="font-black uppercase opacity-30 tracking-widest">
+                            {entry.isClaimed ? 'Secured' : 'Open'}
+                          </Typography>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex flex-wrap justify-center items-center gap-4 mt-16">
+                    <button
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 border-2 border-black font-black uppercase disabled:opacity-20 hover:bg-black hover:text-white transition-colors"
+                    >
+                      Prev
+                    </button>
+                    
+                    <div className="flex gap-2">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`
+                            w-10 h-10 border-2 border-black flex items-center justify-center font-black transition-colors
+                            ${currentPage === page ? 'bg-black text-white' : 'hover:bg-black hover:text-white'}
+                          `}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 border-2 border-black font-black uppercase disabled:opacity-20 hover:bg-black hover:text-white transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

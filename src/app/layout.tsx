@@ -7,6 +7,7 @@ import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { ToastProvider } from '@/components/ui/Toast';
 import { PageLoader } from '@/components/ui/LoadingStates';
+import { GlobalClickSound } from '@/components/interactive/GlobalClickSound';
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
@@ -57,6 +58,7 @@ export default function RootLayout({
             </WalletContextProvider>
           </ToastProvider>
         </ErrorBoundary>
+        <GlobalClickSound />
       </body>
     </html>
   );

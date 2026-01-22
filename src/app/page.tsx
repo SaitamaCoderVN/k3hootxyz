@@ -9,6 +9,7 @@ import { PageWrapper } from '@/components/layout/MinHeightContainer';
 import { CursorTrail } from '@/components/interactive/CursorTrail';
 import { FlashProvider } from '@/components/interactive/FlashEffect';
 import { ScrollReveal } from '@/components/animations';
+import AsciiScrollAnimation from '@/components/animations/AsciiScrollAnimation';
 import { LeaderboardPreview } from '@/components/sections/LeaderboardPreview';
 import BentoGrid from '@/components/ui/BentoGrid';
 import BentoCard from '@/components/ui/BentoCard';
@@ -19,7 +20,7 @@ import { Typography, colors, typography } from '@/design-system';
 
 const HeroSection = () => {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center pt-32 overflow-hidden bg-bone">
+    <section id="hero" className="relative min-h-[90vh] md:min-h-screen flex items-center pt-32 pb-16 md:pb-32 overflow-hidden bg-bone">
       <div className="container mx-auto px-6 sm:px-8 lg:px-12 relative z-10">
         <ScrollReveal type="fadeIn" delay={0.1}>
           <div className="mb-12 overflow-hidden">
@@ -40,22 +41,23 @@ const HeroSection = () => {
           </h1>
         </ScrollReveal>
 
-        <div className="flex flex-col md:flex-row items-end justify-between gap-16 border-t-8 border-black pt-16">
+        <div className="h-2 bg-black w-[40%] mb-16" />
+        <div className="flex flex-col md:flex-row items-end justify-between gap-16">
             <ScrollReveal type="fadeIn" delay={0.3} className="max-w-2xl">
               <Typography variant="body-xl" className="font-black leading-tight text-black text-3xl uppercase tracking-tighter flex items-center">
-                HOOT is the premier private inquiry protocol. High-fidelity responses, immediate settlements, zero-custody rewards.
+                K3HOOT is a quiz & reward automation platform for online communities. This will unlock growth on the $3B quiz market.
               </Typography>
             </ScrollReveal>
 
             <ScrollReveal type="fadeIn" delay={0.4}>
               <div className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto">
                 <Link href="/play" className="w-full sm:w-auto">
-                  <button className="w-full px-12 py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.05] transition-all shadow-[12px_12px_0px_rgba(0,0,0,0.15)]">
+                  <button className="w-full px-8 md:px-12 py-4 md:py-6 bg-black text-white font-black uppercase tracking-[0.4em] hover:scale-[1.05] transition-all shadow-[12px_12px_0px_rgba(0,0,0,0.15)] text-sm md:text-base">
                     Enter Arena
                   </button>
                 </Link>
                 <Link href="/create" className="w-full sm:w-auto">
-                  <button className="w-full px-12 py-6 border-4 border-black font-black uppercase tracking-[0.4em] hover:bg-black hover:text-white transition-all shadow-[12px_12px_0px_rgba(0,0,0,0.05)]">
+                  <button className="w-full px-8 md:px-12 py-4 md:py-6 border-4 border-black font-black uppercase tracking-[0.4em] hover:bg-black hover:text-white transition-all shadow-[12px_12px_0px_rgba(0,0,0,0.05)] text-sm md:text-base">
                     Host Unit
                   </button>
                 </Link>
@@ -65,7 +67,9 @@ const HeroSection = () => {
       </div>
 
       {/* Structured Geometry - Refined Watermarks */}
-      <div className="absolute top-0 right-0 w-[40%] h-full border-l-4 border-black/5 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[60%] md:w-[42%] h-full border-l-4 border-black/5 pointer-events-none overflow-hidden opacity-30 md:opacity-100">
+        <AsciiScrollAnimation className="w-full h-full text-black/30" />
+      </div>
     </section>
   );
 };
@@ -73,13 +77,13 @@ const HeroSection = () => {
 export default function LandingPage() {
   return (
     <FlashProvider>
-      <PageWrapper className="magic-cursor">
+      <PageWrapper>
         <CursorTrail />
         <Header />
         
         <HeroSection />
 
-        <section id="features" className="py-60 bg-paper border-y-8 border-black">
+        <section id="features" className="py-24 md:py-60 bg-paper border-y-8 border-black">
           <div className="container mx-auto px-6 sm:px-8 lg:px-12">
             <div className="mb-32 flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
               <div className="border-l-[12px] border-black pl-10 py-2">
@@ -96,50 +100,40 @@ export default function LandingPage() {
 
             <BentoGrid className="gap-12">
               <BentoCard size="wide">
-                <div className="h-full border-8 border-black bg-white p-12 flex flex-col md:flex-row gap-16 items-center shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
+                <div className="h-full border-8 border-black bg-white p-6 md:p-12 flex flex-col md:flex-row gap-8 md:gap-16 items-center shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
                   <div className="flex-1">
-                    <Typography variant="h2" className="mb-8 font-black uppercase leading-none">Encrypted Inquiry Engine</Typography>
-                    <Typography variant="body-lg" className="mb-12 font-black text-2xl uppercase tracking-tighter leading-tight opacity-60">High-fidelity Solana settlements with verified non-custodial payouts at scale.</Typography>
-                    <div className="flex flex-wrap gap-4">
+                    <Typography variant="h2" className="mb-4 md:mb-8 font-black uppercase leading-none text-2xl md:text-5xl">Encrypted Inquiry Engine</Typography>
+                    <Typography variant="body-lg" className="mb-8 md:mb-12 font-black text-lg md:text-2xl uppercase tracking-tighter leading-tight opacity-60">High-fidelity Solana settlements with verified non-custodial payouts at scale.</Typography>
+                    <div className="flex flex-wrap gap-2 md:gap-4">
                       {['Protocol-Level', 'No Fees', 'Instant Sync'].map(t => (
-                        <span key={t} className="px-6 py-2 bg-black text-white text-[10px] font-black uppercase tracking-[0.2em]">{t}</span>
+                        <span key={t} className="px-4 md:px-6 py-2 bg-black text-white text-[10px] font-black uppercase tracking-[0.2em]">{t}</span>
                       ))}
                     </div>
                   </div>
                 </div>
               </BentoCard>
 
-              <BentoCard size="large">
-                <div className="h-full border-8 border-black bg-white overflow-hidden shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
-                   <div className="p-10 bg-black text-white flex justify-between items-center">
-                        <Typography variant="h3" className="font-black uppercase text-white">Global Standings</Typography>
-                        <Typography variant="body-xs" className="font-black uppercase opacity-40">Live Feed</Typography>
-                   </div>
-                   <div className="p-10">
-                        <LeaderboardPreview />
-                   </div>
-                </div>
-              </BentoCard>
+
 
               <BentoCard size="medium">
-                <div className="h-full border-8 border-black bg-white p-12 flex flex-col justify-between shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
+                <div className="h-full border-8 border-black bg-white p-6 md:p-12 flex flex-col justify-between shadow-[16px_16px_0px_rgba(0,0,0,0.05)]">
                   <div>
-                    <Typography variant="body-xs" className="mb-12 font-black uppercase tracking-[0.5em] opacity-30">Unit Returns</Typography>
-                    <Typography variant="display-lg" className="mb-4 font-black text-6xl sm:text-7xl md:text-8xl leading-none">2.8K</Typography>
-                    <Typography variant="h4" className="font-black uppercase tracking-tight">SOL Dispatched</Typography>
+                    <Typography variant="body-xs" className="mb-8 md:mb-12 font-black uppercase tracking-[0.5em] opacity-30">Unit Returns</Typography>
+                    <Typography variant="display-lg" className="mb-4 font-black text-5xl sm:text-7xl md:text-8xl leading-none">2.8K</Typography>
+                    <Typography variant="h4" className="font-black uppercase tracking-tight text-xl md:text-3xl">SOL Dispatched</Typography>
                   </div>
-                  <div className="pt-10 border-t-4 border-black/5 flex justify-between items-center opacity-40">
+                  <div className="pt-6 md:pt-10 border-t-4 border-black/5 flex justify-between items-center opacity-40">
                        <Typography variant="body-xs" className="uppercase font-black opacity-30 tracking-widest leading-none">On-Chain Verification</Typography>
                   </div>
                 </div>
               </BentoCard>
 
               <BentoCard size="medium">
-                <div className="h-full border-8 border-black bg-black text-white p-12 shadow-[16px_16px_0px_rgba(0,0,0,0.15)]">
-                  <div className="flex justify-between items-start mb-20">
+                <div className="h-full border-8 border-black bg-black text-white p-6 md:p-12 shadow-[16px_16px_0px_rgba(0,0,0,0.15)] flex flex-col justify-center">
+                  <div className="flex justify-between items-start mb-12 md:mb-20">
                      <Typography variant="body-xs" className="font-black uppercase tracking-[0.5em] text-white/30">Node Density</Typography>
                   </div>
-                  <Typography variant="body-xl" className="mb-8 font-black text-3xl uppercase tracking-tighter leading-tight text-white">Universal access across 140+ countries.</Typography>
+                  <Typography variant="body-xl" className="mb-6 md:mb-8 font-black text-2xl md:text-3xl uppercase tracking-tighter leading-tight text-white">Universal access across 140+ countries.</Typography>
                   <div className="w-12 h-1 bg-white/20" />
                 </div>
               </BentoCard>
@@ -147,21 +141,21 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="tokenomics" className="py-60 bg-bone">
+        <section id="tokenomics" className="py-24 md:py-60 bg-bone">
           <div className="container mx-auto px-6 sm:px-8 lg:px-12">
             <div className="mb-32 border-b-[12px] border-black pb-16 flex justify-between items-end">
               <Typography variant="h1" className="text-black font-black uppercase tracking-tighter leading-none">02. Tokenomics</Typography>
               <Typography variant="body-xs" className="font-black uppercase tracking-[0.5em] opacity-20 mb-4 hidden md:block">Supply Configuration</Typography>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-0 border-[8px] border-black">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-[8px] border-black">
               {[
                 { label: 'Total Supply', value: '1,000,000,000' },
                 { label: 'Player Rewards', value: '400,000,000' },
                 { label: 'Liquidity Pool', value: '250,000,000' },
                 { label: 'Ecosystem Fond', value: '350,000,000' },
               ].map((s, i) => (
-                <div key={i} className="p-8 sm:p-12 md:p-16 border-black md:border-r-[8px] border-b-[8px] md:border-b-0 last:border-r-0 bg-white hover:bg-black group transition-all duration-500 overflow-hidden">
+                <div key={i} className="p-8 sm:p-12 md:p-16 border-black sm:border-r-[8px] border-b-[8px] lg:border-b-0 lg:last:border-r-0 bg-white hover:bg-black group transition-all duration-500 overflow-hidden">
                   <Typography variant="body-xs" className="mb-8 md:mb-20 font-black uppercase tracking-[0.4em] opacity-20 group-hover:text-white/40 transition-all truncate">{s.label}</Typography>
                   <Typography variant="h2" className="font-black group-hover:text-white transition-all tracking-tighter text-3xl sm:text-4xl lg:text-5xl break-all line-clamp-1">{s.value}</Typography>
                 </div>
@@ -170,7 +164,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-80 bg-black text-white text-center relative overflow-hidden">
+        <section className="py-32 md:py-80 bg-black text-white text-center relative overflow-hidden">
             <Typography variant="h1" className="text-[clamp(4rem,22vw,20rem)] mb-24 font-black leading-[0.65] tracking-[-0.08em] uppercase text-white relative z-10">
                 Access<br />
                 Now.

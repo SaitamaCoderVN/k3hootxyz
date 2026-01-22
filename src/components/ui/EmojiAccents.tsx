@@ -12,6 +12,16 @@ export const EmojiMap = {
 export const EmojiAccent = ({ name, size = 24, className = "" }: { name: keyof typeof EmojiMap, size?: number, className?: string }) => {
   const unified = EmojiMap[name];
   
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <div style={{ width: size, height: size }} className={className} />;
+  }
+  
   return (
     <div className={`inline-flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
       <Emoji 
